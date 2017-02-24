@@ -28,10 +28,10 @@ Fill in your [Newsman](https://www.newsmanapp.com) API KEY and User ID and click
 
 3. Choose destination segments for your newsletter subscribers and customer groups. You can choose to import customers and subscribers to a list or configure it to import in your selected segments. For the segments to show up in this form, you need to set them up in your Newsman account first.
 
-  ![Data Mapping](https://raw.githubusercontent.com/Newsman/Magento-Newsman/master/assests/data_mapping.png)
+  ![Data Mapping](https://raw.githubusercontent.com/Newsman/Magento2-Newsman/master/assets/data_mapping.png)
 
 4. Choose how often you want your lists to get uploaded to [Newsman](https://www.newsmanapp.com) You can also do a manual synchronization by clicking "Manual Sync".
 
-  ![Synchronization Schedule](https://raw.githubusercontent.com/Newsman/Magento-Newsman/master/assests/synchronization_schedule.png)
+  ![Synchronization Schedule](https://raw.githubusercontent.com/Newsman/Magento2-Newsman/master/assets/synchronization_schedule.png)
 
 5. For the automatic synchronization to work, you need to have Magento's built-in cron job functionality enabled.
