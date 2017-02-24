@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="newsman" translate="label" sortOrder="1000">
+            <label>Newsman</label>
+        </tab>
+        <section id="newsman" translate="label" type="text" sortOrder="1002" showInDefault="1" showInWebsite="0" showInStore="0">
+            <label>Newsman</label>
+            <tab>newsman</tab>
+            <resource>Dazoot_Newsman::newsman_configuration</resource>
+            <group id="credentials" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>General Settings</label>
+                <field id="userId" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>User Id</label>                    
+                </field>
+                <field id="apiKey" translate="label comment" type="text" sortOrder="2" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Api Key</label>
+                    <comment>Api key generated from your newsman account.</comment>                   
+                </field>
+                <field id="listId" translate="label comment" type="select" sortOrder="3" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>List</label>
+                    <source_model>Dazoot\Newsman\Model\Config\Source\Lists</source_model>
+                </field>
+            </group>
+            <group id="sync" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Synchronization Schedule</label>
+                <field id="build_indexes" translate="label comment tooltip" type="button" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Manual Sync</label>
+                    <frontend_model>Dazoot\Newsman\Block\Adminhtml\System\Config\Synchronize</frontend_model>
+                </field>
+            </group>
+            <group id="syncData" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Data Synchronization</label>
+                <field id="customerGroups" translate="label comment tooltip" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Manual Sync</label>
+                    <frontend_model>Dazoot\Newsman\Block\Adminhtml\System\Config\Segments</frontend_model>
+                </field>
+            </group>
+            <group id="about" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="0" showInStore="0">
+                <frontend_model>Dazoot\Newsman\Block\Adminhtml\System\Config\Info</frontend_model>
+            </group>
+        </section>
+    </system>
+</config>

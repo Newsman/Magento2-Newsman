@@ -1,0 +1,36 @@
+<?php /* @var $block \Dazoot\Newsman\Block\System\Config\Synchronize */ ?>
+	<script>
+		require([
+			'jquery',
+			'prototype',
+		], function (jQuery) {
+			function syncronize() {
+				params = {};
+				new Ajax.Request('<?php echo $block->getAjaxSyncUrl() ?>', {
+					loaderArea: false,
+					asynchronous: true,
+					parameters: params,
+					onSuccess: function () {
+						jQuery('#infoPanel').css('display', 'block');
+						jQuery('#msgType').html("Synchronization completed..");
+					},
+					onError: function () {
+						jQuery('#infoPanel').css('display', 'block');
+						jQuery('#msgType').html("Synchronization failed..");
+					}
+				});
+			}
+
+			jQuery('#synchronize_button').click(function () {
+				syncronize();
+				jQuery('#infoPanel').css('display', 'block');
+				jQuery('#msgType').html("Synchronization started..");
+				console.log("Sync started");
+			});
+			jQuery('#closeInfoPanel').click(function () {
+				jQuery('#infoPanel').css('display', 'none');
+			});
+		});
+	</script>
+
+<?php echo $block->getButtonHtml() ?>
