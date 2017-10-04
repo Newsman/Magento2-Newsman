@@ -1,4 +1,4 @@
-# [MageVision](https://www.magevision.com/) Mass Email Customers for Magento 2
+# [Newsman](https://www.newsmanapp.com/) Newsman Import for Magento 2
 
 ## Overview
 The Mass Email Customers extension gives you the ability to send mass email to all or selected registered and guest customers. Send mass email with one click from the admin sales order grid and the admin customer grid. Email template customization like Magento's default email templates. An easy way to contact your customers and keep them up-to-date with your news, events and updates.
