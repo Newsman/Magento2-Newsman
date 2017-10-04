@@ -18,6 +18,7 @@ class Synchronize extends \Magento\Backend\App\Action
 
 	protected $client;
 	protected $subscriberCollectionFactory;
+	protected $_subscriberCollectionFactory;
 	protected $jsonHelper;
 
 	/**
@@ -29,7 +30,8 @@ class Synchronize extends \Magento\Backend\App\Action
 		\Psr\Log\LoggerInterface $logger,
 		\Magento\Customer\Model\ResourceModel\Customer\CollectionFactory $_subscriberCollectionFactory,
 		WriterInterface $configWriter,
-		\Magento\Framework\Json\Helper\Data $jsonHelper
+		\Magento\Framework\Json\Helper\Data $jsonHelper,
+		\Magento\Newsletter\Model\ResourceModel\Subscriber\CollectionFactory $__subscriberCollectionFactory
 	)
 	{
 		$this->_logger = $logger;
@@ -37,6 +39,7 @@ class Synchronize extends \Magento\Backend\App\Action
 		$this->subscriberCollectionFactory = $_subscriberCollectionFactory;
 		$this->configWriter = $configWriter;
 		$this->jsonHelper = $jsonHelper;
+		$this->_subscriberCollectionFactory = $__subscriberCollectionFactory;
 		parent::__construct($context);
 	}
 
@@ -51,12 +54,22 @@ class Synchronize extends \Magento\Backend\App\Action
 		$email = array();
 		$firstname = array();
 
+		$_email = array();
+
 		$customers = $this->subscriberCollectionFactory->create();
+
+		$subscribers = $this->_subscriberCollectionFactory->create()
+			->addFilter('subscriber_status', ['eq' => 1]);
 
 		foreach ($customers as $item)
 		{
 			$email[] = $item["email"];
 			$firstname[] = $item["firstname"];
+		}
+
+		foreach ($subscribers as $item)
+		{
+			$_email[] = $item["subscriber_email"];
 		}
 
 		$max = 9999;
@@ -67,6 +80,25 @@ class Synchronize extends \Magento\Backend\App\Action
 			$csv .= $email[$int];
 			$csv .= ", ";
 			$csv .= $firstname[$int];
+			$csv .= PHP_EOL;
+
+			if ($int == 9999)
+			{
+				$int = 0;
+
+				$list = $this->client->getSelectedList();
+				$ret = $this->client->importCSV($list, $csv);
+			}
+		}
+
+		$list = $this->client->getSelectedList();
+		$ret = $this->client->importCSV($list, $csv);
+
+		$csv = "";
+		$csv = "email" . PHP_EOL;
+		for ($int = 0; $int < count($_email); $int++)
+		{
+			$csv .= $_email[$int];
 			$csv .= PHP_EOL;
 
 			if ($int == 9999)

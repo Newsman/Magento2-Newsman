@@ -20,6 +20,7 @@ class Segments extends \Magento\Backend\App\Action
 
 	protected $client;
 	protected $subscriberCollectionFactory;
+	protected $_subscriberCollectionFactory;
 	protected $jsonHelper;
 
 	protected $customerGroup;
@@ -35,7 +36,8 @@ class Segments extends \Magento\Backend\App\Action
 		\Magento\Customer\Model\ResourceModel\Customer\CollectionFactory $_subscriberCollectionFactory,
 		WriterInterface $configWriter,
 		\Magento\Framework\Json\Helper\Data $jsonHelper,
-		\Magento\Customer\Model\ResourceModel\Group\Collection $customerGroup
+		\Magento\Customer\Model\ResourceModel\Group\Collection $customerGroup,
+		\Magento\Newsletter\Model\ResourceModel\Subscriber\CollectionFactory $__subscriberCollectionFactory
 	)
 	{
 		$this->_logger = $logger;
@@ -44,6 +46,7 @@ class Segments extends \Magento\Backend\App\Action
 		$this->configWriter = $configWriter;
 		$this->jsonHelper = $jsonHelper;
 		$this->customerGroup = $customerGroup;
+		$this->_subscriberCollectionFactory = $__subscriberCollectionFactory;
 		parent::__construct($context);
 	}
 
@@ -91,6 +94,17 @@ class Segments extends \Magento\Backend\App\Action
 
 		for ($gint = 1; $gint < $groupsCount; $gint++)
 		{
+			//subscribers
+			$_email = array();
+			$subscribers = $this->_subscriberCollectionFactory->create()
+				->addFilter('subscriber_status', ['eq' => 1]);
+
+			foreach ($subscribers as $item)
+			{
+				$_email[] = $item["subscriber_email"];
+			}
+
+
 			$customers = $this->subscriberCollectionFactory->create()->addFieldToFilter("group_id", $gint);
 
 			$segment = $_dataMapping[$intCount][$gint];
@@ -111,6 +125,26 @@ class Segments extends \Magento\Backend\App\Action
 				$csv .= $email[$sint];
 				$csv .= ",";
 				$csv .= $firstname[$sint];
+				$csv .= PHP_EOL;
+
+				if ($sint == 9999)
+				{
+					$sint = 0;
+
+					$list = $this->client->getSelectedList();
+					$ret = $this->client->importCSVinSegment($list, array($segment), $csv);
+				}
+			}
+
+			$list = $this->client->getSelectedList();
+			$ret = $this->client->importCSVinSegment($list, array($segment), $csv);
+
+			//Subscriber add
+
+			$csv = 'email' . PHP_EOL;
+			for ($sint = 0; $sint < count($_email); $sint++)
+			{
+				$csv .= $_email[$sint];
 				$csv .= PHP_EOL;
 
 				if ($sint == 9999)
