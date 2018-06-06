@@ -54,6 +54,8 @@ class Cron extends \Magento\Backend\App\Action
 	 */
 	public function execute()
 	{
+		$max = 9999;
+
 		$customerGroups = $this->customerGroup->toOptionArray();
 
 		$groupsCount = count($customerGroups);
@@ -100,12 +102,14 @@ class Cron extends \Magento\Backend\App\Action
 					$csv .= $firstname[$sint];
 					$csv .= PHP_EOL;
 
-					if ($sint == 9999)
+					if ($sint == $max)
 					{
-						$sint = 0;
+						$max += $max;
 
 						$list = $this->client->getSelectedList();
 						$ret = $this->client->importCSVinSegment($list, array($segment), $csv);
+
+						$csv = "";
 					}
 				}
 
@@ -138,12 +142,14 @@ class Cron extends \Magento\Backend\App\Action
 			$csv .= $firstname[$int];
 			$csv .= PHP_EOL;
 
-			if ($int == 9999)
+			if ($int == $max)
 			{
-				$int = 0;
+				$max += $max;
 
 				$list = $this->client->getSelectedList();
 				$ret = $this->client->importCSV($list, $csv);
+
+				$csv = "";
 			}
 		}
 
