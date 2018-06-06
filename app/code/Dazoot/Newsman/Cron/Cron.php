@@ -104,7 +104,7 @@ class Cron extends \Magento\Backend\App\Action
 
 					if ($sint == $max)
 					{
-						$max += $max;
+						$max += 9999;
 
 						$list = $this->client->getSelectedList();
 						$ret = $this->client->importCSVinSegment($list, array($segment), $csv);
@@ -144,7 +144,7 @@ class Cron extends \Magento\Backend\App\Action
 
 			if ($int == $max)
 			{
-				$max += $max;
+				$max += 9999;
 
 				$list = $this->client->getSelectedList();
 				$ret = $this->client->importCSV($list, $csv);
