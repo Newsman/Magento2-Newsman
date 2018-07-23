@@ -56,22 +56,25 @@ class Synchronize extends \Magento\Backend\App\Action
 
 		$_email = array();
 
-		$customers = $this->subscriberCollectionFactory->create();
+		//$customers = $this->subscriberCollectionFactory->create();
 
 		$subscribers = $this->_subscriberCollectionFactory->create()
 			->addFilter('subscriber_status', ['eq' => 1]);
 
+		/*
 		foreach ($customers as $item)
 		{
 			$email[] = $item["email"];
 			$firstname[] = $item["firstname"];
 		}
+		*/
 
 		foreach ($subscribers as $item)
 		{
 			$_email[] = $item["subscriber_email"];
 		}
 
+		/*
 		$max = 9999;
 
 		$csv = "email, firstname" . PHP_EOL;
@@ -93,17 +96,22 @@ class Synchronize extends \Magento\Backend\App\Action
 
 		$list = $this->client->getSelectedList();
 		$ret = $this->client->importCSV($list, $csv);
+		*/
+
+		$max = 9999;
 
 		$csv = "";
-		$csv = "email" . PHP_EOL;
+		$csv = "email, source" . PHP_EOL;
 		for ($int = 0; $int < count($_email); $int++)
 		{
 			$csv .= $_email[$int];
+			$csv .= ",";
+			$csv .= "Magento 2 newsman plugin";
 			$csv .= PHP_EOL;
 
-			if ($int == 9999)
+			if ($int == $max)
 			{
-				$int = 0;
+				$max += 9999;
 
 				$list = $this->client->getSelectedList();
 				$ret = $this->client->importCSV($list, $csv);

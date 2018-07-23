@@ -16,10 +16,9 @@ class Cron extends \Magento\Backend\App\Action
 
 	const XML_DATA_MAPPING = 'newsman/data/mapping';
 
-	protected $configWriter;
-
 	protected $client;
 	protected $subscriberCollectionFactory;
+	protected $_subscriberCollectionFactory;
 	protected $jsonHelper;
 
 	protected $customerGroup;
@@ -33,17 +32,17 @@ class Cron extends \Magento\Backend\App\Action
 		\Psr\Log\LoggerInterface $logger,
 		\Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
 		\Magento\Customer\Model\ResourceModel\Customer\CollectionFactory $_subscriberCollectionFactory,
-		WriterInterface $configWriter,
 		\Magento\Framework\Json\Helper\Data $jsonHelper,
-		\Magento\Customer\Model\ResourceModel\Group\Collection $customerGroup
+		\Magento\Customer\Model\ResourceModel\Group\Collection $customerGroup,
+		\Magento\Newsletter\Model\ResourceModel\Subscriber\CollectionFactory $__subscriberCollectionFactory
 	)
 	{
 		$this->_logger = $logger;
 		$this->client = new Apiclient();
 		$this->subscriberCollectionFactory = $_subscriberCollectionFactory;
-		$this->configWriter = $configWriter;
 		$this->jsonHelper = $jsonHelper;
 		$this->customerGroup = $customerGroup;
+		$this->_subscriberCollectionFactory = $__subscriberCollectionFactory;
 		parent::__construct($context);
 	}
 
@@ -93,13 +92,15 @@ class Cron extends \Magento\Backend\App\Action
 					$firstname[] = $item["firstname"];
 				}
 
-				$csv = 'email,firstname' . PHP_EOL;
+				$csv = 'email,firstname,source' . PHP_EOL;
 				for ($sint = 0; $sint < count($email); $sint++)
 				{
 					$firstname[$sint] = str_replace(array('"', ","), "", $firstname[$sint]);
 					$csv .= $email[$sint];
 					$csv .= ",";
 					$csv .= $firstname[$sint];
+					$csv .= ",";
+					$csv .= "magento 2 newsman plugin";
 					$csv .= PHP_EOL;
 
 					if ($sint == $max)
@@ -121,25 +122,29 @@ class Cron extends \Magento\Backend\App\Action
 		}
 
 		$arr = array();
-		$email = array();
-		$firstname = array();
 
-		$customers = $this->subscriberCollectionFactory->create();
+		//Get only active subscriberss
 
-		foreach ($customers as $item)
+		$_email = array();
+
+		$subscribers = $this->_subscriberCollectionFactory->create()
+			->addFilter('subscriber_status', ['eq' => 1]);
+
+
+		foreach ($subscribers as $item)
 		{
-			$email[] = $item["email"];
-			$firstname[] = $item["firstname"];
+			$_email[] = $item["subscriber_email"];
 		}
 
 		$max = 9999;
 
-		$csv = "email, firstname" . PHP_EOL;
-		for ($int = 0; $int < count($email); $int++)
+		$csv = "";
+		$csv = "email,source" . PHP_EOL;
+		for ($int = 0; $int < count($_email); $int++)
 		{
-			$csv .= $email[$int];
-			$csv .= ", ";
-			$csv .= $firstname[$int];
+			$csv .= $_email[$int];
+			$csv .= ",";
+			$csv .= "magento 2 newsman plugin";
 			$csv .= PHP_EOL;
 
 			if ($int == $max)
@@ -148,8 +153,6 @@ class Cron extends \Magento\Backend\App\Action
 
 				$list = $this->client->getSelectedList();
 				$ret = $this->client->importCSV($list, $csv);
-
-				$csv = "";
 			}
 		}
 
