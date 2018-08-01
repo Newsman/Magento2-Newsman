@@ -57,6 +57,8 @@ class Segments extends \Magento\Backend\App\Action
 	 */
 	public function execute()
 	{
+		$max = 9999;
+
 		$customerGroups = $this->customerGroup->toOptionArray();
 
 		$groupsCount = count($customerGroups);
@@ -90,27 +92,27 @@ class Segments extends \Magento\Backend\App\Action
 
 		$_dataMappingCount = count($_dataMapping);
 
+		//subscribers
+		$_email = array();
+		$subscribers = $this->_subscriberCollectionFactory->create()
+			->addFilter('subscriber_status', ['eq' => 1]);
+
+		foreach ($subscribers as $item)
+		{
+			$_email[] = $item["subscriber_email"];
+		}
+
 		$intCount = 0;
 
 		for ($gint = 1; $gint < $groupsCount; $gint++)
 		{
-			//subscribers
-			$_email = array();
-			$subscribers = $this->_subscriberCollectionFactory->create()
-				->addFilter('subscriber_status', ['eq' => 1]);
-
-			foreach ($subscribers as $item)
-			{
-				$_email[] = $item["subscriber_email"];
-			}
-
-
 			$customers = $this->subscriberCollectionFactory->create()->addFieldToFilter("group_id", $gint);
 
 			$segment = $_dataMapping[$intCount][$gint];
 
 			$email = array();
 			$firstname = array();
+			$date = array();
 
 			foreach ($customers as $item)
 			{
@@ -118,18 +120,20 @@ class Segments extends \Magento\Backend\App\Action
 				$firstname[] = $item["firstname"];
 			}
 
-			$csv = 'email,firstname' . PHP_EOL;
+			$csv = 'email,firstname,source' . PHP_EOL;
 			for ($sint = 0; $sint < count($email); $sint++)
 			{
 				$firstname[$sint] = str_replace(array('"', ","), "", $firstname[$sint]);
 				$csv .= $email[$sint];
 				$csv .= ",";
 				$csv .= $firstname[$sint];
+				$csv .= ",";
+				$csv .= "magento 2 newsman plugin - segments customer";
 				$csv .= PHP_EOL;
 
-				if ($sint == 9999)
+				if ($sint == $max)
 				{
-					$sint = 0;
+					$max += 9999;
 
 					$list = $this->client->getSelectedList();
 					$ret = $this->client->importCSVinSegment($list, array($segment), $csv);
@@ -141,15 +145,19 @@ class Segments extends \Magento\Backend\App\Action
 
 			//Subscriber add
 
-			$csv = 'email' . PHP_EOL;
+			$max = 9999;
+
+			$csv = 'email,source' . PHP_EOL;
 			for ($sint = 0; $sint < count($_email); $sint++)
 			{
 				$csv .= $_email[$sint];
+				$csv .= ",";
+				$csv .= "magento 2 newsman plugin - segments subscriber";
 				$csv .= PHP_EOL;
 
-				if ($sint == 9999)
+				if ($sint == $max)
 				{
-					$sint = 0;
+					$max += 9999;
 
 					$list = $this->client->getSelectedList();
 					$ret = $this->client->importCSVinSegment($list, array($segment), $csv);

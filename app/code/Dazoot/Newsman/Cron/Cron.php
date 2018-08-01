@@ -67,12 +67,10 @@ class Cron extends \Magento\Backend\App\Action
 
 		$dataMapping = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_DATA_MAPPING);
 
-
 		$dataMapping = json_decode($dataMapping, true);
 
 		if ($dataMapping != null || $dataMapping != "")
 		{
-
 			$dataMappingCount = count($dataMapping);
 
 			$intCount = 0;
@@ -90,27 +88,41 @@ class Cron extends \Magento\Backend\App\Action
 				{
 					$email[] = $item["email"];
 					$firstname[] = $item["firstname"];
+					$date[] = $item["updated_at"];
 				}
 
+				$import = false;
 				$csv = 'email,firstname,source' . PHP_EOL;
 				for ($sint = 0; $sint < count($email); $sint++)
 				{
-					$firstname[$sint] = str_replace(array('"', ","), "", $firstname[$sint]);
-					$csv .= $email[$sint];
-					$csv .= ",";
-					$csv .= $firstname[$sint];
-					$csv .= ",";
-					$csv .= "magento 2 newsman plugin";
-					$csv .= PHP_EOL;
+					$date[$sint] = strtotime($date[$sint]);
+					$age = time() - $date[$sint];
 
-					if ($sint == $max)
+					//2 days - 48 hours
+					if($age < 172800)
 					{
-						$max += 9999;
+						$import = true;
+					}
 
-						$list = $this->client->getSelectedList();
-						$ret = $this->client->importCSVinSegment($list, array($segment), $csv);
+					if($import)
+					{
+						$firstname[$sint] = str_replace(array('"', ","), "", $firstname[$sint]);
+						$csv .= $email[$sint];
+						$csv .= ",";
+						$csv .= $firstname[$sint];
+						$csv .= ",";
+						$csv .= "magento 2 newsman plugin - segments customer CRON";
+						$csv .= PHP_EOL;
 
-						$csv = "";
+						if ($sint == $max)
+						{
+							$max += 9999;
+
+							$list = $this->client->getSelectedList();
+							$ret = $this->client->importCSVinSegment($list, array($segment), $csv);
+
+							$csv = "";
+						}
 					}
 				}
 
@@ -144,7 +156,7 @@ class Cron extends \Magento\Backend\App\Action
 		{
 			$csv .= $_email[$int];
 			$csv .= ",";
-			$csv .= "magento 2 newsman plugin";
+			$csv .= "magento 2 newsman plugin - subscriber CRON";
 			$csv .= PHP_EOL;
 
 			if ($int == $max)
