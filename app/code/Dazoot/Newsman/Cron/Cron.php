@@ -99,12 +99,15 @@ class Cron extends \Magento\Backend\App\Action
 					$age = time() - $date[$sint];
 
 					//2 days - 48 hours
-					if($age < 172800)
+					if ($age < 172800)
 					{
 						$import = true;
+					} else
+					{
+						$import = false;
 					}
 
-					if($import)
+					if ($import)
 					{
 						$firstname[$sint] = str_replace(array('"', ","), "", $firstname[$sint]);
 						$csv .= $email[$sint];
@@ -138,40 +141,111 @@ class Cron extends \Magento\Backend\App\Action
 		//Get only active subscriberss
 
 		$_email = array();
+		$_date = array();
 
 		$subscribers = $this->_subscriberCollectionFactory->create()
 			->addFilter('subscriber_status', ['eq' => 1]);
 
-
 		foreach ($subscribers as $item)
 		{
 			$_email[] = $item["subscriber_email"];
+			$_date[] = $item["change_status_at"];
 		}
 
-		$max = 9999;
+		//Check Version
+		$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+		$productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface');
+		$currentV = $productMetadata->getVersion();
 
-		$csv = "";
-		$csv = "email,source" . PHP_EOL;
-		for ($int = 0; $int < count($_email); $int++)
+		$v = $this->MagentoVersionSubscriberFilter();
+		$filterAfterDate = false;
+
+		foreach ($v as $version)
 		{
-			$csv .= $_email[$int];
-			$csv .= ",";
-			$csv .= "magento 2 newsman plugin - subscriber CRON";
-			$csv .= PHP_EOL;
-
-			if ($int == $max)
+			if ($currentV == $version)
 			{
-				$max += 9999;
-
-				$list = $this->client->getSelectedList();
-				$ret = $this->client->importCSV($list, $csv);
+				$filterAfterDate = true;
 			}
 		}
+		//Check Version
 
-		$list = $this->client->getSelectedList();
-		$ret = $this->client->importCSV($list, $csv);
+		if (!$filterAfterDate)
+		{
+			$max = 9999;
+
+			$csv = "";
+			$csv = "email,source" . PHP_EOL;
+			for ($int = 0; $int < count($_email); $int++)
+			{
+				$csv .= $_email[$int];
+				$csv .= ",";
+				$csv .= "magento 2 newsman plugin - subscriber CRON";
+				$csv .= PHP_EOL;
+
+				if ($int == $max)
+				{
+					$max += 9999;
+
+					$list = $this->client->getSelectedList();
+					$ret = $this->client->importCSV($list, $csv);
+				}
+			}
+
+			$list = $this->client->getSelectedList();
+			$ret = $this->client->importCSV($list, $csv);
+		} else
+		{
+			$max = 9999;
+
+			$csv = "";
+			$csv = "email,source" . PHP_EOL;
+			for ($int = 0; $int < count($_email); $int++)
+			{
+				$_date[$sint] = strtotime($_date[$sint]);
+				$age = time() - $_date[$sint];
+
+				//2 days - 48 hours
+				if ($age < 172800)
+				{
+					$import = true;
+				} else
+				{
+					$import = false;
+				}
+
+				if ($import)
+				{
+					$csv .= $_email[$int];
+					$csv .= ",";
+					$csv .= "magento 2 newsman plugin - subscriber CRON";
+					$csv .= PHP_EOL;
+
+					if ($int == $max)
+					{
+						$max += 9999;
+
+						$list = $this->client->getSelectedList();
+						$ret = $this->client->importCSV($list, $csv);
+					}
+				}
+			}
+
+			$list = $this->client->getSelectedList();
+			$ret = $this->client->importCSV($list, $csv);
+		}
 
 
 		$this->_logger->debug('Running Cron from Newsman_Import class');
+	}
+
+	public function MagentoVersionSubscriberFilter()
+	{
+		$versions = array(
+			"2.2.3",
+			"2.2.4",
+			"2.2.5"
+		);
+
+		return $versions;
 	}
 }
