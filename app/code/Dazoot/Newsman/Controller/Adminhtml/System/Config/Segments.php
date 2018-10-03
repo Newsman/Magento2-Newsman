@@ -57,117 +57,112 @@ class Segments extends \Magento\Backend\App\Action
 	 */
 	public function execute()
 	{
-		$max = 9999;
-
 		$customerGroups = $this->customerGroup->toOptionArray();
 
 		$groupsCount = count($customerGroups);
 
 		$dataMapping = [];
 
-		for ($int = 1; $int < $groupsCount; $int++)
-		{
-			$val = $customerGroups[$int]["value"];
-			$dataMapping[][$val] = $this->getRequest()->getPost($val);
-		}
-
-		$_dataMapping = $dataMapping;
-		$dataMapping = json_encode($dataMapping);
-
-		$this->configWriter->save('newsman/data/mapping', $dataMapping);
-
-		$arr = array();
-
-		/*
 		$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 
 		$storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
 
 		$dataMapping = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_DATA_MAPPING);
 
-
 		$dataMapping = json_decode($dataMapping, true);
-		$dataMappingCount = count($dataMapping);
-		*/
 
-		$_dataMappingCount = count($_dataMapping);
+		$batchSize = 5000;
+		$list = $this->client->getSelectedList();
 
-		//subscribers
-		$_email = array();
-		$subscribers = $this->_subscriberCollectionFactory->create()
-			->addFilter('subscriber_status', ['eq' => 1]);
-
-		foreach ($subscribers as $item)
+		if ($dataMapping != null || $dataMapping != "")
 		{
-			$_email[] = $item["subscriber_email"];
+			$dataMappingCount = count($dataMapping);
+
+			$intCount = 0;
+
+			for ($gint = 1; $gint < $groupsCount; $gint++)
+			{
+				$customers = $this->subscriberCollectionFactory->create()->addFieldToFilter("group_id", $gint);
+
+				$segment = $dataMapping[$intCount][$gint];
+
+				$customers_to_import = array();
+
+				foreach ($customers as $item)
+				{
+					$date = strtotime($item["updated_at"]);
+					$age = time() - $date;
+
+					if ($age > 172800)
+					{
+						continue;
+					}
+
+					$customers_to_import[] = array(
+						"email" => $item["email"],
+						"firstname" => $item["firstname"],
+						"date" => $item["updated_at"]
+					);
+
+					if ((count($customers_to_import) % $batchSize) == 0)
+					{
+						$this->_importData($customers_to_import, $list, array($segment));
+					}
+				}
+
+				if (count($customers_to_import) > 0)
+				{
+					$this->_importData($customers_to_import, $list, array($segment));
+				}
+
+				unset($customers_to_import);
+
+				$intCount++;
+			}
+		}
+	}
+
+	public static function safeForCsv($str)
+	{
+		return '"' . str_replace('"', '""', $str) . '"';
+	}
+
+	protected function _importData(&$data, $list, $segments = null)
+	{
+		$csv = '"email","firstname","source"' . PHP_EOL;
+
+		$source = self::safeForCsv("magento 2 newsman plugin - segments customer manual sync");
+		foreach ($data as $_dat)
+		{
+			$csv .= sprintf(
+				"%s,%s,%s",
+				self::safeForCsv($_dat["email"]),
+				self::safeForCsv($_dat["firstname"]),
+				$source
+			);
+			$csv .= PHP_EOL;
 		}
 
-		$intCount = 0;
-
-		for ($gint = 1; $gint < $groupsCount; $gint++)
+		$ret = null;
+		try
 		{
-			$customers = $this->subscriberCollectionFactory->create()->addFieldToFilter("group_id", $gint);
-
-			$segment = $_dataMapping[$intCount][$gint];
-
-			$email = array();
-			$firstname = array();
-			$date = array();
-
-			foreach ($customers as $item)
+			if (is_array($segments) && count($segments) > 0)
 			{
-				$email[] = $item["email"];
-				$firstname[] = $item["firstname"];
+				$ret = $this->client->importCSVinSegment($list, $segments, $csv);
+			} else
+			{
+				$ret = $this->client->importCSV($list, $csv);
 			}
 
-			$csv = 'email,firstname,source' . PHP_EOL;
-			for ($sint = 0; $sint < count($email); $sint++)
+			if ($ret == "")
 			{
-				$firstname[$sint] = str_replace(array('"', ","), "", $firstname[$sint]);
-				$csv .= $email[$sint];
-				$csv .= ",";
-				$csv .= $firstname[$sint];
-				$csv .= ",";
-				$csv .= "magento 2 newsman plugin - segments customer";
-				$csv .= PHP_EOL;
-
-				if ($sint == $max)
-				{
-					$max += 9999;
-
-					$list = $this->client->getSelectedList();
-					$ret = $this->client->importCSVinSegment($list, array($segment), $csv);
-				}
+				throw new Exception("Import failed");
 			}
-
-			$list = $this->client->getSelectedList();
-			$ret = $this->client->importCSVinSegment($list, array($segment), $csv);
-
-			//Subscriber add
-
-			$max = 9999;
-
-			$csv = 'email,source' . PHP_EOL;
-			for ($sint = 0; $sint < count($_email); $sint++)
-			{
-				$csv .= $_email[$sint];
-				$csv .= ",";
-				$csv .= "magento 2 newsman plugin - segments subscriber";
-				$csv .= PHP_EOL;
-
-				if ($sint == $max)
-				{
-					$max += 9999;
-
-					$list = $this->client->getSelectedList();
-					$ret = $this->client->importCSVinSegment($list, array($segment), $csv);
-				}
-			}
-
-			$list = $this->client->getSelectedList();
-			$ret = $this->client->importCSVinSegment($list, array($segment), $csv);
-
-			$intCount++;
+		} catch (Exception $e)
+		{
+			$this->_logger->debug('Cron failed Newsman_Import class');
 		}
+
+		$data = array();
 	}
 }

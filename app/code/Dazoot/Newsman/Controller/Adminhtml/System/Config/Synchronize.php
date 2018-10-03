@@ -56,69 +56,68 @@ class Synchronize extends \Magento\Backend\App\Action
 
 		$_email = array();
 
-		//$customers = $this->subscriberCollectionFactory->create();
-
 		$subscribers = $this->_subscriberCollectionFactory->create()
 			->addFilter('subscriber_status', ['eq' => 1]);
 
-		/*
-		foreach ($customers as $item)
-		{
-			$email[] = $item["email"];
-			$firstname[] = $item["firstname"];
-		}
-		*/
+		$batchSize = 5000;
+
+		$customers_to_import = array();
+
+		$list = $this->client->getSelectedList();
 
 		foreach ($subscribers as $item)
 		{
-			$_email[] = $item["subscriber_email"];
-		}
+			$customers_to_import[] = array(
+				"email" => $item["subscriber_email"]
+			);
 
-		/*
-		$max = 9999;
-
-		$csv = "email, firstname" . PHP_EOL;
-		for ($int = 0; $int < count($email); $int++)
-		{
-			$csv .= $email[$int];
-			$csv .= ", ";
-			$csv .= $firstname[$int];
-			$csv .= PHP_EOL;
-
-			if ($int == 9999)
+			if ((count($customers_to_import) % $batchSize) == 0)
 			{
-				$int = 0;
-
-				$list = $this->client->getSelectedList();
-				$ret = $this->client->importCSV($list, $csv);
+				$this->_importData($customers_to_import, $list);
 			}
 		}
 
-		$list = $this->client->getSelectedList();
-		$ret = $this->client->importCSV($list, $csv);
-		*/
-
-		$max = 9999;
-
-		$csv = "";
-		$csv = "email, source" . PHP_EOL;
-		for ($int = 0; $int < count($_email); $int++)
+		if (count($customers_to_import) > 0)
 		{
-			$csv .= $_email[$int];
-			$csv .= ",";
-			$csv .= "Magento 2 newsman plugin";
-			$csv .= PHP_EOL;
-
-			if ($int == $max)
-			{
-				$max += 9999;
-
-				$list = $this->client->getSelectedList();
-				$ret = $this->client->importCSV($list, $csv);
-			}
+			$this->_importData($customers_to_import, $list);
 		}
 
-		$list = $this->client->getSelectedList();
-		$ret = $this->client->importCSV($list, $csv);
+		unset($customers_to_import);
+	}
+
+	protected function _importData(&$data, $list, $segments = null)
+	{
+		$csv = '"email","source"' . PHP_EOL;
+
+		$source = self::safeForCsv("magento 2 newsman plugin - list subscriber manual sync");
+		foreach ($data as $_dat)
+		{
+			$csv .= sprintf(
+				"%s,%s",
+				self::safeForCsv($_dat["email"]),
+				$source
+			);
+			$csv .= PHP_EOL;
+		}
+
+		$ret = null;
+		try
+		{
+			$ret = $this->client->importCSV($list, $csv);
+			if ($ret == "")
+			{
+				throw new Exception("Import failed");
+			}
+		} catch (Exception $e)
+		{
+			$this->_logger->debug('Cron failed Newsman_Import class');
+		}
+
+		$data = array();
+	}
+
+	public static function safeForCsv($str)
+	{
+		return '"' . str_replace('"', '""', $str) . '"';
 	}
 }

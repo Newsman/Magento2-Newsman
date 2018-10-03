@@ -15,11 +15,15 @@ class Cron extends \Magento\Backend\App\Action
 	protected $_logger;
 
 	const XML_DATA_MAPPING = 'newsman/data/mapping';
+	const XML_CRON_RUN = "newsman/data/cron_run";
 
 	protected $client;
 	protected $subscriberCollectionFactory;
 	protected $_subscriberCollectionFactory;
 	protected $jsonHelper;
+	protected $cronRun;
+	protected $configWriter;
+	protected $timezone;
 
 	protected $customerGroup;
 
@@ -34,7 +38,9 @@ class Cron extends \Magento\Backend\App\Action
 		\Magento\Customer\Model\ResourceModel\Customer\CollectionFactory $_subscriberCollectionFactory,
 		\Magento\Framework\Json\Helper\Data $jsonHelper,
 		\Magento\Customer\Model\ResourceModel\Group\Collection $customerGroup,
-		\Magento\Newsletter\Model\ResourceModel\Subscriber\CollectionFactory $__subscriberCollectionFactory
+		\Magento\Newsletter\Model\ResourceModel\Subscriber\CollectionFactory $__subscriberCollectionFactory,
+		WriterInterface $configWriter,
+		\Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
 	)
 	{
 		$this->_logger = $logger;
@@ -43,6 +49,8 @@ class Cron extends \Magento\Backend\App\Action
 		$this->jsonHelper = $jsonHelper;
 		$this->customerGroup = $customerGroup;
 		$this->_subscriberCollectionFactory = $__subscriberCollectionFactory;
+		$this->configWriter = $configWriter;
+		$this->timezone = $timezone;
 		parent::__construct($context);
 	}
 
@@ -51,10 +59,52 @@ class Cron extends \Magento\Backend\App\Action
 	 *
 	 * @return void
 	 */
+	public static function safeForCsv($str)
+	{
+		return '"' . str_replace('"', '""', $str) . '"';
+	}
+
+	protected function _importData(&$data, $list, $segments = null)
+	{
+		$csv = '"email","firstname","source"' . PHP_EOL;
+
+		$source = self::safeForCsv("magento 2 newsman plugin - segments customer CRON");
+		foreach ($data as $_dat)
+		{
+			$csv .= sprintf(
+				"%s,%s,%s",
+				self::safeForCsv($_dat["email"]),
+				self::safeForCsv($_dat["firstname"]),
+				$source
+			);
+			$csv .= PHP_EOL;
+		}
+
+		$ret = null;
+		try
+		{
+			if (is_array($segments) && count($segments) > 0)
+			{
+				$ret = $this->client->importCSVinSegment($list, $segments, $csv);
+			} else
+			{
+				$ret = $this->client->importCSV($list, $csv);
+			}
+
+			if ($ret == "")
+			{
+				throw new Exception("Import failed");
+			}
+		} catch (Exception $e)
+		{
+			$this->_logger->debug('Cron failed Newsman_Import class');
+		}
+
+		$data = array();
+	}
+
 	public function execute()
 	{
-		$max = 9999;
-
 		$customerGroups = $this->customerGroup->toOptionArray();
 
 		$groupsCount = count($customerGroups);
@@ -67,173 +117,151 @@ class Cron extends \Magento\Backend\App\Action
 
 		$dataMapping = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_DATA_MAPPING);
 
-		$dataMapping = json_decode($dataMapping, true);
+		//Cron Schedule Time
+		$this->cronRun = (!empty($objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_CRON_RUN))) ? $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_CRON_RUN) : null;
 
-		if ($dataMapping != null || $dataMapping != "")
+		$cronAllow = false;
+
+		if (empty($this->cronRun))
 		{
-			$dataMappingCount = count($dataMapping);
+			$cronAllow = true;
 
-			$intCount = 0;
-
-			for ($gint = 1; $gint < $groupsCount; $gint++)
-			{
-				$customers = $this->subscriberCollectionFactory->create()->addFieldToFilter("group_id", $gint);
-
-				$segment = $dataMapping[$intCount][$gint];
-
-				$email = array();
-				$firstname = array();
-
-				foreach ($customers as $item)
-				{
-					$email[] = $item["email"];
-					$firstname[] = $item["firstname"];
-					$date[] = $item["updated_at"];
-				}
-
-				$import = false;
-				$csv = 'email,firstname,source' . PHP_EOL;
-				for ($sint = 0; $sint < count($email); $sint++)
-				{
-					$date[$sint] = strtotime($date[$sint]);
-					$age = time() - $date[$sint];
-
-					//2 days - 48 hours
-					if ($age < 172800)
-					{
-						$import = true;
-					} else
-					{
-						$import = false;
-					}
-
-					if ($import)
-					{
-						$firstname[$sint] = str_replace(array('"', ","), "", $firstname[$sint]);
-						$csv .= $email[$sint];
-						$csv .= ",";
-						$csv .= $firstname[$sint];
-						$csv .= ",";
-						$csv .= "magento 2 newsman plugin - segments customer CRON";
-						$csv .= PHP_EOL;
-
-						if ($sint == $max)
-						{
-							$max += 9999;
-
-							$list = $this->client->getSelectedList();
-							$ret = $this->client->importCSVinSegment($list, array($segment), $csv);
-
-							$csv = "";
-						}
-					}
-				}
-
-				$list = $this->client->getSelectedList();
-				$ret = $this->client->importCSVinSegment($list, array($segment), $csv);
-
-				$intCount++;
-			}
-		}
-
-		$arr = array();
-
-		//Get only active subscriberss
-
-		$_email = array();
-		$_date = array();
-
-		$subscribers = $this->_subscriberCollectionFactory->create()
-			->addFilter('subscriber_status', ['eq' => 1]);
-
-		foreach ($subscribers as $item)
-		{
-			$_email[] = $item["subscriber_email"];
-			$_date[] = $item["change_status_at"];
-		}
-
-		//Check Version
-		$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-		$productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface');
-		$currentV = $productMetadata->getVersion();
-
-		$v = $this->MagentoVersionSubscriberFilter();
-		$filterAfterDate = false;
-
-		foreach ($v as $version)
-		{
-			if ($currentV == $version)
-			{
-				$filterAfterDate = true;
-			}
-		}
-		//Check Version
-
-		if (!$filterAfterDate)
-		{
-			$max = 9999;
-
-			$csv = "";
-			$csv = "email,source" . PHP_EOL;
-			for ($int = 0; $int < count($_email); $int++)
-			{
-				$csv .= $_email[$int];
-				$csv .= ",";
-				$csv .= "magento 2 newsman plugin - subscriber CRON";
-				$csv .= PHP_EOL;
-
-				if ($int == $max)
-				{
-					$max += 9999;
-
-					$list = $this->client->getSelectedList();
-					$ret = $this->client->importCSV($list, $csv);
-				}
-			}
-
-			$list = $this->client->getSelectedList();
-			$ret = $this->client->importCSV($list, $csv);
+			//Run first time
+			$cronDate = $this->timezone->date();
+			$cronDate = $cronDate->format("Y-m-d H:i:s");
+			$this->configWriter->save(self::XML_CRON_RUN, $cronDate);
 		} else
 		{
-			$max = 9999;
+			$date = strtotime($this->cronRun);
+			$age = strtotime($this->timezone->date()->format("Y-m-d H:i:s")) - $date;
 
-			$csv = "";
-			$csv = "email,source" . PHP_EOL;
-			for ($int = 0; $int < count($_email); $int++)
+			if ($age > 86400)
 			{
-				$_date[$sint] = strtotime($_date[$sint]);
-				$age = time() - $_date[$sint];
+				$cronAllow = true;
 
-				//2 days - 48 hours
-				if ($age < 172800)
-				{
-					$import = true;
-				} else
-				{
-					$import = false;
-				}
+				//Run always
+				$cronDate = $this->timezone->date();
+				$cronDate = $cronDate->format("Y-m-d H:i:s");
+				$this->configWriter->save(self::XML_CRON_RUN, $cronDate);
+			}
+		}
+		//Cron Schedule Time
 
-				if ($import)
-				{
-					$csv .= $_email[$int];
-					$csv .= ",";
-					$csv .= "magento 2 newsman plugin - subscriber CRON";
-					$csv .= PHP_EOL;
+		if ($cronAllow)
+		{
+			$dataMapping = json_decode($dataMapping, true);
 
-					if ($int == $max)
+			$batchSize = 5000;
+			$list = $this->client->getSelectedList();
+
+			if ($dataMapping != null || $dataMapping != "")
+			{
+				$dataMappingCount = count($dataMapping);
+
+				$intCount = 0;
+
+				for ($gint = 1; $gint < $groupsCount; $gint++)
+				{
+					$customers = $this->subscriberCollectionFactory->create()->addFieldToFilter("group_id", $gint);
+
+					$segment = $dataMapping[$intCount][$gint];
+
+					$customers_to_import = array();
+
+					foreach ($customers as $item)
 					{
-						$max += 9999;
+						$date = strtotime($item["updated_at"]);
+						$age = time() - $date;
 
-						$list = $this->client->getSelectedList();
-						$ret = $this->client->importCSV($list, $csv);
+						if ($age > 172800)
+						{
+							continue;
+						}
+
+						$customers_to_import[] = array(
+							"email" => $item["email"],
+							"firstname" => $item["firstname"],
+							"date" => $item["updated_at"]
+						);
+
+						if ((count($customers_to_import) % $batchSize) == 0)
+						{
+							$this->_importData($customers_to_import, $list, array($segment));
+						}
 					}
+
+					if (count($customers_to_import) > 0)
+					{
+						$this->_importData($customers_to_import, $list, array($segment));
+					}
+
+					unset($customers_to_import);
+
+					$intCount++;
 				}
 			}
 
-			$list = $this->client->getSelectedList();
-			$ret = $this->client->importCSV($list, $csv);
-		}
+			$arr = array();
 
+			//Get only active subscriberss
+
+			$subscribers = $this->_subscriberCollectionFactory->create()
+				->addFilter('subscriber_status', ['eq' => 1]);
+
+			$v = $this->MagentoVersionSubscriberFilter();
+
+			$filterAfterDate = false;
+
+			//Check Version
+			$objectManager = null;
+			$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+			$productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface');
+			$currentV = $productMetadata->getVersion();
+
+			foreach ($v as $version)
+			{
+				if ($currentV == $version)
+				{
+					$filterAfterDate = true;
+					break;
+				}
+			}
+
+			$customers_to_import = array();
+
+			foreach ($subscribers as $item)
+			{
+				if ($filterAfterDate)
+				{
+					$date = strtotime($item["change_status_at"]);
+					$age = time() - $date;
+
+					//2 days - 48 hours
+					if ($age > 172800)
+					{
+						continue;
+					}
+				}
+
+				$customers_to_import[] = array(
+					"email" => $item["subscriber_email"],
+					"firstname" => $item["firstname"],
+					"date" => ""
+				);
+
+				if ((count($customers_to_import) % $batchSize) == 0)
+				{
+					$this->_importData($customers_to_import, $list);
+				}
+			}
+
+			if (count($customers_to_import) > 0)
+			{
+				$this->_importData($customers_to_import, $list);
+			}
+
+			unset($customers_to_import);
+		}
 
 		$this->_logger->debug('Running Cron from Newsman_Import class');
 	}
