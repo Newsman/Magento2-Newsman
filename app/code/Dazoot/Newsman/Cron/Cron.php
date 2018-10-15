@@ -135,7 +135,7 @@ class Cron extends \Magento\Backend\App\Action
 			$date = strtotime($this->cronRun);
 			$age = strtotime($this->timezone->date()->format("Y-m-d H:i:s")) - $date;
 
-			if ($age > 86400)
+			if ($age >= 86400)
 			{
 				$cronAllow = true;
 
