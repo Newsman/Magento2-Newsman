@@ -10,7 +10,9 @@ Installation
 
 2. Edit file from *"app/etc/config.php"*
 
-- Add this line 'Dazoot_Newsman' => 1, in the array.
+- Add these lines in the array:
+ 'Dazoot_Newsman' => 1,
+ 'Dazoot_Newsmansmtp' => 1
 
 3. We need access to the server bash shell. And apply this command:
 
@@ -35,3 +37,7 @@ Fill in your [Newsman](https://www.newsmanapp.com) API KEY and User ID and click
   ![Synchronization Schedule](https://raw.githubusercontent.com/Newsman/Magento2-Newsman/master/assets/synchronization_schedule.png)
 
 5. For the automatic synchronization to work, you need to have Magento's built-in cron job functionality enabled.
+
+6. Newsman SMTP Configuration
+
+  ![SMTP Configuration](https://raw.githubusercontent.com/Newsman/Magento2-Newsman/master/assets/smtp.png)

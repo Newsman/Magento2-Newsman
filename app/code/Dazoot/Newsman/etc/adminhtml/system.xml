@@ -9,6 +9,14 @@
             <label>Newsman</label>
             <tab>newsman</tab>
             <resource>Dazoot_Newsman::newsman_configuration</resource>
+            <group id="about2" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="0" translate="label">
+                <attribute type="expanded">1</attribute>
+                <label>Newsman SMTP</label>
+                <field id="link" translate="label" type="label" sortOrder="2" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Configuration</label>
+                    <frontend_model>Dazoot\Newsman\Block\Adminhtml\System\Config\Form\Field\Link</frontend_model>
+                </field>
+            </group>
             <group id="credentials" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>General Settings</label>
                 <field id="userId" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
