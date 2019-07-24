@@ -8,8 +8,7 @@ class Lists implements \Magento\Framework\Option\ArrayInterface
 {
 	protected $client;
 
-	public function __construct(
-	)
+	public function __construct()
 	{
 		$this->client = new Apiclient();
 	}
@@ -20,11 +19,13 @@ class Lists implements \Magento\Framework\Option\ArrayInterface
 
 		$arrayList = [];
 
-		for ($int = 0; $int < count($_lists); $int++)
+		if (!empty($_lists) && is_array($_lists))
 		{
-			$arrayList[$int] = ['value' => $_lists[$int]["list_id"], 'label' => $_lists[$int]["list_name"]];
+			for ($int = 0; $int < count($_lists); $int++)
+			{
+				$arrayList[$int] = ['value' => $_lists[$int]["list_id"], 'label' => $_lists[$int]["list_name"]];
+			}
 		}
-
 		return $arrayList;
 	}
 }

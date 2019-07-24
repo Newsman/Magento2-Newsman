@@ -141,7 +141,8 @@ HTML;
 
 			$intArr = 1;
 			$intCustomerGroup = 1;
-			if ($segments != null)
+
+			if ($segments != null && !array_key_exists("err", $segments))
 			{
 				foreach ($segments as $item => $value)
 				{
