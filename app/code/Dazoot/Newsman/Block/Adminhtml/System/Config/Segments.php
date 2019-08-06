@@ -110,6 +110,11 @@ HTML;
 		$dataMapping = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_DATA_MAPPING);
 
 		$dataMapping = json_decode($dataMapping, true);
+
+		if(empty($dataMapping)){
+			$dataMapping = array();
+		}
+
 		$dataMappingCount = count($dataMapping);
 
 		$arr = array();
