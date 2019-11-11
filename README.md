@@ -21,6 +21,9 @@ Installation
 - ("root/yourmagentodirectory") php bin/magento setup:di:compile
 	
 ## Configuration
+
+### Newsman Sync Addon
+
 1. Go to **Stores > Configuration > Newsman > General Settings**
 Fill in your [Newsman](https://www.newsmanapp.com) API KEY and User ID and click the Save Config button.
 
@@ -38,6 +41,10 @@ Fill in your [Newsman](https://www.newsmanapp.com) API KEY and User ID and click
 
 5. For the automatic synchronization to work, you need to have Magento's built-in cron job functionality enabled.
 
-6. Newsman SMTP Configuration
+### Newsman SMTP Configuration
 
   ![SMTP Configuration](https://raw.githubusercontent.com/Newsman/Magento2-Newsman/master/assets/smtp.png)
+
+### Newsman Remarketing
+
+  ![SMTP Configuration](https://raw.githubusercontent.com/Newsman/Magento2-Newsman/master/assets/marketing.png)
