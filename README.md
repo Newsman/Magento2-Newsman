@@ -19,6 +19,14 @@ Installation
 - ("root/yourmagentodirectory") php bin/magento setup:upgrade
 - ("root/yourmagentodirectory/var/di" - delete di folder
 - ("root/yourmagentodirectory") php bin/magento setup:di:compile
+
+## Auto installation: 
+1. Copy the *"app/code/Dazoot"* directory from this repository to your "app/code/" shop directory.
+
+2. Configuration -> Web Setup Wizard -> Module Manager -> :
+
+Enable dazoot/module-newsman
+Enable dazoot/newsmanmarketing
 	
 ## Configuration
 
