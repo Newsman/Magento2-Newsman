@@ -17,7 +17,12 @@ Installation
 3. We need access to the server bash shell. And apply this command:
 
 - ("root/yourmagentodirectory") php bin/magento setup:upgrade
-- ("root/yourmagentodirectory/var/di" - delete di folder
+Delete Cache 
+for Magento 2.0x
+- ("root/yourmagentodirectory/var/di") - delete di folder
+for Magento 2.3.x
+- ("root/yourmagentodirectory/generated/metadata") - delete di folder
+Last command
 - ("root/yourmagentodirectory") php bin/magento setup:di:compile
 
 ## Auto installation: 
