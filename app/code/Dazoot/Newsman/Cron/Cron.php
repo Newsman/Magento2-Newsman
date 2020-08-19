@@ -18,7 +18,9 @@ class Cron extends \Magento\Backend\App\Action
 	const XML_CRON_RUN = "newsman/data/cron_run";
 
 	protected $client;
+	//Customers
 	protected $subscriberCollectionFactory;
+	//Subscribers
 	protected $_subscriberCollectionFactory;
 	protected $jsonHelper;
 	protected $cronRun;
@@ -66,9 +68,9 @@ class Cron extends \Magento\Backend\App\Action
 
 	protected function _importData(&$data, $list, $segments = null)
 	{
-		$csv = '"email","firstname","source"' . PHP_EOL;
+		$csv = '"email","fullname","source"' . PHP_EOL;
 
-		$source = self::safeForCsv("magento 2 newsman plugin - segments customer CRON");
+		$source = self::safeForCsv("magento 2 newsman plugin - segments customer, subscribers CRON");
 		foreach ($data as $_dat)
 		{
 			$csv .= sprintf(
@@ -204,7 +206,6 @@ class Cron extends \Magento\Backend\App\Action
 			$arr = array();
 
 			//Get only active subscriberss
-
 			$subscribers = $this->_subscriberCollectionFactory->create()
 				->addFilter('subscriber_status', ['eq' => 1]);
 
