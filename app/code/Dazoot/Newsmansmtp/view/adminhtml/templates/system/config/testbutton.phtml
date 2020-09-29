@@ -29,6 +29,7 @@
                 data: postData,
                 showLoader: true
             }).done(function(response) {
+
                 if (typeof response === 'object') {
                     if (response.error) {
                         alert({ title: 'Error', content: response.message });

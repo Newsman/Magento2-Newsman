@@ -2,6 +2,7 @@
 
 
 namespace Dazoot\Newsman\Controller\Index;
+use \DateTime;
 
 class Index extends \Magento\Framework\App\Action\Action
 {
@@ -12,7 +13,7 @@ class Index extends \Magento\Framework\App\Action\Action
     private $_subscriberCollectionFactory;
     private $_productsCollectionFactory;
 
-    public function __construct(
+    public function __construct(   
         \Magento\Framework\App\Action\Context $context,
         \Magento\Customer\Model\ResourceModel\Customer\CollectionFactory $customerCollectionFactory,
         \Magento\Newsletter\Model\ResourceModel\Subscriber\CollectionFactory $subscriberCollectionFactory,
@@ -41,6 +42,10 @@ class Index extends \Magento\Framework\App\Action\Action
     {
         $apikey = (empty($_GET["apikey"])) ? "" : $_GET["apikey"];
         $newsman = (empty($_GET["newsman"])) ? "" : $_GET["newsman"];
+        $start = (!empty($_GET["start"]) && $_GET["start"] >= 0) ? $_GET["start"] : 0;
+        $limit = (empty($_GET["limit"])) ? 10 : $_GET["limit"];        
+        $order_id = (empty($_GET["order_id"])) ? "" : $_GET["order_id"];
+        $product_id = (empty($_GET["product_id"])) ? "" : $_GET["product_id"];
 
         if (!empty($newsman) && !empty($apikey)) {
             $apikey = $_GET["apikey"];
@@ -56,13 +61,26 @@ class Index extends \Magento\Framework\App\Action\Action
             switch ($_GET["newsman"]) {
                 case "orders.json":
 
+                    $orders = null;
+
                     $ordersObj = array();
 
-                    $orders = $this->_orderCollectionFactory->create();
+                    if(empty($order_id))
+                    {                    
+                        $orders = $this->_orderCollectionFactory->create();
+                        $orders->getSelect()->limit($limit, $start);
+                    }
+                    else{
+                        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                        $order = $objectManager->create('Magento\Sales\Model\Order')->load($order_id);
+                        $orders = array(
+                            $order
+                        );
+                    }
 
                     foreach ($orders as $item) {
 
-                        $colOrder = $item->getData();
+                        $colOrder = $item->getData();                       
 
                         $productsJson = array();
 
@@ -70,16 +88,34 @@ class Index extends \Magento\Framework\App\Action\Action
 
                         foreach ($products as $prod) {
 
+                           $prodData = $prod->getData();                      
+
+                           $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                           $prodObjManager = $objectManager->create('Magento\Catalog\Model\Product')->load($prod->getId());
+
+                           $imageHelper = $objectManager->get('\Magento\Catalog\Helper\Product');                                                      
+
+                           $url = $prodObjManager->getProductUrl();
+                           $image_url = $imageHelper->getImageUrl($prodObjManager);              
+
                             $productsJson[] = array(
                                 "id" => $prod->getId(),
                                 "name" => $prod->getName(),
-                                "quantity" => $prod->getQtyOrdered(),
-                                "price" => $prod->getPrice()
+                                "quantity" => (int)$prod->getQtyOrdered(),
+                                "price" => (float)$prod->getPrice(),
+                                "price_old" => (float)0,
+                                "image_url" => $image_url,
+                                "url" => $url
                             );
                         }
 
+                        $date = new DateTime($colOrder["created_at"]);
+                        $date = $date->getTimestamp(); 
+
                         $ordersObj[] = array(
                             "order_no" => $colOrder["entity_id"],
+                            "date" => $date,
+                            "status" => $colOrder["status"],
                             "lastname" => $colOrder["customer_lastname"],
                             "firstname" => $colOrder["customer_firstname"],
                             "email" => $colOrder["customer_email"],
@@ -105,9 +141,22 @@ class Index extends \Magento\Framework\App\Action\Action
 
                 case "products.json":
 
-                    $products = $this->_productsCollectionFactory->create()->addAttributeToSelect('*')->load();
-
                     $productsJson = array();
+
+                    $products = null;
+
+                    if(empty($product_id))
+                    {
+                        $products = $this->_productsCollectionFactory->create()->setPageSize($limit)->setCurPage($start)->addAttributeToSelect('*')->load();						
+						//$products->getSelect()->limit($limit, $start);
+                    }
+                    else{
+                        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                        $prodObjManager = $objectManager->create('Magento\Catalog\Model\Product')->load($product_id);
+                        $products = array(
+                            $prodObjManager
+                        );
+                    }
 
                     foreach ($products as $prod) {
 
@@ -115,13 +164,24 @@ class Index extends \Magento\Framework\App\Action\Action
 
                         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
                         $StockState = $objectManager->get('\Magento\CatalogInventory\Api\StockStateInterface');
-                        $s = $StockState->getStockQty($_prod["entity_id"]);
+                        $s = $StockState->getStockQty($_prod["entity_id"]);                 
+
+                        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                        $prodObjManager = $objectManager->create('Magento\Catalog\Model\Product')->load($prod->getId());
+
+                        $imageHelper = $objectManager->get('\Magento\Catalog\Helper\Product');                                                      
+
+                        $url = $prodObjManager->getProductUrl();
+                        $image_url = $imageHelper->getImageUrl($prodObjManager);        
 
                         $productsJson[] = array(
                             "id" => $_prod["entity_id"],
                             "name" => $_prod["name"],
-                            "quantity" => $s,
-                            "price" => $_prod["price"]
+                            "stock_quantity" => $s,
+                            "price" => $_prod["price"],
+                            "price_old" => (float)0,
+                            "image_url" => $image_url,
+                            "url" => $url
                         );
                     }
 
@@ -176,6 +236,37 @@ class Index extends \Magento\Framework\App\Action\Action
                     return;
 
                     break;
+
+                case "count.json":
+                    
+                    $subscribers = $this->_subscriberCollectionFactory->create()
+                    ->addFilter('subscriber_status', ['eq' => 1]);
+                    $subscribers = $subscribers->count();
+
+                    $json = array(
+                        "subscribers" => $subscribers
+                    );
+        
+                    header('Content-Type: application/json');
+                    echo json_encode($json, JSON_PRETTY_PRINT);   
+
+                break;
+
+                case "version.js":
+
+                    $version = "";
+                    
+                    $version = \Magento\Framework\AppInterface::VERSION;
+                    if(empty($version))
+                    {
+                        $productMetadata = new \Magento\Framework\App\ProductMetadata();
+                        $version = $productMetadata->getVersion();
+                    }
+
+                    header('Content-Type: application/json');
+                    echo json_encode($version, JSON_PRETTY_PRINT);   
+
+                break;
             }
         } else {
             http_response_code(403);

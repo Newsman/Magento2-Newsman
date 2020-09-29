@@ -127,7 +127,7 @@
                         <field id="*/*/active">1</field>
                     </depends>
                 </field>
-               <!--<group id="debug" translate="label" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="100">
+               <group id="debug" translate="label" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="100">
                     <depends>
                         <field id="*/*/active">1</field>
                     </depends>
@@ -147,7 +147,7 @@
                     <field id="button" translate="label comment" type="button" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
                         <frontend_model>Dazoot\Newsmansmtp\Block\Adminhtml\System\Config\TestButton</frontend_model>
                     </field>
-                </group>-->
+                </group>
             </group>
         </section>
     </system>
