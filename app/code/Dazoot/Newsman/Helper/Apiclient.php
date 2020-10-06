@@ -11,6 +11,7 @@ class Apiclient extends \Magento\Framework\App\Helper\AbstractHelper
 
 	public $userId, $apiKey, $listId;
 
+	protected $ip;
 	protected $scopeConfig;
 
 	const XML_PATH_USER_RECIPIENT = 'newsman/credentials/userId';
@@ -56,6 +57,11 @@ class Apiclient extends \Magento\Framework\App\Helper\AbstractHelper
 		return $this->client->import->csv($list, $segments, $csv);
 	}
 
+	public function unsubscribe($email){
+		$listId = $this->getSelectedList();
+		return $this->client->subscriber->saveUnsubscribe($listId, $email, $this->ip);
+	}
+
 	public function getSegmentsByList()
 	{
 		$listId = $this->getSelectedList();
@@ -82,5 +88,15 @@ class Apiclient extends \Magento\Framework\App\Helper\AbstractHelper
 		$this->userId = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_PATH_USER_RECIPIENT);
 		$this->apiKey = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_PATH_API_RECIPIENT);
 		$this->listId = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_PATH_LIST_RECIPIENT);
+
+		if(!empty($_SERVER['HTTP_CLIENT_IP'])){
+			//ip from share internet
+			$this->ip = $_SERVER['HTTP_CLIENT_IP'];
+		}elseif(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
+			//ip pass from proxy
+			$this->ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		}else{
+			$this->ip = $_SERVER['REMOTE_ADDR'];
+		}	
 	}
 }

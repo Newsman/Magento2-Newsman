@@ -12,13 +12,15 @@ class Index extends \Magento\Framework\App\Action\Action
     private $_customerCollectionFactory;
     private $_subscriberCollectionFactory;
     private $_productsCollectionFactory;
+    private $_subscriber;
 
     public function __construct(   
         \Magento\Framework\App\Action\Context $context,
         \Magento\Customer\Model\ResourceModel\Customer\CollectionFactory $customerCollectionFactory,
         \Magento\Newsletter\Model\ResourceModel\Subscriber\CollectionFactory $subscriberCollectionFactory,
         \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
-        \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productsCollectionFactory
+        \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productsCollectionFactory,
+        \Magento\Newsletter\Model\Subscriber $subscriber
     )
     {
         parent::__construct($context);
@@ -27,6 +29,7 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->_subscriberCollectionFactory = $subscriberCollectionFactory;
         $this->_customerCollectionFactory = $customerCollectionFactory;
         $this->_productsCollectionFactory = $productsCollectionFactory;
+        $this->_subscriber= $subscriber;
     }
 
     public function execute()
