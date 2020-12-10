@@ -68,3 +68,8 @@ Fill in your [Newsman](https://www.newsmanapp.com) API KEY and User ID and click
 ### Newsman Remarketing
 
   ![SMTP Configuration](https://raw.githubusercontent.com/Newsman/Magento2-Newsman/master/assets/marketing.png)
+
+## Webhooks
+
+- Unsubscribing `Newsletter Subscribers` from Magento Admin will automatically unsubscribe in Newsman List
+- Unsubscribing `Newsletter Subscribers` from Newsman will automatically unsubscribe in Magento

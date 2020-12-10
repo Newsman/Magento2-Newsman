@@ -3,6 +3,6 @@
     <router id="standard">
         <route frontName="newsman" id="newsman">
             <module name="Dazoot_Newsman"/>
-        </route>
+        </route>       
     </router>
 </config>
