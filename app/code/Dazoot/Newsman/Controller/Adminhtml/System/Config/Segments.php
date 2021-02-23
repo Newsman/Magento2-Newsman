@@ -67,59 +67,50 @@ class Segments extends \Magento\Backend\App\Action
 
 		$storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
 
-		$dataMapping = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_DATA_MAPPING);
-
-		$dataMapping = json_decode($dataMapping, true);
+		$storeManager = $objectManager->get('Magento\Store\Model\StoreManagerInterface');
+		$storeId = (int) $this->getRequest()->getParam('website', 0);
+		if($storeId == 0)
+		{
+			$storeId = (int) $this->getRequest()->getParam('store', 0);
+		}	
 
 		$batchSize = 5000;
-		$list = $this->client->getSelectedList();
+		$list = $this->client->getSelectedList($storeId);
+		
+		$customers = $this->subscriberCollectionFactory->create()->addFieldToFilter("website_id", $storeId);
 
-		if ($dataMapping != null || $dataMapping != "")
+		$segment = $dataMapping[$intCount][$gint];
+
+		$customers_to_import = array();
+
+		foreach ($customers as $item)
 		{
-			$dataMappingCount = count($dataMapping);
+			$date = strtotime($item["updated_at"]);
+			$age = time() - $date;
 
-			$intCount = 0;
-
-			for ($gint = 1; $gint < $groupsCount; $gint++)
+			if ($age > 172800)
 			{
-				$customers = $this->subscriberCollectionFactory->create()->addFieldToFilter("group_id", $gint);
+				continue;
+			}
 
-				$segment = $dataMapping[$intCount][$gint];
+			$customers_to_import[] = array(
+				"email" => $item["email"],
+				"firstname" => $item["firstname"],
+				"date" => $item["updated_at"]
+			);
 
-				$customers_to_import = array();
-
-				foreach ($customers as $item)
-				{
-					$date = strtotime($item["updated_at"]);
-					$age = time() - $date;
-
-					if ($age > 172800)
-					{
-						continue;
-					}
-
-					$customers_to_import[] = array(
-						"email" => $item["email"],
-						"firstname" => $item["firstname"],
-						"date" => $item["updated_at"]
-					);
-
-					if ((count($customers_to_import) % $batchSize) == 0)
-					{
-						$this->_importData($customers_to_import, $list, array($segment));
-					}
-				}
-
-				if (count($customers_to_import) > 0)
-				{
-					$this->_importData($customers_to_import, $list, array($segment));
-				}
-
-				unset($customers_to_import);
-
-				$intCount++;
+			if ((count($customers_to_import) % $batchSize) == 0)
+			{
+				$this->_importData($customers_to_import, $list, array($segment));
 			}
 		}
+
+		if (count($customers_to_import) > 0)
+		{
+			$this->_importData($customers_to_import, $list, array($segment));
+		}
+
+		unset($customers_to_import);					
 	}
 
 	public static function safeForCsv($str)
@@ -129,7 +120,7 @@ class Segments extends \Magento\Backend\App\Action
 
 	protected function _importData(&$data, $list, $segments = null)
 	{
-		$csv = '"email","firstname","source"' . PHP_EOL;
+		$csv = '"email","fullname","source"' . PHP_EOL;
 
 		$source = self::safeForCsv("magento 2 newsman plugin - segments customer manual sync");
 		foreach ($data as $_dat)

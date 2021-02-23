@@ -16,6 +16,7 @@ class Apiclient extends \Magento\Framework\App\Helper\AbstractHelper
 	const XML_PATH_USER_RECIPIENT = 'newsman/credentials/userId';
 	const XML_PATH_API_RECIPIENT = 'newsman/credentials/apiKey';
 	const XML_PATH_LIST_RECIPIENT = 'newsman/credentials/listId';
+	const XML_PATH_SEGMENT_RECIPIENT = 'newsman/credentials/segmentId';
 
 	public function __construct()
 	{
@@ -46,9 +47,9 @@ class Apiclient extends \Magento\Framework\App\Helper\AbstractHelper
 		return $_lists;
 	}
 
-	public function importCSV($list, $csv)
+	public function importCSV($list, $segments, $csv)
 	{
-		return $this->client->import->csv($list, array(), $csv);
+		return $this->client->import->csv($list, $segments, $csv);
 	}
 	
 	public function importCSVinSegment($list, $segments, $csv)
@@ -61,21 +62,30 @@ class Apiclient extends \Magento\Framework\App\Helper\AbstractHelper
 		return $this->client->subscriber->saveUnsubscribe($listId, $email, $this->ip);
 	}
 
-	public function getSegmentsByList()
+	public function getSegmentsByList($storeId)
 	{
-		$listId = $this->getSelectedList();
+		$listId = $this->getSelectedList($storeId);		
 		$segments = $this->client->segment->all($listId);
 
 		return $segments;
 	}
 
-	public function getSelectedList()
+	public function getSelectedList($storeId)
 	{
 		$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 
-		$storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+		$storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;		
 
-		return $this->listId = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_PATH_LIST_RECIPIENT);
+		return $this->listId = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_PATH_LIST_RECIPIENT, $storeScope, $storeId);
+	}
+
+	public function getSelectedSegment($storeId)
+	{
+		$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
+		$storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;		
+
+		return $this->listId = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_PATH_SEGMENT_RECIPIENT, $storeScope, $storeId);
 	}
 
 	public function getCredentials()
@@ -84,9 +94,9 @@ class Apiclient extends \Magento\Framework\App\Helper\AbstractHelper
 
 		$storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
 
-		$this->userId = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_PATH_USER_RECIPIENT);
-		$this->apiKey = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_PATH_API_RECIPIENT);
-		$this->listId = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_PATH_LIST_RECIPIENT);
+		$this->userId = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_PATH_USER_RECIPIENT, $storeScope);
+		$this->apiKey = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_PATH_API_RECIPIENT, $storeScope);
+		$this->listId = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_PATH_LIST_RECIPIENT, $storeScope);
 
 		if(!empty($_SERVER['HTTP_CLIENT_IP'])){
 			//ip from share internet

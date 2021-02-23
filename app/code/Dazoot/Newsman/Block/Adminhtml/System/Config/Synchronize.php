@@ -53,7 +53,23 @@ class Synchronize extends \Magento\Config\Block\System\Config\Form\Field
 	 */
 	public function getAjaxSyncUrl()
 	{
-		return $this->getUrl('newsman/system_config/synchronize');
+
+		$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
+		$storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;		
+		
+		$storeManager = $objectManager->get('Magento\Store\Model\StoreManagerInterface');
+		
+		$storeId = (int) $this->getRequest()->getParam('website', 0);
+		$param = "?storeid=" . $storeId;
+
+		if($storeId == 0)
+		{		
+			$storeId = (int) $this->getRequest()->getParam('store', 0);
+			$param = "?storeid=" . $storeId;
+		}
+
+		return $this->getUrl('newsman/system_config/synchronize') . $param;
 	}
 
 	/**

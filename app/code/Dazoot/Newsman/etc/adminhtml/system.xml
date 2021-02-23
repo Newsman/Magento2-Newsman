@@ -29,21 +29,25 @@
                     <label>List</label>
                     <source_model>Dazoot\Newsman\Model\Config\Source\Lists</source_model>
                 </field>
+                <field id="segmentId" translate="label comment" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Segment</label>
+                    <source_model>Dazoot\Newsman\Model\Config\Source\Segments</source_model>
+                </field>                
             </group>
             <group id="sync" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Synchronization Schedule</label>
+                <label>Synchronization - Newsletter Subscribers Active, Customers Active</label>
                 <field id="build_indexes" translate="label comment tooltip" type="button" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Manual Sync</label>
                     <frontend_model>Dazoot\Newsman\Block\Adminhtml\System\Config\Synchronize</frontend_model>
                 </field>
             </group>
-            <group id="syncData" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Data Synchronization</label>
+            <!--<group id="syncData" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Segments Synchronization - Customers</label>
                 <field id="customerGroups" translate="label comment tooltip" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Manual Sync</label>
                     <frontend_model>Dazoot\Newsman\Block\Adminhtml\System\Config\Segments</frontend_model>
                 </field>
-            </group>
+            </group>-->
             <group id="about" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
                 <frontend_model>Dazoot\Newsman\Block\Adminhtml\System\Config\Info</frontend_model>
             </group>

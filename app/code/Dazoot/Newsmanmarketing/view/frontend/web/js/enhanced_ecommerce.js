@@ -37,6 +37,8 @@ define(["jquery"], function (t) {
                 })
             }, this.tvc_identify = function (t) {
 
+                console.log(t);
+
                 function wait_to_load_and_identify() {
                     if (typeof _nzm.get_tracking_id === 'function') {
                         if (_nzm.get_tracking_id() == '') {
@@ -115,7 +117,6 @@ define(["jquery"], function (t) {
                 });
             }, this.add_product_checkout = function (t) {
 
-
                 for (var c in t) {
                     _nzm.run("ec:addProduct", {
                         id: t[c].tvc_i,
@@ -129,7 +130,6 @@ define(["jquery"], function (t) {
                 _nzm.run('ec:setAction', 'checkout');
                 _nzm.run('send', 'pageview');
 
-                return !0
             }
         };
         return c

@@ -21,6 +21,8 @@ class Segments extends \Magento\Backend\Block\AbstractBlock implements
 
 	protected $customerGroup;
 
+	protected $scopeConfig;
+
 	/**
 	 * Constructor
 	 * @param Context $context
@@ -30,12 +32,14 @@ class Segments extends \Magento\Backend\Block\AbstractBlock implements
 	public function __construct(
 		Context $context,
 		Data $helper,
-		\Magento\Customer\Model\ResourceModel\Group\Collection $customerGroup
+		\Magento\Customer\Model\ResourceModel\Group\Collection $customerGroup,
+		\Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
 	)
 	{
 		$this->helper = $helper;
 		$this->client = new Apiclient();
 		$this->customerGroup = $customerGroup;
+		$this->scopeConfig = $scopeConfig;
 		parent::__construct($context);
 	}
 
@@ -99,16 +103,33 @@ HTML;
 
 		/*Insert segments*/
 
-		$segments = $this->client->getSegmentsByList();
-
 		/*Select data mapping from config_data*/
 
 		$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 
-		$storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+		$storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;		
 
-		$dataMapping = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_DATA_MAPPING);
+		/*
+		$storeManager = $objectManager->get('Magento\Store\Model\StoreManagerInterface');
+		$storeId = $storeManager->getStore()->getWebsiteId();
+		
+		if($storeId == 0 || $storeId == 1)
+		{
+			$storeId = $storeManager->getStore()->getId();			
+		}	
+		*/
 
+		$storeManager = $objectManager->get('Magento\Store\Model\StoreManagerInterface');
+		$storeId = (int) $this->getRequest()->getParam('website', 0);
+		if($storeId == 0)
+		{
+			$storeId = (int) $this->getRequest()->getParam('store', 0);
+		}		
+
+		$segments = $this->client->getSegmentsByList($storeId);
+
+		$dataMapping = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_DATA_MAPPING, $storeScope, $storeId);			
+		
 		$dataMapping = json_decode($dataMapping, true);
 
 		if(empty($dataMapping)){
@@ -233,8 +254,8 @@ HTML;
 
 		$html .= <<<HTML
 		<div style="display: block; width: 100%; padding: 20px 0px 5px 0px;">
-<button id="synchronizeSegments_button" title="Synchronize Segments" type="button" class="action-default scalable" data-ui-id="widget-button-1" $enable>
-    <span>Synchronize Segments</span>
+<button id="synchronizeSegments_button" title="Synchronize" type="button" class="action-default scalable" data-ui-id="widget-button-1" $enable>
+    <span>Synchronize</span>
 </button>
 </div>
 HTML;

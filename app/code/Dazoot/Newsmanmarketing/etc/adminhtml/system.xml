@@ -33,31 +33,6 @@
                         Enter ID
                     </comment>
                 </field>
-                <!--<field id="enableIP" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
-                   <label>Enable IP Anonymization</label>
-                   <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <depends>
-                       <field id="enable">1</field>
-                   </depends>
-                   <comment>
-                     <![CDATA[Use this feature to anonymize (or stop collecting) the I.P Address of your users in Google Analytics. Be in legal compliance by using I.P Anonymization which is important for EU countries As per the GDPR compliance.
-                      Read our <a href="
-https://www.tatvic.com/privacy-policy/?ref=plugin_policy&utm_source=plugin_backend&utm_medium=magento2_free_extension&utm_campaign=GDPR_complaince_ecomm_plugins">privacy policy</a>.]]>
-
-                   </comment>
-               </field>
-                <field id="enableOptOut" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
-                   <label>Enable Google Analytics Opt Out</label>
-                   <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <depends>
-                       <field id="enable">1</field>
-                   </depends>
-                   <comment>
-                      <![CDATA[Use this feature to provide website visitors the ability to prevent their data from being used by Google Analytics As per the GDPR compliance.
-                      Read our <a href="
-https://www.tatvic.com/privacy-policy/?ref=plugin_policy&utm_source=plugin_backend&utm_medium=magento2_free_extension&utm_campaign=GDPR_complaince_ecomm_plugins">privacy policy</a>.]]>
-                   </comment>
-               </field>-->
             </group>
             <group id="support" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"
                    showInStore="1">
