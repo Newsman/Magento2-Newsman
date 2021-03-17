@@ -30,6 +30,8 @@ class Segments implements \Magento\Framework\Option\ArrayInterface
 			$storeId = (int) $this->request->getParam('store', 0);
 		}		
 
+		$this->client->setCredentials($storeId);
+
 		$_lists = $this->client->getSegmentsByList($storeId);
 
 		$arrayList = [];

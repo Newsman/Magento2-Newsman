@@ -57,7 +57,9 @@ class Synchronize extends \Magento\Backend\App\Action
 		$storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;		
 		
 		$storeManager = $objectManager->get('Magento\Store\Model\StoreManagerInterface');
-		$storeId = (int) $this->getRequest()->getParam('storeid', 0);			
+		$storeId = (int) $this->getRequest()->getParam('storeid', 0);		
+		
+		$this->client->setCredentials($storeId);
 
 		$batchSize = 9000;
 

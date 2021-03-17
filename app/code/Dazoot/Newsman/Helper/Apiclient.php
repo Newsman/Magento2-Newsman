@@ -11,7 +11,7 @@ class Apiclient extends \Magento\Framework\App\Helper\AbstractHelper
 	public $userId, $apiKey, $listId;
 
 	protected $ip;
-	protected $scopeConfig;
+	protected $scopeConfig, $storeId;
 
 	const XML_PATH_USER_RECIPIENT = 'newsman/credentials/userId';
 	const XML_PATH_API_RECIPIENT = 'newsman/credentials/apiKey';
@@ -26,14 +26,25 @@ class Apiclient extends \Magento\Framework\App\Helper\AbstractHelper
 	public function initializeClient()
 	{
 		try
+		{			
+		
+		} catch (\Exception $e)
 		{
-			$this->getCredentials();
 
+		}
+	}
+
+	public function setCredentials($storeId){
+		$this->storeId = $storeId;
+
+		$this->getCredentials($this->storeId);
+	
+		try{
 			$this->client = new Newsman_Client($this->userId, $this->apiKey);
 			$this->client->setCallType('rest');
 			$this->client->setTransport('curl');
-		} catch (\Exception $e)
-		{
+		}
+		catch(\Exception $e){
 
 		}
 	}
@@ -65,7 +76,16 @@ class Apiclient extends \Magento\Framework\App\Helper\AbstractHelper
 	public function getSegmentsByList($storeId)
 	{
 		$listId = $this->getSelectedList($storeId);		
-		$segments = $this->client->segment->all($listId);
+
+		$segments = array();
+
+		try{
+		  $segments = $this->client->segment->all($listId);
+		}
+		catch(\Exception $e)
+		{
+
+		}
 
 		return $segments;
 	}
@@ -88,15 +108,15 @@ class Apiclient extends \Magento\Framework\App\Helper\AbstractHelper
 		return $this->listId = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_PATH_SEGMENT_RECIPIENT, $storeScope, $storeId);
 	}
 
-	public function getCredentials()
+	public function getCredentials($storeId)
 	{
 		$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 
 		$storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
 
-		$this->userId = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_PATH_USER_RECIPIENT, $storeScope);
-		$this->apiKey = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_PATH_API_RECIPIENT, $storeScope);
-		$this->listId = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_PATH_LIST_RECIPIENT, $storeScope);
+		$this->userId = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_PATH_USER_RECIPIENT, $storeScope, $storeId);
+		$this->apiKey = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_PATH_API_RECIPIENT, $storeScope, $storeId);
+		$this->listId = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_PATH_LIST_RECIPIENT, $storeScope, $storeId);
 
 		if(!empty($_SERVER['HTTP_CLIENT_IP'])){
 			//ip from share internet

@@ -25,6 +25,8 @@ class Newsletter implements ObserverInterface
 
     public function execute(Observer $observer)
     {
+		$this->client->setCredentials(0);
+
         $event = $observer->getEvent();
         $customer = $event->getSubscriber();
         $customerEmail = $customer->getSubscriberEmail();
