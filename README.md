@@ -26,7 +26,7 @@ for Magento 2.0x
 Delete Cache 
 for Magento 2.3x
 ```
-- ("root/yourmagentodirectory/generated/metadata") - delete di folder
+- ("root/yourmagentodirectory/generated/metadata") - delete metadata folder
 ```
 Last command
 ```
@@ -42,24 +42,25 @@ Enable dazoot/newsmanmarketing
 	
 ## Configuration
 
-### Newsman Sync Addon
+### Newsman Sync
 
 1. Go to **Stores > Configuration > Newsman > General Settings**
 Fill in your [Newsman](https://www.newsmanapp.com) API KEY and User ID and click the Save Config button.
 
   ![General Settings](https://raw.githubusercontent.com/Newsman/Magento2-Newsman/master/assets/general_settings.png)
 
-2. After the [Newsman](https://www.newsmanapp.com) API KEY and User ID are set, you can choose a list and press Save Config.
+2. After the [Newsman](https://www.newsmanapp.com) API KEY and User ID are set, you can choose a list and (optional) segment and press Save Config.
 
-3. Choose destination segments for your newsletter subscribers and customer groups. You can choose to import customers and subscribers to a list or configure it to import in your selected segments. For the segments to show up in this form, you need to set them up in your Newsman account first.
-
-  ![Data Mapping](https://raw.githubusercontent.com/Newsman/Magento2-Newsman/master/assets/data_mapping.png)
-
-4. Choose how often you want your lists to get uploaded to [Newsman](https://www.newsmanapp.com) You can also do a manual synchronization by clicking "Manual Sync".
+3. You do a manual synchronization by clicking "Manual Sync".
 
   ![Synchronization Schedule](https://raw.githubusercontent.com/Newsman/Magento2-Newsman/master/assets/synchronization_schedule.png)
 
-5. For the automatic synchronization to work, you need to have Magento's built-in cron job functionality enabled.
+4. For the automatic synchronization to work, you need to have Magento's built-in cron job functionality enabled.
+
+#### Webhooks
+
+- Unsubscribing `Newsletter Subscribers` from Magento Admin will automatically unsubscribe in Newsman List
+- Unsubscribing `Newsletter Subscribers` from Newsman will automatically unsubscribe in Magento
 
 ### Newsman SMTP Configuration
 
@@ -68,8 +69,3 @@ Fill in your [Newsman](https://www.newsmanapp.com) API KEY and User ID and click
 ### Newsman Remarketing
 
   ![SMTP Configuration](https://raw.githubusercontent.com/Newsman/Magento2-Newsman/master/assets/marketing.png)
-
-## Webhooks
-
-- Unsubscribing `Newsletter Subscribers` from Magento Admin will automatically unsubscribe in Newsman List
-- Unsubscribing `Newsletter Subscribers` from Newsman will automatically unsubscribe in Magento
