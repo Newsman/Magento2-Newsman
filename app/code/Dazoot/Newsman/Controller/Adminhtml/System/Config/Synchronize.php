@@ -69,40 +69,50 @@ class Synchronize extends \Magento\Backend\App\Action
 		if($segment == 0)
 			$segment = array();
 		
+
+		$importType = $this->client->getImportType($storeId);
+		if(empty($importType))
+			$importType = 1;
+	
 		$customers = $this->subscriberCollectionFactory->create()
 		->addFilter('is_active', ['eq' => 1])
 		->addFieldToFilter("website_id", $storeId);
 
-		$customers_to_import = array();
-
-		foreach ($customers as $item)
+		if($importType == 2)
 		{
-			/*$date = strtotime($item["updated_at"]);
-			$age = time() - $date;
+		
+			$customers_to_import = array();
 
-			if ($age > 172800)
+			foreach ($customers as $item)
 			{
-				continue;
-			}*/
+				/*$date = strtotime($item["updated_at"]);
+				$age = time() - $date;
 
-			$customers_to_import[] = array(
-				"email" => $item["email"],
-				"firstname" => $item["firstname"],
-				"date" => $item["updated_at"]
-			);
+				if ($age > 172800)
+				{
+					continue;
+				}*/
 
-			if ((count($customers_to_import) % $batchSize) == 0)
+				$customers_to_import[] = array(
+					"email" => $item["email"],
+					"firstname" => $item["firstname"],
+					"date" => $item["updated_at"]
+				);
+
+				if ((count($customers_to_import) % $batchSize) == 0)
+				{
+					$this->importDataCustomers($customers_to_import, $list, array($segment));
+				}
+			}
+
+			if (count($customers_to_import) > 0)
 			{
 				$this->importDataCustomers($customers_to_import, $list, array($segment));
 			}
-		}
 
-		if (count($customers_to_import) > 0)
-		{
-			$this->importDataCustomers($customers_to_import, $list, array($segment));
-		}
+			unset($customers_to_import);
 
-		unset($customers_to_import);
+		}
 
 		//subscribers import
 

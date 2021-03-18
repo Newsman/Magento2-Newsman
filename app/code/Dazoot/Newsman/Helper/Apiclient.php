@@ -8,7 +8,7 @@ class Apiclient extends \Magento\Framework\App\Helper\AbstractHelper
 {
 	protected $client;
 
-	public $userId, $apiKey, $listId;
+	public $userId, $apiKey, $listId, $importType;
 
 	protected $ip;
 	protected $scopeConfig, $storeId;
@@ -17,6 +17,7 @@ class Apiclient extends \Magento\Framework\App\Helper\AbstractHelper
 	const XML_PATH_API_RECIPIENT = 'newsman/credentials/apiKey';
 	const XML_PATH_LIST_RECIPIENT = 'newsman/credentials/listId';
 	const XML_PATH_SEGMENT_RECIPIENT = 'newsman/credentials/segmentId';
+	const XML_PATH_IMPORTTYPE_RECIPIENT = 'newsman/credentials/importType';
 
 	public function __construct()
 	{
@@ -97,6 +98,15 @@ class Apiclient extends \Magento\Framework\App\Helper\AbstractHelper
 		$storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;		
 
 		return $this->listId = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_PATH_LIST_RECIPIENT, $storeScope, $storeId);
+	}
+
+	public function getImportType($storeId)
+	{
+		$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
+		$storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;		
+
+		return $this->importType = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_PATH_IMPORTTYPE_RECIPIENT, $storeScope, $storeId);
 	}
 
 	public function getSelectedSegment($storeId)
