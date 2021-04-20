@@ -41,7 +41,7 @@
             <group id="sync" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Synchronization - Newsletter Subscribers Active, Customers Active</label>
                 <field id="build_indexes" translate="label comment tooltip" type="button" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Manual Sync</label>
+                    <label>Sync</label>
                     <frontend_model>Dazoot\Newsman\Block\Adminhtml\System\Config\Synchronize</frontend_model>
                 </field>
             </group>

@@ -134,8 +134,12 @@ class Apiclient extends \Magento\Framework\App\Helper\AbstractHelper
 		}elseif(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
 			//ip pass from proxy
 			$this->ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-		}else{
+		}elseif(!empty($_SERVER['REMOTE_ADDR']))
+		{
 			$this->ip = $_SERVER['REMOTE_ADDR'];
+		}
+		else{
+			$this->ip = "127.0.0.1";
 		}	
 	}
 }
