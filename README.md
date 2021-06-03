@@ -45,6 +45,10 @@ for Magento 2.3x
 - Enable dazoot/newsmanmarketing
 - Dazoot_Newsmansmtp
 	
+# After installation
+
+Clear cache from System -> Cache Management -> Flush Magento Cache and Flush CSS/JS Cache
+	
 # Configuration
 
 ## Newsman Sync
