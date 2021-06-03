@@ -2,14 +2,14 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="../../../../Magento/Config/etc/system_file.xsd">
     <system>
-        <tab id="newsman_remarketing" translate="label" sortOrder="10">
+        <tab id="newsmanmarketing" translate="label" sortOrder="10">
             <label>Newsman Remarketing</label>
         </tab>
 
-        <section id="tatvic_ee" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1"
+        <section id="newsmanmarketing" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1"
                  showInStore="1">
             <label>Newsman Remarketing</label>
-            <tab>newsman_remarketing</tab>
+            <tab>newsmanmarketing</tab>
             <resource>Dazoot_Newsmanmarketing::ee</resource>
             <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1"
                    showInStore="1">

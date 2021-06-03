@@ -52,7 +52,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         \Magento\Catalog\Block\Product\ProductList\Toolbar $productListBlockToolbar
     ){
         parent::__construct($context);
-        $this->_tvc_ga_options = $this->scopeConfig->getValue('tatvic_ee', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $this->_tvc_ga_options = $this->scopeConfig->getValue('newsmanmarketing', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         $this->tvc_blockFactory = $blockFactory;
         $this->tvc_categoryCollectionFactory = $categoryCollectionFactory;
         $this->tvc_registry = $registry;

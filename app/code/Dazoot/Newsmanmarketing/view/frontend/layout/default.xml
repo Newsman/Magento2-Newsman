@@ -1,7 +1,7 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
 <body>
     <referenceContainer name="head.additional">
-        <block ifconfig="tatvic_ee/general/enable" class="Dazoot\Newsmanmarketing\Block\EnhancedEcommerce" name="head.enhancedecommerce" template="head.phtml"/>
+        <block ifconfig="newsmanmarketing/general/enable" class="Dazoot\Newsmanmarketing\Block\EnhancedEcommerce" name="head.newsmanmarketing" template="head.phtml"/>
     </referenceContainer>
 </body>
 </page>

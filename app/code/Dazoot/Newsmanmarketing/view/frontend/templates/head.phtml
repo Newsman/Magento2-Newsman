@@ -62,9 +62,9 @@ if ($customerSession->isLoggedIn())
 
 	echo "<script>
 			require(
-					['Dazoot_Newsmanmarketing/js/enhanced_ecommerce','jquery'],
-						function(enhanced_ecommerce){
-							var obj = new enhanced_ecommerce();
+					['Dazoot_Newsmanmarketing/js/newsmanmarketing','jquery'],
+						function(newsmanmarketing){
+							var obj = new newsmanmarketing();
 							obj.tvc_identify($usrData);
 						}
 			);
@@ -76,9 +76,9 @@ if ($get_action == 'catalog_product_view')
 	echo "<script>
 			var tvc_pp =" . $tvc_data . ";
 			require(
-					['Dazoot_Newsmanmarketing/js/enhanced_ecommerce','jquery'], 
-						function(enhanced_ecommerce){
-							var obj = new enhanced_ecommerce();
+					['Dazoot_Newsmanmarketing/js/newsmanmarketing','jquery'], 
+						function(newsmanmarketing){
+							var obj = new newsmanmarketing();
 							obj.tvc_pro_detail(tvc_pp);
 							obj.tvc_add_to_cart(tvc_pp);
 						}
@@ -90,9 +90,9 @@ if ($get_action == 'catalog_category_view')
 	echo "<script>
 			var tvc_pgc =" . $tvc_data . ";
 			require(
-					['Dazoot_Newsmanmarketing/js/enhanced_ecommerce','jquery'], 
-						function(enhanced_ecommerce){
-							var obj = new enhanced_ecommerce();
+					['Dazoot_Newsmanmarketing/js/newsmanmarketing','jquery'], 
+						function(newsmanmarketing){
+							var obj = new newsmanmarketing();
 							obj.tvc_get_impression(tvc_pgc);
 							obj.tvc_impr_click(tvc_pgc);
 						}
@@ -104,9 +104,9 @@ if ($get_action == 'checkout_cart_index')
 	echo "<script>
         var tvc_remove =" . $tvc_data . ";
         require(
-                ['Dazoot_Newsmanmarketing/js/enhanced_ecommerce','jquery'], 
-                    function(enhanced_ecommerce){
-                        var obj = new enhanced_ecommerce();
+                ['Dazoot_Newsmanmarketing/js/newsmanmarketing','jquery'], 
+                    function(newsmanmarketing){
+                        var obj = new newsmanmarketing();
                         obj.add_product_checkout(tvc_remove);
                     }
         );
@@ -119,9 +119,9 @@ if ($get_action == 'checkout_onepage_success')
 		var t_keys = Object.keys(tvc_oo);
 		var t_last = t_keys[tvc_oo.length-1];
 		require(
-				['Dazoot_Newsmanmarketing/js/enhanced_ecommerce','jquery'], 
-					function(enhanced_ecommerce){
-						var obj = new enhanced_ecommerce();
+				['Dazoot_Newsmanmarketing/js/newsmanmarketing','jquery'], 
+					function(newsmanmarketing){
+						var obj = new newsmanmarketing();
 						obj.tvc_transaction_call(tvc_oo,tvc_oo[t_last]);
 					}
 		);

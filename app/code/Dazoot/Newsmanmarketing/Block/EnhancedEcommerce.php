@@ -3,10 +3,6 @@ namespace Dazoot\Newsmanmarketing\Block;
 
 use Magento\Framework\View\Element\Template;
 
-/**
-* Class EnhancedEcommerce
-* @package Tatvic\EnhancedEcommerce\Block
-*/
 class EnhancedEcommerce extends Template
 {
     protected $_helper;
