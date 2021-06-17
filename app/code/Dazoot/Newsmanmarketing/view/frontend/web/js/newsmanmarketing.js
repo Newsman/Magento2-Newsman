@@ -97,6 +97,7 @@ define(["jquery"], function (t) {
 
                     _nzm.run('ec:setAction', 'add');
                     _nzm.run('send', 'event', 'UX', 'click', 'add to cart');
+                    _nzm.run('send', 'pageview');
 
                 })
             }, this.tvc_remove_cart = function (t) {
@@ -115,6 +116,7 @@ define(["jquery"], function (t) {
 
                     _nzm.run('ec:setAction', 'remove');
                     _nzm.run('send', 'event', 'UX', 'click', 'remove from cart');
+	            _nzm.run('send', 'pageview');
 
                 })
             }, this.tvc_transaction_call = function (t, c) {
@@ -133,6 +135,7 @@ define(["jquery"], function (t) {
                     'tax': c.tvc_tt,
                     'shipping': c.tvc_ts
                 });
+		_nzm.run('send', 'pageview');
             }, this.add_product_checkout = function (t) {
 
                 for (var c in t) {
