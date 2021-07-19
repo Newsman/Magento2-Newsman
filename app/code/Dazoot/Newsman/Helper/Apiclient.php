@@ -91,7 +91,7 @@ class Apiclient extends \Magento\Framework\App\Helper\AbstractHelper
 		return $segments;
 	}
 
-	public function getSelectedList($storeId)
+	public function getSelectedList($storeId = 0)
 	{
 		$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 
