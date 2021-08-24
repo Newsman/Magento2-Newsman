@@ -283,11 +283,11 @@ class EmailTest extends Template
         $this->fromAddress = $from;
 
         //Create email
-        $name = 'Test from MagePal SMTP';
+        $name = 'Test from Newsman SMTP';
         $mail = new Zend_Mail();
         $mail->setFrom($this->fromAddress, $name);
         $mail->addTo($this->toAddress, $this->toAddress);
-        $mail->setSubject('Hello from MagePal SMTP (1 of 2)');
+        $mail->setSubject('Hello from Newsman SMTP (1 of 2)');
 
         $htmlBody = $this->_email->setTemplateVars(['hash' => $this->hash])->getEmailBody();
 
