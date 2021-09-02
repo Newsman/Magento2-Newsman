@@ -39,9 +39,14 @@ class Newsletter implements ObserverInterface
 
         }
         else{
-            $ret = $this->client->unsubscribe($customerEmail);
+            try{
+                $ret = $this->client->unsubscribe($customerEmail);
 
-            $json = \json_encode($ret);
+                $json = \json_encode($ret);
+            }
+            catch(Exception $e){
+                //subscriber does not exist on the list
+            }
         }
 
         $sub = $checkSubscriber->getData();
