@@ -336,7 +336,7 @@ class Newsman_Client
 		{
 			$_error = @json_decode($ret, true);
 
-			if (is_array($_error) && array_key_exists("err", $_error) && array_key_exists("message", $_error) && array_key_exists("code", $_error))
+			/*if (is_array($_error) && array_key_exists("err", $_error) && array_key_exists("message", $_error) && array_key_exists("code", $_error))
 			{
 				throw new \Exception(
 					$_error["message"], $_error["code"]
@@ -346,7 +346,7 @@ class Newsman_Client
 				throw new \Exception(
 					(string)curl_error($cu), (string)$http_status
 				);
-			}
+			}*/
 		}
 
 		return $ret;
