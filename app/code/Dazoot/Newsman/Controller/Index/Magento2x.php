@@ -293,14 +293,13 @@ class Index extends \Magento\Framework\App\Action\Action
 
                 case "version.js":
 
-                    $version = "";
-                    
-                    $version = \Magento\Framework\AppInterface::VERSION;
-                    if(empty($version))
-                    {
-                        $productMetadata = new \Magento\Framework\App\ProductMetadata();
-                        $version = $productMetadata->getVersion();
-                    }
+                    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                    $productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface');
+                    $version = $productMetadata->getVersion(); 
+
+                    $version = array(
+                        "version" => "Magento " . $version
+                    );
 
                     header('Content-Type: application/json');
                     echo json_encode($version, JSON_PRETTY_PRINT);   
