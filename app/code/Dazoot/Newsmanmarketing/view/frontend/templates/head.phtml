@@ -41,9 +41,7 @@
 
 	if (tvc_ip == 1) {
 		_nzm.run('set', 'anonymizeIp', true);
-	}
-
-	_nzm.run('require', 'ec');
+	}	
 
 </script>
 <?php
@@ -52,6 +50,17 @@ list($tvc_data, $get_action) = $block->getAction();
 
 $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 $customerSession = $objectManager->get('Magento\Customer\Model\Session');
+
+echo "<script>
+require(
+	['Dazoot_Newsmanmarketing/js/newsmanmarketing','jquery'],
+	function(newsmanmarketing){
+		var obj = new newsmanmarketing();
+		obj.tvc_autoevents();
+	}	
+);
+</script>";
+
 if ($customerSession->isLoggedIn())
 {
 	$usrData = array();
@@ -69,7 +78,7 @@ if ($customerSession->isLoggedIn())
 							obj.tvc_identify($usrData);
 						}
 			);
-		</script>";
+		</script>";	
 }
 
 if ($get_action == 'catalog_product_view')
@@ -102,6 +111,7 @@ if ($get_action == 'catalog_category_view')
 }
 if ($get_action == 'checkout_cart_index')
 {
+	/*Obsolete
 	echo "<script>
         var tvc_remove =" . $tvc_data . ";
         require(
@@ -112,6 +122,7 @@ if ($get_action == 'checkout_cart_index')
                     }
         );
         </script>";
+	*/
 }
 if ($get_action == 'checkout_onepage_success')
 {

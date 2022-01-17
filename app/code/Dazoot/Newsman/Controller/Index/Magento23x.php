@@ -16,6 +16,7 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
     private $_subscriberCollectionFactory;
     private $_productsCollectionFactory;
     private $_subscriber;
+    private $_cartSession;
 
     public function __construct(   
         \Magento\Framework\App\Action\Context $context,
@@ -23,7 +24,8 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
         \Magento\Newsletter\Model\ResourceModel\Subscriber\CollectionFactory $subscriberCollectionFactory,
         \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
         \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productsCollectionFactory,
-        \Magento\Newsletter\Model\Subscriber $subscriber
+        \Magento\Newsletter\Model\Subscriber $subscriber,
+        \Magento\Checkout\Model\Session\Proxy $cartSession
     )
     {
         parent::__construct($context);
@@ -33,6 +35,7 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
         $this->_customerCollectionFactory = $customerCollectionFactory;
         $this->_productsCollectionFactory = $productsCollectionFactory;
         $this->_subscriber= $subscriber;
+        $this->_cartSession = $cartSession;
 
         // CsrfAwareAction Magento -> 2.3 compatibility
         if (interface_exists("\Magento\Framework\App\CsrfAwareActionInterface")) {
@@ -97,15 +100,18 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
         $order_id = (empty($_GET["order_id"])) ? "" : $_GET["order_id"];
         $product_id = (empty($_GET["product_id"])) ? "" : $_GET["product_id"];
 
-        if (!empty($newsman) && !empty($apikey)) {
-            $apikey = $_GET["apikey"];
+        if (!empty($newsman) && !empty($apikey) || $newsman == "getCart.json") {
+            $apikey = $_GET["apikey"] ?? "";
             $currApiKey = $_apikey;
 
-            if ($apikey != $currApiKey) {
-                http_response_code(403);
-                header('Content-Type: application/json');
-                echo json_encode(403, JSON_PRETTY_PRINT);
-                return;
+            if($newsman != "getCart.json")
+            {
+                if ($apikey != $currApiKey) {
+                    http_response_code(403);
+                    header('Content-Type: application/json');
+                    echo json_encode(403, JSON_PRETTY_PRINT);
+                    return;
+                }
             }
 
             switch ($_GET["newsman"]) {
@@ -302,7 +308,7 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
 
                 break;
 
-                case "version.js":                    
+                case "version.json":                    
 
                     $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
                     $productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface');
@@ -314,6 +320,32 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
 
                     header('Content-Type: application/json');
                     echo json_encode($version, JSON_PRETTY_PRINT);   
+
+                break;
+                
+                case "getCart.json":
+
+                    if ((bool)$_POST["post"] == true) {              
+                       
+                        $cart = $this->_cartSession->getQuote()->getAllVisibleItems();
+              
+                        $prod = array();
+
+                        foreach ( $cart as $cart_item_key => $cart_item ) {                   
+
+                                $prod[] = array(
+                                    "id" => $cart_item->getId(),
+                                    "name" => $cart_item->getName(),
+                                    "price" => $cart_item->getPrice(),						
+                                    "quantity" => $cart_item->getQty()
+                                );							
+                                                    
+                            }									 						
+
+                            header('Content-Type: application/json');
+                            echo json_encode($prod, JSON_PRETTY_PRINT);  
+                        return;
+                    }
 
                 break;
             }

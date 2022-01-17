@@ -1,6 +1,90 @@
 define(["jquery"], function (t) {
         "use strict";
         var c = function () {
+            this.tvc_autoevents = function (t){
+
+            _nzm.run('require', 'ec');
+
+            var isProd = false;
+            let lastCart = sessionStorage.getItem('lastCart');		
+
+            if(lastCart === null)
+                lastCart = {};	
+
+            let lastCartFlag = false;
+            let bufferedClick = false;
+            let firstLoad = true;
+
+            NewsmanAutoEvents();	
+            setInterval(NewsmanAutoEvents, 5000);
+            
+            BufferClick();
+
+            function NewsmanAutoEvents(){		
+                var ajaxurl = '/newsman/index/index?newsman=getCart.json';
+                if(bufferedClick || firstLoad)
+                {
+                    jQuery.post(ajaxurl, {  
+                    post: true,
+                    }, function (response) {				
+                        lastCart = JSON.parse(sessionStorage.getItem('lastCart'));						
+                        if(lastCart === null)
+                            lastCart = {};	
+                        //check cache
+                        if(lastCart.length > 0 && lastCart != null && lastCart != undefined && response.length > 0 && response != null && response != undefined)
+                        {				
+                            if(JSON.stringify(lastCart) === JSON.stringify(response))
+                            {
+                                if(!isProd)
+                                    console.log('newsman remarketing: cache loaded, cart is unchanged');
+                                lastCartFlag = true;					
+                            }
+                            else{
+                                lastCartFlag = false;
+                            }
+                        }			
+                        if(response.length > 0 && lastCartFlag == false)
+                        {
+                            _nzm.run('ec:setAction', 'clear_cart');
+                            _nzm.run('send', 'event', 'detail view', 'click', 'clearCart');	
+                            for (var item in response) {				
+                                _nzm.run( 'ec:addProduct', 
+                                    response[item]
+                                );				
+                            }	
+                            
+                            _nzm.run( 'ec:setAction', 'add' );
+                            _nzm.run( 'send', 'event', 'UX', 'click', 'add to cart' );
+                            sessionStorage.setItem('lastCart', JSON.stringify(response));					
+                            if(!isProd)
+                                console.log('newsman remarketing: cart sent');				
+                        }
+                        else{
+                            if(!isProd)
+                                console.log('newsman remarketing: request not sent');
+                        }
+                        firstLoad = false;
+                        bufferedClick = false;
+                        
+                    });
+                }
+            }
+
+            function BufferClick(){
+                window.onclick = function (e) {
+                    const origin = ['a', 'input', 'span', 'i', 'button'];
+        
+                    var click = e.target.localName;			
+                    if(!isProd)
+                        console.log('newsman remarketing element clicked: ' + click);
+                    for (const element of origin) {
+                        if(click == element)
+                            bufferedClick = true;
+                    }
+                }
+            }
+
+            },
             this.tvc_get_impression = function (t) {
                 var c = 0, e = Object.keys(t).length;
                 for (var n in t) {
@@ -65,6 +149,7 @@ define(["jquery"], function (t) {
                 _nzm.run('send', 'pageview');
 
             }, this.tvc_add_to_cart = function (t) {
+                /*Obsolete
                 jQuery("#product-addtocart-button").on("click", function () {
 
                     var variationBool = false;
@@ -97,10 +182,11 @@ define(["jquery"], function (t) {
 
                     _nzm.run('ec:setAction', 'add');
                     _nzm.run('send', 'event', 'UX', 'click', 'add to cart');
-                    _nzm.run('send', 'pageview');
-
+                    _nzm.run('send', 'pageview');            
                 })
+                */
             }, this.tvc_remove_cart = function (t) {
+                /*
                 jQuery(".action-delete").on("click", function () {
                     var c = jQuery(this).attr("data-post");
                     c = jQuery.parseJSON(c);
@@ -117,8 +203,8 @@ define(["jquery"], function (t) {
                     _nzm.run('ec:setAction', 'remove');
                     _nzm.run('send', 'event', 'UX', 'click', 'remove from cart');
 	            _nzm.run('send', 'pageview');
-
                 })
+                */
             }, this.tvc_transaction_call = function (t, c) {
                 for (var e in t)_nzm.run("ec:addProduct", {
                     id: t[e].tvc_i,
