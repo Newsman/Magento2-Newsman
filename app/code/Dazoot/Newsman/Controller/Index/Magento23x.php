@@ -11,6 +11,7 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
 {
     const XML_PATH_API_RECIPIENT = 'newsman/credentials/apiKey';
 
+    private $logger;
     private $_orderCollectionFactory;
     private $_customerCollectionFactory;
     private $_subscriberCollectionFactory;
@@ -19,6 +20,7 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
     private $_cartSession;
 
     public function __construct(   
+        \Psr\Log\LoggerInterface $logger,
         \Magento\Framework\App\Action\Context $context,
         \Magento\Customer\Model\ResourceModel\Customer\CollectionFactory $customerCollectionFactory,
         \Magento\Newsletter\Model\ResourceModel\Subscriber\CollectionFactory $subscriberCollectionFactory,
@@ -30,6 +32,7 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
     {
         parent::__construct($context);
 
+        $this->logger = $logger;
         $this->_orderCollectionFactory = $orderCollectionFactory;
         $this->_subscriberCollectionFactory = $subscriberCollectionFactory;
         $this->_customerCollectionFactory = $customerCollectionFactory;
@@ -63,8 +66,9 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
     {
         $newsman_events = json_decode($_POST["newsman_events"]);
         $event = $newsman_events[0];
-
-        switch($event->type)
+        $type = $event->type;
+ 
+        switch($type)
         {
             case "unsub":
 
@@ -86,6 +90,17 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
                 ) {
                     $subscriber->unsubscribe();
                 }
+
+            break;
+            case "subscribe_confirm":                
+
+                $this->logger->debug(\json_encode($post)); 
+                $this->logger->debug(\json_encode($event->data->email));
+
+                $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
+                $subscriberFactory = $objectManager->get('\Magento\Newsletter\Model\SubscriberFactory');
+                $subscriberFactory->create()->subscribe($event->data->email);    
 
             break;
         }

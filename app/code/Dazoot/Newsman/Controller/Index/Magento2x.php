@@ -52,8 +52,9 @@ class Index extends \Magento\Framework\App\Action\Action
     {
         $newsman_events = json_decode($_POST["newsman_events"]);
         $event = $newsman_events[0];
-
-        switch($event->type)
+        $type = $event->type;
+ 
+        switch($type)
         {
             case "unsub":
 
@@ -75,6 +76,17 @@ class Index extends \Magento\Framework\App\Action\Action
                 ) {
                     $subscriber->unsubscribe();
                 }
+
+            break;
+            case "subscribe_confirm":                
+
+                $this->logger->debug(\json_encode($post)); 
+                $this->logger->debug(\json_encode($event->data->email));
+
+                $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
+                $subscriberFactory = $objectManager->get('\Magento\Newsletter\Model\SubscriberFactory');
+                $subscriberFactory->create()->subscribe($event->data->email);    
 
             break;
         }
