@@ -51,14 +51,12 @@ class Index extends \Magento\Framework\App\Action\Action
     public function webhookEvents($post)
     {
         $newsman_events = json_decode($_POST["newsman_events"]);
-        $event = $newsman_events[0];
-        $type = $event->type;
- 
-        switch($type)
-        {
-            case "unsub":
 
-                $email = $event->data->email;     
+        foreach($newsman_events as $event)
+        {                  
+            if($event['type'] == "unsub" || $event['type'] == "unsub")
+            {                                              
+                $email = $event["data"]["email"];     
                 $subscriber = null;
         
                 $subscribers = $this->_subscriberCollectionFactory->create()
@@ -76,19 +74,14 @@ class Index extends \Magento\Framework\App\Action\Action
                 ) {
                     $subscriber->unsubscribe();
                 }
-
-            break;
-            case "subscribe_confirm":                
-
-                $this->logger->debug(\json_encode($post)); 
-                $this->logger->debug(\json_encode($event->data->email));
-
+            }
+            elseif($event["type"] == "subscribe_confirm")
+            {
                 $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 
                 $subscriberFactory = $objectManager->get('\Magento\Newsletter\Model\SubscriberFactory');
-                $subscriberFactory->create()->subscribe($event->data->email);    
-
-            break;
+                $subscriberFactory->create()->subscribe($event["data"]["email"]);    
+            }
         }
     }
 
@@ -244,7 +237,6 @@ class Index extends \Magento\Framework\App\Action\Action
 
                     header('Content-Type: application/json');
                     echo json_encode($productsJson, JSON_PRETTY_PRINT);
-		    exit;
                     return;
 
                     break;
