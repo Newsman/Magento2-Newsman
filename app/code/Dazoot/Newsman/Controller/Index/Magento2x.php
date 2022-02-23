@@ -244,6 +244,7 @@ class Index extends \Magento\Framework\App\Action\Action
 
                     header('Content-Type: application/json');
                     echo json_encode($productsJson, JSON_PRETTY_PRINT);
+		    exit;
                     return;
 
                     break;
