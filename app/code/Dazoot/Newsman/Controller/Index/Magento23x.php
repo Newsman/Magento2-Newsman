@@ -51,11 +51,11 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
     }
 
     public function execute()
-    {       
+    {  
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 
         $apiKey = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue(self::XML_PATH_API_RECIPIENT);
-     
+
         if(isset($_POST["newsman_events"]))
             $this->webhookEvents($_POST);
         else                    
@@ -64,12 +64,12 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
 
     public function webhookEvents($post)
     {
-        $newsman_events = json_decode($_POST["newsman_events"]);
+        $newsman_events = json_decode($_POST["newsman_events"], true);
 
         foreach($newsman_events as $event)
-        {                  
-            if($event['type'] == "unsub" || $event['type'] == "unsub")
-            {                                              
+        {            
+            if($event['type'] == "unsub")
+            {                                                            
                 $email = $event["data"]["email"];     
                 $subscriber = null;
         
@@ -82,11 +82,11 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
         
                     $col = $sub->getData();
                     $email = $col["subscriber_email"];              
-                }   
-                
+                }       
+        
                 if (!empty($subscriber) && $subscriber->getSubscriberStatus() == \Magento\Newsletter\Model\Subscriber::STATUS_SUBSCRIBED
-                ) {
-                    $subscriber->unsubscribe();
+                ) {                             
+                    $subscriber->unsubscribe();           
                 }
             }
             elseif($event["type"] == "subscribe_confirm")
@@ -211,8 +211,7 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
 
                     if(empty($product_id))
                     {
-                        $products = $this->_productsCollectionFactory->create()->setPageSize($limit)->setCurPage($start)->addAttributeToSelect('*')->load();						
-						//$products->getSelect()->limit($limit, $start);
+                        $products = $this->_productsCollectionFactory->create()->setPage($start, $limit)->addAttributeToSelect('*')->load();											
                     }
                     else{
                         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
@@ -334,7 +333,7 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
                 
                 case "getCart.json":
 
-                    if ((bool)$_POST["post"] == true) {              
+                    if (!empty($_POST["post"]) && (bool)$_POST["post"] == true) {              
                        
                         $cart = $this->_cartSession->getQuote()->getAllVisibleItems();
               

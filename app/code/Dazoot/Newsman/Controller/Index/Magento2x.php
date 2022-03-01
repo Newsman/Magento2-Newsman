@@ -50,12 +50,12 @@ class Index extends \Magento\Framework\App\Action\Action
 
     public function webhookEvents($post)
     {
-        $newsman_events = json_decode($_POST["newsman_events"]);
+        $newsman_events = json_decode($_POST["newsman_events"], true);
 
         foreach($newsman_events as $event)
-        {                  
-            if($event['type'] == "unsub" || $event['type'] == "unsub")
-            {                                              
+        {            
+            if($event['type'] == "unsub")
+            {                                                            
                 $email = $event["data"]["email"];     
                 $subscriber = null;
         
@@ -68,11 +68,11 @@ class Index extends \Magento\Framework\App\Action\Action
         
                     $col = $sub->getData();
                     $email = $col["subscriber_email"];              
-                }   
-                
+                }       
+        
                 if (!empty($subscriber) && $subscriber->getSubscriberStatus() == \Magento\Newsletter\Model\Subscriber::STATUS_SUBSCRIBED
-                ) {
-                    $subscriber->unsubscribe();
+                ) {                             
+                    $subscriber->unsubscribe();           
                 }
             }
             elseif($event["type"] == "subscribe_confirm")
@@ -189,58 +189,57 @@ class Index extends \Magento\Framework\App\Action\Action
 
                     break;
 
-                case "products.json":
+                    case "products.json":
 
-                    $productsJson = array();
-
-                    $products = null;
-
-                    if(empty($product_id))
-                    {
-                        $products = $this->_productsCollectionFactory->create()->setPageSize($limit)->setCurPage($start)->addAttributeToSelect('*')->load();						
-						//$products->getSelect()->limit($limit, $start);
-                    }
-                    else{
-                        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-                        $prodObjManager = $objectManager->create('Magento\Catalog\Model\Product')->load($product_id);
-                        $products = array(
-                            $prodObjManager
-                        );
-                    }
-
-                    foreach ($products as $prod) {
-
-                        $_prod = $prod->getData();
-
-                        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-                        $StockState = $objectManager->get('\Magento\CatalogInventory\Api\StockStateInterface');
-                        $s = $StockState->getStockQty($_prod["entity_id"]);                 
-
-                        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-                        $prodObjManager = $objectManager->create('Magento\Catalog\Model\Product')->load($prod->getId());
-
-                        $imageHelper = $objectManager->get('\Magento\Catalog\Helper\Product');                                                      
-
-                        $url = $prodObjManager->getProductUrl();
-                        $image_url = $imageHelper->getImageUrl($prodObjManager);        
-
-                        $productsJson[] = array(
-                            "id" => $_prod["entity_id"],
-                            "name" => $_prod["name"],
-                            "stock_quantity" => (int)$s,
-                            "price" => (float)$_prod["price"],
-                            "price_old" => (float)0,
-                            "image_url" => $image_url,
-                            "url" => $url
-                        );
-                    }
-
-                    header('Content-Type: application/json');
-                    echo json_encode($productsJson, JSON_PRETTY_PRINT);
-                    exit;
-                    return;
-
-                    break;
+                        $productsJson = array();
+    
+                        $products = null;
+    
+                        if(empty($product_id))
+                        {
+                            $products = $this->_productsCollectionFactory->create()->setPage($start, $limit)->addAttributeToSelect('*')->load();											
+                        }
+                        else{
+                            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                            $prodObjManager = $objectManager->create('Magento\Catalog\Model\Product')->load($product_id);
+                            $products = array(
+                                $prodObjManager
+                            );
+                        }
+    
+                        foreach ($products as $prod) {
+    
+                            $_prod = $prod->getData();
+    
+                            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                            $StockState = $objectManager->get('\Magento\CatalogInventory\Api\StockStateInterface');
+                            $s = $StockState->getStockQty($_prod["entity_id"]);                 
+    
+                            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                            $prodObjManager = $objectManager->create('Magento\Catalog\Model\Product')->load($prod->getId());
+    
+                            $imageHelper = $objectManager->get('\Magento\Catalog\Helper\Product');                                                      
+    
+                            $url = $prodObjManager->getProductUrl();
+                            $image_url = $imageHelper->getImageUrl($prodObjManager);        
+    
+                            $productsJson[] = array(
+                                "id" => $_prod["entity_id"],
+                                "name" => $_prod["name"],
+                                "stock_quantity" => (int)$s,
+                                "price" => (float)$_prod["price"],
+                                "price_old" => (float)0,
+                                "image_url" => $image_url,
+                                "url" => $url
+                            );
+                        }
+    
+                        header('Content-Type: application/json');
+                        echo json_encode($productsJson, JSON_PRETTY_PRINT);
+                        exit;
+                        return;
+    
+                        break;
 
                 case "customers.json":
 
@@ -320,7 +319,7 @@ class Index extends \Magento\Framework\App\Action\Action
 
                 case "getCart.json":
 
-                    if ((bool)$_POST["post"] == true) {              
+                    if (!empty($_POST["post"]) && (bool)$_POST["post"] == true) {              
                        
                         $cart = $this->_cartSession->getQuote()->getAllVisibleItems();
               
