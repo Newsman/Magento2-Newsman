@@ -210,8 +210,10 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
                     $products = null;
 
                     if(empty($product_id))
-                    {
-                        $products = $this->_productsCollectionFactory->create()->setPage($start, $limit)->addAttributeToSelect('*')->load();											
+                    {                
+                        $products = $this->_productsCollectionFactory->create();
+                        $products->addAttributeToSelect('*');
+                        $products->getSelect()->limit($limit, $start);
                     }
                     else{
                         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
@@ -232,7 +234,7 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
                         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
                         $prodObjManager = $objectManager->create('Magento\Catalog\Model\Product')->load($prod->getId());
 
-                        $imageHelper = $objectManager->get('\Magento\Catalog\Helper\Product');                                                      
+                        $imageHelper = $objectManager->get('\Magento\Catalog\Helper\Product');
 
                         $url = $prodObjManager->getProductUrl();
                         $image_url = $imageHelper->getImageUrl($prodObjManager);        
