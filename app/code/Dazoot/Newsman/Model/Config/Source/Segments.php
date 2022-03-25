@@ -39,11 +39,12 @@ class Segments implements \Magento\Framework\Option\ArrayInterface
 		if (!empty($_lists) && is_array($_lists))
 		{
 			for ($int = 0; $int < count($_lists); $int++)
-			{
-				if($int == 0)				
-					$arrayList[] = ['value' => '', 'label' => '(Optional) No segment'];								
+			{				
+				if($int == 0)								
+					$arrayList[] = ['value' => '', 'label' => '(Optional) No segment'];				
 
-				$arrayList[$int] = ['value' => $_lists[$int]["segment_id"], 'label' => $_lists[$int]["segment_name"]];
+				if(count($_lists) > 0)
+					$arrayList[$int] = ['value' => $_lists[$int]["segment_id"], 'label' => $_lists[$int]["segment_name"]];
 			}
 		}
 		else{
