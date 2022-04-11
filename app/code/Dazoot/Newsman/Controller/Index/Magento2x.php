@@ -95,7 +95,7 @@ class Index extends \Magento\Framework\App\Action\Action
         $product_id = (empty($_GET["product_id"])) ? "" : $_GET["product_id"];
 
         if (!empty($newsman) && !empty($apikey) || $newsman == "getCart.json") {
-            $apikey = $_GET["apikey"];
+            $apikey = $_GET["apikey"] ?? "";
             $currApiKey = $_apikey;
 
             if($newsman != "getCart.json")
@@ -330,7 +330,7 @@ class Index extends \Magento\Framework\App\Action\Action
                         foreach ( $cart as $cart_item_key => $cart_item ) {                   
 
                                 $prod[] = array(
-                                    "id" => $cart_item->getId(),
+                                    "id" => $cart_item->getProductId(),
                                     "name" => $cart_item->getName(),
                                     "price" => $cart_item->getPrice(),						
                                     "quantity" => $cart_item->getQty()

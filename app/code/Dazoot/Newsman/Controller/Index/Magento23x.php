@@ -344,7 +344,7 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
                         foreach ( $cart as $cart_item_key => $cart_item ) {                   
 
                                 $prod[] = array(
-                                    "id" => $cart_item->getId(),
+                                    "id" => $cart_item->getProductId(),
                                     "name" => $cart_item->getName(),
                                     "price" => $cart_item->getPrice(),						
                                     "quantity" => $cart_item->getQty()
