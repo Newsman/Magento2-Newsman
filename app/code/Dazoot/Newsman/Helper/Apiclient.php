@@ -306,7 +306,15 @@ class Newsman_Client
 			$v_params[$k] = $params[$i];
 		}
 		
-		$ret = $this->sendRequestRest($this->method_namespace . "." . $name, $v_params);
+		$ret = null;
+		
+		try{
+			$ret = $this->sendRequestRest($this->method_namespace . "." . $name, $v_params);
+		}
+		catch(Exception $e)
+		{
+			// api usage
+		}
 
 		// reset
 		$this->method_namespace = null;
