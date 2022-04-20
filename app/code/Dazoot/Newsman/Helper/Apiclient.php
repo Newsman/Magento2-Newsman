@@ -71,7 +71,16 @@ class Apiclient extends \Magento\Framework\App\Helper\AbstractHelper
 
 	public function unsubscribe($email){
 		$listId = $this->getSelectedList();
-		return $this->client->subscriber->saveUnsubscribe($listId, $email, $this->ip);
+		
+		$ret = null;
+		
+		try{
+		        return $this->client->subscriber->saveUnsubscribe($listId, $email, $this->ip);
+		}
+		catch(Exception $e)
+		{
+			//api usage limit
+		}
 	}
 
 	public function getSegmentsByList($storeId)
