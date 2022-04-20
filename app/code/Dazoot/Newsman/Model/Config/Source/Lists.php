@@ -40,9 +40,14 @@ class Lists implements \Magento\Framework\Option\ArrayInterface
 		{
 			for ($int = 0; $int < count($_lists); $int++)
 			{
-				$arrayList[$int] = ['value' => $_lists[$int]["list_id"], 'label' => $_lists[$int]["list_name"]];
+				if(count($_lists) > 0)
+					$arrayList[$int] = ['value' => $_lists[$int]["list_id"], 'label' => $_lists[$int]["list_name"]];
 			}
 		}
+		else{
+			$arrayList[0] = ['value' => '0', 'label' => 'No list'];
+		}
+		
 		return $arrayList;
 	}
 }
