@@ -321,28 +321,25 @@ class Index extends \Magento\Framework\App\Action\Action
 
                 case "getCart.json":
 
-                    if (!empty($_POST["post"]) && (bool)$_POST["post"] == true) {              
-                       
-                        $cart = $this->_cartSession->getQuote()->getAllVisibleItems();
-              
-                        $prod = array();
+                    $cart = $this->_cartSession->getQuote()->getAllVisibleItems();
+            
+                    $prod = array();
 
-                        foreach ( $cart as $cart_item_key => $cart_item ) {                   
+                    foreach ( $cart as $cart_item_key => $cart_item ) {                   
 
-                                $prod[] = array(
-                                    "id" => $cart_item->getProductId(),
-                                    "name" => $cart_item->getName(),
-                                    "price" => $cart_item->getPrice(),						
-                                    "quantity" => $cart_item->getQty()
-                                );							
-                                                    
-                            }									 						
+                            $prod[] = array(
+                                "id" => $cart_item->getProductId(),
+                                "name" => $cart_item->getName(),
+                                "price" => $cart_item->getPrice(),						
+                                "quantity" => $cart_item->getQty()
+                            );							
+                                                
+                        }									 						
 
-                            header('Content-Type: application/json');
-                            echo json_encode($prod, JSON_PRETTY_PRINT);  
-                        return;
-                    }
-
+                        header('Content-Type: application/json');
+                        echo json_encode($prod, JSON_PRETTY_PRINT);  
+                    return;
+                    
                 break;
             }
         } else {
