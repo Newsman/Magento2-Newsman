@@ -165,8 +165,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getExtensionVersion()
     {
-        $moduleInfo = $this->moduleList->getOne(self::MODULE_VERSION);
-        return $moduleInfo['setup_version'];
+        return "1.2";
     }
 
     /**
