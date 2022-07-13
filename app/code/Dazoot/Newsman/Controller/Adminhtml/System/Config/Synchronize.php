@@ -50,49 +50,42 @@ class Synchronize extends \Magento\Backend\App\Action
 	 */
 	public function execute()
 	{
-		//customers import
-
 		$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 
 		$storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;		
 		
 		$storeManager = $objectManager->get('Magento\Store\Model\StoreManagerInterface');
-		$storeId = (int) $this->getRequest()->getParam('storeid', 0);		
-		
+		$storeId = $storeManager->getStore()->getId();
+
 		$this->client->setCredentials($storeId);
 
 		$batchSize = 9000;
 
 		$list = $this->client->getSelectedList($storeId);
-		$segment = $this->client->getSelectedSegment($storeId);
+		$segmentVal = $this->client->getSelectedSegment($storeId);
+		$segment = null;
 
-		if($segment == 0)
+		if($segmentVal == 0 || $segmentVal == 1)
 			$segment = array();
-		
+		else
+			$segment = array($segmentVal);	
 
 		$importType = $this->client->getImportType($storeId);
 		if(empty($importType))
 			$importType = 1;
-	
-		$customers = $this->subscriberCollectionFactory->create()
-		->addFilter('is_active', ['eq' => 1])
-		->addFieldToFilter("website_id", $storeId);
 
 		if($importType == 2)
 		{
+			//customers import
+
+			$customers = $this->subscriberCollectionFactory->create()
+			->addFilter('is_active', ['eq' => 1])
+			->addFieldToFilter("website_id", $storeId);
 		
 			$customers_to_import = array();
 
 			foreach ($customers as $item)
 			{
-				/*$date = strtotime($item["updated_at"]);
-				$age = time() - $date;
-
-				if ($age > 172800)
-				{
-					continue;
-				}*/
-
 				$customers_to_import[] = array(
 					"email" => $item["email"],
 					"firstname" => $item["firstname"],
@@ -101,17 +94,16 @@ class Synchronize extends \Magento\Backend\App\Action
 
 				if ((count($customers_to_import) % $batchSize) == 0)
 				{
-					$this->importDataCustomers($customers_to_import, $list, array($segment));
+					$this->importDataCustomers($customers_to_import, $list, $segment);
 				}
 			}
 
 			if (count($customers_to_import) > 0)
 			{
-				$this->importDataCustomers($customers_to_import, $list, array($segment));
+				$this->importDataCustomers($customers_to_import, $list, $segment);
 			}
 
 			unset($customers_to_import);
-
 		}
 
 		//subscribers import
@@ -136,13 +128,13 @@ class Synchronize extends \Magento\Backend\App\Action
 
 			if ((count($customers_to_import) % $batchSize) == 0)
 			{
-				$this->_importData($customers_to_import, $list, array($segment));
+				$this->_importData($customers_to_import, $list, $segment);
 			}
 		}
 
 		if (count($customers_to_import) > 0)
 		{
-			$this->_importData($customers_to_import, $list, array($segment));
+			$this->_importData($customers_to_import, $list, $segment);
 		}
 
 		unset($customers_to_import);
@@ -152,7 +144,7 @@ class Synchronize extends \Magento\Backend\App\Action
 	{
 		$csv = '"email","source"' . PHP_EOL;
 
-		$source = self::safeForCsv("magento 2 newsman plugin - list&segment subscriber manual sync");
+		$source = self::safeForCsv("magento 2 newsman plugin");
 		foreach ($data as $_dat)
 		{
 			$csv .= sprintf(
@@ -167,6 +159,7 @@ class Synchronize extends \Magento\Backend\App\Action
 		try
 		{
 			$ret = $this->client->importCSV($list, $segments, $csv);
+			
 			if ($ret == "")
 			{
 				throw new Exception("Import failed");
@@ -183,7 +176,7 @@ class Synchronize extends \Magento\Backend\App\Action
 	{
 		$csv = '"email","fullname","source"' . PHP_EOL;
 
-		$source = self::safeForCsv("magento 2 newsman plugin - list&segment customer manual sync");
+		$source = self::safeForCsv("magento 2 newsman plugin");
 		foreach ($data as $_dat)
 		{
 			$csv .= sprintf(

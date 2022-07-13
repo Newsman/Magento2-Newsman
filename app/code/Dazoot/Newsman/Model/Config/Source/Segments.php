@@ -48,7 +48,7 @@ class Segments implements \Magento\Framework\Option\ArrayInterface
 			}
 		}
 		else{
-			$arrayList[0] = ['value' => '0', 'label' => 'Select a list'];
+			$arrayList[] = ['value' => '1', 'label' => 'Select a list or No segments present'];
 		}
 
 		return $arrayList;

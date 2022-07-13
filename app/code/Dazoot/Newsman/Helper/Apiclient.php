@@ -89,6 +89,9 @@ class Apiclient extends \Magento\Framework\App\Helper\AbstractHelper
 
 		$segments = array();
 
+		if($listId == 0 || $listId == 1 || $listId == null)
+			return $segments;
+
 		try{
 		  $segments = $this->client->segment->all($listId);
 		}
