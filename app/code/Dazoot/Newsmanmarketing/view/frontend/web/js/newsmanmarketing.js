@@ -7,182 +7,214 @@ define(["jquery"], function (t) {
 
                 var isProd = true;
 
-                let lastCart = sessionStorage.getItem('lastCart');			
-                if(lastCart === null)
-                    lastCart = {};			
-        
+                let lastCart = sessionStorage.getItem('lastCart');
+                if (lastCart === null)
+                    lastCart = {};
+
                 var lastCartFlag = false;
-                var bufferedClick = false;
                 var firstLoad = true;
                 var bufferedXHR = false;
+                var unlockClearCart = true;
                 var ajaxurl = '/newsman/index/index?newsman=getCart.json';
                 var documentComparer = domain;
                 var documentUrl = document.URL;
-                var sameOrigin = (documentUrl.indexOf(documentComparer) !== -1);			
-                          
-                if(sameOrigin)		
-                {
+                var sameOrigin = (documentUrl.indexOf(documentComparer) !== -1);
+
+                let startTime, endTime;
+
+                function startTimePassed() {
+                    startTime = new Date();
+                };
+
+                startTimePassed();
+
+                function endTimePassed() {
+                    var flag = false;
+
+                    endTime = new Date();
+                    var timeDiff = endTime - startTime;
+
+                    timeDiff /= 1000;
+
+                    var seconds = Math.round(timeDiff);
+
+                    if (firstLoad)
+                        flag = true;
+
+                    if (seconds >= 5)
+                        flag = true;
+
+                    return flag;
+                }
+
+                if (sameOrigin) {
                     NewsmanAutoEvents();
-                    setInterval(NewsmanAutoEvents, 5000);		
-        
+                    setInterval(NewsmanAutoEvents, 5000);
+
                     detectXHR();
                 }
-        
-                function NewsmanAutoEvents(){							
-        
-                        let postObj = { 
-                            post: true
-                        }
-        
-                        let post = JSON.stringify(postObj)
-        
-                        let xhr = new XMLHttpRequest()
-        
-                        if (bufferedXHR || firstLoad) {
-        
+
+                function NewsmanAutoEvents() {
+
+                    if (!endTimePassed())
+                        return;
+
+                    let xhr = new XMLHttpRequest()
+
+                    if (bufferedXHR || firstLoad) {
+
                         xhr.open('GET', ajaxurl, true);
+
+                        startTimePassed();
+
                         xhr.onload = function() {
-                        
-                            if(xhr.status == 200 || xhr.status == 201)
-                              {
-                            
-                                var response = JSON.parse(xhr.responseText); 
-        
-                                lastCart = JSON.parse(sessionStorage.getItem('lastCart'));						
-        
-                                if(lastCart === null)
-                                    lastCart = {};	
-        
+
+                            if (xhr.status == 200 || xhr.status == 201) {
+
+                                var response = JSON.parse(xhr.responseText);
+
+                                lastCart = JSON.parse(sessionStorage.getItem('lastCart'));
+
+                                if (lastCart === null)
+                                    lastCart = {};
+
                                 //check cache
-                                if(lastCart.length > 0 && lastCart != null && lastCart != undefined && response.length > 0 && response != null && response != undefined)
-                                {				
-                                    if(JSON.stringify(lastCart) === JSON.stringify(response))
-                                    {
-                                        if(!isProd)
+                                if (lastCart.length > 0 && lastCart != null && lastCart != undefined && response.length > 0 && response != null && response != undefined) {
+                                    if (JSON.stringify(lastCart) === JSON.stringify(response)) {
+                                        if (!isProd)
                                             console.log('newsman remarketing: cache loaded, cart is unchanged');
-        
-                                        lastCartFlag = true;					
-                                    }
-                                    else{
+
+                                        lastCartFlag = true;
+                                    } else {
                                         lastCartFlag = false;
+
+                                        if (!isProd)
+                                            console.log('newsman remarketing: cache loaded, cart is changed');
                                     }
-                                }			
-        
-                                if(response.length > 0 && lastCartFlag == false)
-                                {
-        
-                                    _nzm.run('ec:setAction', 'clear_cart');										
-                                    _nzm.run( 'send', 'event', 'detail view', 'click', 'clearCart', null, _nzm.createFunctionWithTimeout(function() {												
-        
-                                        for (var item in response) {				
-        
-                                            _nzm.run( 'ec:addProduct', 
-                                                response[item]
-                                            );				
-        
-                                        }	
-        
-                                        _nzm.run( 'ec:setAction', 'add' );
-                                        _nzm.run( 'send', 'event', 'UX', 'click', 'add to cart' );
-        
-                                        sessionStorage.setItem('lastCart', JSON.stringify(response));					
-        
-                                        if(!isProd)
-                                            console.log('newsman remarketing: cart sent');
-        
-                                    }));										
-        
                                 }
-                                else{
-        
-                                    if(!isProd)
+
+                                if (response.length > 0 && lastCartFlag == false) {
+
+                                    addToCart(response);
+
+                                }
+                                //send only when on last request, products existed
+                                else if (response.length == 0 && lastCart.length > 0 && unlockClearCart) {
+
+                                    clearCart();
+
+                                    if (!isProd)
+                                        console.log('newsman remarketing: clear cart sent');
+
+                                } else {
+
+                                    if (!isProd)
                                         console.log('newsman remarketing: request not sent');
-        
+
                                 }
-        
-                                firstLoad = false;				
+
+                                firstLoad = false;
                                 bufferedXHR = false;
-                                }
-                        
-                        }	
-                        
-                           xhr.send(null);
-                        
-                    }
-                    else{
-                        if(!isProd)
+
+                            }
+
+                        }
+
+                        xhr.send(null);
+
+                    } else {
+                        if (!isProd)
                             console.log('newsman remarketing: !buffered xhr || first load');
                     }
-                  
+
                 }
-        
-                function detectXHR() {	
-                    
-                    var proxied = window.XMLHttpRequest.prototype.send;
-                    window.XMLHttpRequest.prototype.send = function() {		
-        
-                        var pointer = this;
-                        var validate = true;
-                        var intervalId = window.setInterval(function(){
-        
-                                if(pointer.readyState != 4){
-                                        return;
-                                }
-        
-                                var _location = pointer.getResponseHeader('access-control-allow-origin');				
-        
-                                                        //own request exclusion
-                                if(
-                                                        pointer.responseURL.indexOf('getCart.json') >= 0 ||
-                                                        //magento
-                                                        pointer.responseURL.indexOf('/static/') >= 0 || 
-                                                        pointer.responseURL.indexOf('/pub/static') >= 0 || 
-                                                        pointer.responseURL.indexOf('/customer/section') >= 0
-                                                        )
-                                {							
-                                    validate = false;												
-                                }
-                                else{
-                                    validate = true;
-                                }
-        
-                                if(validate && !_location || _location == window.location.origin)
-                                {
-                                    bufferedXHR = true;
-        
-                                    if(!isProd)
-                                        console.log('newsman remarketing: ajax request fired and catched from same domain');
-        
-                                    NewsmanAutoEvents();
-                                }
-                    
-                                clearInterval(intervalId);
-                
-                        }, 1);
-        
-                        return proxied.apply(this, [].slice.call(arguments));
-                    };	
-        
+
+                function clearCart() {
+
+                    _nzm.run('ec:setAction', 'clear_cart');
+                    _nzm.run('send', 'event', 'detail view', 'click', 'clearCart');
+
+                    sessionStorage.setItem('lastCart', JSON.stringify([]));
+
+                    unlockClearCart = false;
+
                 }
-        
-                function BufferClick(){
-        
-                    window.onclick = function (e) {
-                        const origin = ['a', 'input', 'span', 'i', 'button'];
-            
-                        var click = e.target.localName;			
-        
-                        if(!isProd)
-                            console.log('newsman remarketing element clicked: ' + click);
-        
-                        for (const element of origin) {
-                            if(click == element)
-                                bufferedClick = true;
+
+                function addToCart(response) {
+
+                    _nzm.run('ec:setAction', 'clear_cart');
+                    _nzm.run('send', 'event', 'detail view', 'click', 'clearCart', null, _nzm.createFunctionWithTimeout(function() {
+
+                        for (var item in response) {
+
+                            _nzm.run('ec:addProduct',
+                                response[item]
+                            );
+
                         }
-                    }
-        
+
+                        _nzm.run('ec:setAction', 'add');
+                        _nzm.run('send', 'event', 'UX', 'click', 'add to cart');
+
+                        sessionStorage.setItem('lastCart', JSON.stringify(response));
+                        unlockClearCart = true;
+
+                        if (!isProd)
+                            console.log('newsman remarketing: cart sent');
+
+                    }));
+
                 }
-        
+
+                function detectXHR() {
+
+                    var proxied = window.XMLHttpRequest.prototype.send;
+                    window.XMLHttpRequest.prototype.send = function() {
+
+                        var pointer = this;
+                        var validate = false;
+                        var intervalId = window.setInterval(function() {
+
+                            if (pointer.readyState != 4) {
+                                return;
+                            }
+
+                            var _location = pointer.responseURL;
+
+                            //own request exclusion
+                            if (
+                                            pointer.responseURL.indexOf('getCart.json') >= 0 ||
+                                            //magento 2.x
+                                            pointer.responseURL.indexOf('/static/') >= 0 ||
+                                            pointer.responseURL.indexOf('/pub/static') >= 0 ||
+                                            pointer.responseURL.indexOf('/customer/section') >= 0 ||
+                                            //opencart 1
+                                            pointer.responseURL.indexOf('getCart=true') >= 0
+                            ) {
+                                validate = false;
+                            } else {
+                                if (_location.indexOf(window.location.origin) !== -1)
+                                    validate = true;
+                            }
+
+                            if (validate) {
+                                bufferedXHR = true;
+
+                                if (!isProd)
+                                    console.log('newsman remarketing: ajax request fired and catched from same domain');
+
+                                NewsmanAutoEvents();
+                            }
+
+                            clearInterval(intervalId);
+
+                        }, 1);
+
+                        return proxied.apply(this, [].slice.call(arguments));
+                    };
+
+                }
+
                 //Newsman remarketing auto events
             },
             this.tvc_get_impression = function (t) {
