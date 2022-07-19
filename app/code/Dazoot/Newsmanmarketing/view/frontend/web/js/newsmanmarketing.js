@@ -3,23 +3,29 @@ define(["jquery"], function (t) {
         var c = function () {
             this.tvc_autoevents = function (domain){         
 
-                //Newsman remarketing auto events
+//Newsman remarketing auto events REPLACEABLE
 
-                var isProd = true;
+var ajaxurl = 'https://' + document.location.hostname + '/newsman/index/index?newsman=getCart.json';
 
-                let lastCart = sessionStorage.getItem('lastCart');
-                if (lastCart === null)
-                    lastCart = {};
+//Newsman remarketing auto events REPLACEABLE
 
-                var lastCartFlag = false;
-                var firstLoad = true;
-                var bufferedXHR = false;
-                var unlockClearCart = true;
-		var isError = false;
-                var ajaxurl = '/newsman/index/index?newsman=getCart.json';
-                var documentComparer = domain;
-                var documentUrl = document.URL;
-                var sameOrigin = (documentUrl.indexOf(documentComparer) !== -1);
+//Newsman remarketing auto events
+
+var isProd = true;
+
+let lastCart = sessionStorage.getItem('lastCart');
+if (lastCart === null)
+    lastCart = {};
+
+var lastCartFlag = false;
+var firstLoad = true;
+var bufferedXHR = false;
+var unlockClearCart = true;
+var isError = false;
+var documentComparer = document.location.hostname;
+var documentUrl = document.URL;
+var sameOrigin = (documentUrl.indexOf(documentComparer) !== -1);
+
 let startTime, endTime;
 
 function startTimePassed() {

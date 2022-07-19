@@ -108,12 +108,35 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
         $order_id = (empty($_GET["order_id"])) ? "" : $_GET["order_id"];
         $product_id = (empty($_GET["product_id"])) ? "" : $_GET["product_id"];
 
-        if (!empty($newsman) && !empty($apikey) || $newsman == "getCart.json") {
+        if (!empty($newsman) && !empty($apikey) || strpos($_GET["newsman"], 'getCart.json') !== false) {
             $apikey = $_GET["apikey"] ?? "";
             $currApiKey = $_apikey;
 
-            if($newsman != "getCart.json")
+            if(strpos($_GET["newsman"], 'getCart.json') !== false)
             {
+                $cart = $this->_cartSession->getQuote()->getAllVisibleItems();
+            
+                $prod = array();
+
+                foreach ( $cart as $cart_item_key => $cart_item ) {                   
+
+                        $prod[] = array(
+                            "id" => $cart_item->getProductId(),
+                            "name" => $cart_item->getName(),
+                            "price" => $cart_item->getPrice(),						
+                            "quantity" => $cart_item->getQty()
+                        );							
+                                            
+                    }									 						
+
+                    header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+                    header("Cache-Control: post-check=0, pre-check=0", false);
+                    header("Pragma: no-cache");
+                    header('Content-Type:application/json');
+                    echo json_encode($prod, JSON_PRETTY_PRINT);
+                    exit;
+            }
+            else{
                 if ($apikey != $currApiKey) {
                     http_response_code(403);
                     header('Content-Type: application/json');
@@ -123,6 +146,7 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
             }
 
             switch ($_GET["newsman"]) {
+
                 case "orders.json":
 
                     $orders = null;
@@ -332,29 +356,6 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
                     echo json_encode($version, JSON_PRETTY_PRINT);   
 
                 break;
-                
-                case "getCart.json":
-
-                    $cart = $this->_cartSession->getQuote()->getAllVisibleItems();
-            
-                    $prod = array();
-
-                    foreach ( $cart as $cart_item_key => $cart_item ) {                   
-
-                            $prod[] = array(
-                                "id" => $cart_item->getProductId(),
-                                "name" => $cart_item->getName(),
-                                "price" => $cart_item->getPrice(),						
-                                "quantity" => $cart_item->getQty()
-                            );							
-                                                
-                        }									 						
-
-                        header('Content-Type: application/json');
-                        echo json_encode($prod, JSON_PRETTY_PRINT);  
-                    return;
-
-                break;
             }
         } else {
             http_response_code(403);
@@ -372,4 +373,4 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
     {
         return true;
     }
-}
+}?>
