@@ -13,9 +13,9 @@ class EnhancedEcommerce extends Template
     
     public function __construct(
     \Magento\Framework\View\Element\Template\Context $context,
-        array $data = [],
      \Magento\Framework\App\Request\Http $request,
-     \Dazoot\Newsmanmarketing\Helper\Data $helper
+     \Dazoot\Newsmanmarketing\Helper\Data $helper,
+     array $data = []
     ){
         parent::__construct($context,$data);
         $this->_helper = $helper;
