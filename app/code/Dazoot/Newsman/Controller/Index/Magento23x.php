@@ -268,7 +268,7 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
                             "name" => $_prod["name"],
                             "stock_quantity" => (int)$s,
                             "price" => (float)$_prod["price"],
-                            "price_old" => (float)0,
+                            "price_old" => (!empty($_prod["special_price"])) ? (float)$_prod["special_price"] : 0,
                             "image_url" => $image_url,
                             "url" => $url
                         );
