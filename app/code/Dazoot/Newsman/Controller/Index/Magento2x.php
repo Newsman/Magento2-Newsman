@@ -249,12 +249,21 @@ class Index extends \Magento\Framework\App\Action\Action
                         $url = $prodObjManager->getProductUrl();
                         $image_url = $imageHelper->getImageUrl($prodObjManager);        
 
+                        $priceOld = 0;
+                        $price = $prod->getPriceInfo()->getPrice('regular_price')->getValue();
+
+                        if(!empty($prod->getPriceInfo()->getPrice('special_price')->getValue()))
+                        {
+                            $price = $prod->getPriceInfo()->getPrice('special_price')->getValue();
+                            $priceOld = $prod->getPriceInfo()->getPrice('regular_price')->getValue();
+                        }
+                        
                         $productsJson[] = array(
                             "id" => $_prod["entity_id"],
                             "name" => $_prod["name"],
                             "stock_quantity" => (int)$s,
-                            "price" => (float)$_prod["price"],
-                            "price_old" => (!empty($_prod["special_price"])) ? (float)$_prod["special_price"] : 0,
+                            "price" => $price,
+                            "price_old" => $priceOld,
                             "image_url" => $image_url,
                             "url" => $url
                         );
