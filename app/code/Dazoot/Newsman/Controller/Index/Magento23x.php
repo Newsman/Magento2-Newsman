@@ -264,12 +264,18 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
                         $image_url = $imageHelper->getImageUrl($prodObjManager);        
 
                         $priceOld = 0;
-                        $price = $prod->getPriceInfo()->getPrice('regular_price')->getValue();
+                        $price = $prod->getPriceInfo()->getPrice('final_price')->getValue();
 
                         if(!empty($prod->getPriceInfo()->getPrice('special_price')->getValue()))
                         {
-                            $price = $prod->getPriceInfo()->getPrice('special_price')->getValue();
-                            $priceOld = $prod->getPriceInfo()->getPrice('regular_price')->getValue();
+                            if(empty($prod->getPriceInfo()->getPrice('regular_price')->getValue()) || $prod->getPriceInfo()->getPrice('regular_price')->getValue() == 0)
+                            {
+                                $priceOld = $prod->getPriceInfo()->getPrice('special_price')->getValue();
+                            }
+                            else{
+                                $price = $prod->getPriceInfo()->getPrice('special_price')->getValue();
+                                $priceOld = $prod->getPriceInfo()->getPrice('regular_price')->getValue();
+                            }
                         }
                         
                         $productsJson[] = array(
