@@ -263,7 +263,7 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
                         $url = $prodObjManager->getProductUrl();
                         $image_url = $imageHelper->getImageUrl($prodObjManager);        
 
-                        $priceOld = $prod->getPriceInfo()->getPrice('special_price')->getValue();
+                        $priceOld = $prod->getPriceInfo()->getPrice('regular_price')->getValue();
                         $price = $prod->getPriceInfo()->getPrice('final_price')->getValue();
 
                         if(!empty($prod->getPriceInfo()->getPrice('special_price')->getValue()))
