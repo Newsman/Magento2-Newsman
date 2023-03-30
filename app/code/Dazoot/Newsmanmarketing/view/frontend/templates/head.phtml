@@ -44,7 +44,6 @@ _nzm_tracking_server = endpoint;
 	script_dom.id = 'nzm-tracker';
 	script_dom.setAttribute('data-site-id', remarketingid);
 	script_dom.src = remarketingEndpoint;
-	//check for engine name
 	if (_nzmPluginInfo.indexOf('shopify') !== -1) {
 		script_dom.onload = function(){
 			if (typeof newsmanRemarketingLoad === 'function')
