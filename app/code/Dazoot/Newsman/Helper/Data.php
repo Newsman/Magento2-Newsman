@@ -14,6 +14,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_PATH_EMAIL_TEMPLATE   = 'massemailcustomers/email/template';
     const MODULE_NAME               = 'Newsman import subscribers';
     const MODULE_VERSION            = 'Dazoot_Newsman';
+    const XMP_PATH_ENABLED          = 'newsman/credentials/active';
+    const XMP_PATH_URL_FORM         = 'newsman/credentials/url_form';
 
     /**
      * @var \Magento\Framework\Mail\Template\TransportBuilder
