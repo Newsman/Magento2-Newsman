@@ -108,7 +108,7 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
         $order_id = (empty($_GET["order_id"])) ? "" : $_GET["order_id"];
         $product_id = (empty($_GET["product_id"])) ? "" : $_GET["product_id"];
 
-        if (!empty($newsman) && !empty($apikey) || strpos($_GET["newsman"], 'getCart.json') !== false) {
+        if (!empty($newsman) && !empty($apikey) || strpos($newsman, 'getCart.json') !== false) {
             $apikey = $_GET["apikey"] ?? "";
             $currApiKey = $_apikey;
 
