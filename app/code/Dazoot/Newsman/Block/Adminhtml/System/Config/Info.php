@@ -52,7 +52,7 @@ padding:15px 15px 15px 15px;">
 <img src="$logoUrl" style="padding: 5px;" />
 </p>
 <p>
-<strong>$name v$version</strong> by <strong><a href="https://www.newsman.ro" target="_blank">Newsman</a></strong><br />
+<strong>$name</strong> by <strong><a href="https://www.newsman.ro" target="_blank">Newsman</a></strong><br />
 Import your customers in your Newsman account from Magento admin.</p>
 <p>
 <br />Like and follow us on 

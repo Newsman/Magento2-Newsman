@@ -45,6 +45,9 @@
                     <frontend_model>Dazoot\Newsman\Block\Adminhtml\System\Config\Synchronize</frontend_model>
                 </field>
             </group>
+            <group id="cron" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                <frontend_model>Dazoot\Newsman\Block\Adminhtml\System\Config\Cron</frontend_model>
+            </group>
             <!--<group id="syncData" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Segments Synchronization - Customers</label>
                 <field id="customerGroups" translate="label comment tooltip" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
