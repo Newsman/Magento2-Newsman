@@ -10,15 +10,14 @@ use Dazoot\Newsmansmtp\Helper\Data;
 use Dazoot\Newsmansmtp\Model\Store;
 use Dazoot\Newsmansmtp\Model\ZendMailOne\Smtp as ZendMailOneSmtp;
 use Dazoot\Newsmansmtp\Model\ZendMailTwo\Smtp as ZendMailTwoSmtp;
-use Zend_mail;
-use Zend_Mail_Exception;
-use Zend_Mail_Transport_Smtp;
+use Laminas\Mail\Message as LaminasMessage;
+use Laminas\Mail\Transport\Smtp as LaminasSmtpTransport;
 
 /**
  * Class TransportPlugin
  * @package Dazoot\Newsmansmtp\Plugin\Mail
  */
-class TransportPlugin extends Zend_Mail_Transport_Smtp
+class TransportPlugin extends LaminasSmtpTransport
 {
     /**
      * @var Data
@@ -40,13 +39,13 @@ class TransportPlugin extends Zend_Mail_Transport_Smtp
     ) {
         $this->dataHelper = $dataHelper;
         $this->storeModel = $storeModel;
+        parent::__construct();
     }
 
     /**
      * @param TransportInterface $subject
      * @param Closure $proceed
      * @throws MailException
-     * @throws Zend_Mail_Exception
      */
     public function aroundSendMessage(
         TransportInterface $subject,
@@ -59,12 +58,12 @@ class TransportPlugin extends Zend_Mail_Transport_Smtp
 
             $message = $subject->getMessage();
 
-            //ZendMail1 - Magento <= 2.2.7
-            //ZendMail2 - Magento >= 2.2.8
+            // ZendMail1 - Magento <= 2.2.7
+            // ZendMail2 - Magento >= 2.2.8
             if ($message instanceof Zend_mail) {
                 $smtp = new ZendMailOneSmtp($this->dataHelper, $this->storeModel);
                 $smtp->sendSmtpMessage($message);
-            } elseif ($message instanceof Message) {
+            } elseif ($message instanceof LaminasMessage) {
                 $smtp = new ZendMailTwoSmtp($this->dataHelper, $this->storeModel);
                 $smtp->sendSmtpMessage($message);
             } else {
