@@ -4,18 +4,17 @@ namespace Dazoot\Newsmansmtp\Model;
 
 use Exception;
 use InvalidArgumentException;
+use Laminas\Mail\Message;
+use Laminas\Mail\Transport\Sendmail as LaminasSendmailTransport;
 use Magento\Framework\Exception\MailException;
 use Magento\Framework\Mail\MessageInterface;
 use Magento\Framework\Mail\TransportInterface;
-use Magento\Framework\Phrase;
-use Zend_Mail;
-use Zend_Mail_Transport_Sendmail;
 
 /**
  * Class Transport
  * @package Dazoot\Newsmansmtp\Model
  */
-class Transport extends Zend_Mail_Transport_Sendmail implements TransportInterface
+class Transport implements TransportInterface
 {
     /**
      * @var MessageInterface
@@ -28,11 +27,10 @@ class Transport extends Zend_Mail_Transport_Sendmail implements TransportInterfa
      */
     public function __construct(MessageInterface $message, $parameters = null)
     {
-        if (!$message instanceof Zend_Mail) {
-            throw new InvalidArgumentException('The message should be an instance of \Zend_Mail');
+        if (!$message instanceof MessageInterface) {
+            throw new InvalidArgumentException('The message should be an instance of \Laminas\Mail\Message');
         }
 
-        parent::__construct($parameters);
         $this->_message = $message;
     }
 
@@ -45,14 +43,15 @@ class Transport extends Zend_Mail_Transport_Sendmail implements TransportInterfa
     public function sendMessage()
     {
         try {
-            parent::send($this->_message);
+            $transport = new LaminasSendmailTransport();
+            $transport->send($this->_message);
         } catch (Exception $e) {
             throw new MailException(new Phrase($e->getMessage()), $e);
         }
     }
 
     /**
-     * @return MessageInterface|Zend_Mail
+     * @return MessageInterface
      */
     public function getMessage()
     {
