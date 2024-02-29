@@ -563,6 +563,9 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
 
 	public static function safeForCsv($str)
 	{
+        if(empty($str))
+            return "";
+
 		return '"' . str_replace('"', '""', $str) . '"';
 	}
 }?>
