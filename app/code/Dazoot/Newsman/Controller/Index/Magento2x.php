@@ -4,6 +4,11 @@
 namespace Dazoot\Newsman\Controller\Index;
 
 use \DateTime;
+use Magento\Framework\App\Action\Action;
+use Magento\Framework\App\Action\Context;
+use Magento\SalesRule\Api\CouponRepositoryInterface;
+use Magento\SalesRule\Model\CouponFactory;
+use Magento\Framework\Controller\Result\JsonFactory;
 
 class Index extends \Magento\Framework\App\Action\Action
 {
@@ -17,6 +22,9 @@ class Index extends \Magento\Framework\App\Action\Action
     private $_cartSession;
     protected $client;
 	protected $subscriberCollectionFactory;
+    protected $couponFactory;
+    protected $couponRepository;
+    protected $resultJsonFactory;
 
     public function __construct(   
         \Magento\Framework\App\Action\Context $context,
@@ -25,7 +33,10 @@ class Index extends \Magento\Framework\App\Action\Action
         \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
         \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productsCollectionFactory,
         \Magento\Newsletter\Model\Subscriber $subscriber,
-        \Magento\Checkout\Model\Session\Proxy $cartSession
+        \Magento\Checkout\Model\Session\Proxy $cartSession,
+        CouponFactory $couponFactory,
+        CouponRepositoryInterface $couponRepository,
+        JsonFactory $resultJsonFactory
     )
     {
         parent::__construct($context);
@@ -38,6 +49,9 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->_subscriber= $subscriber;
         $this->_cartSession = $cartSession;
         $this->subscriberCollectionFactory = $customerCollectionFactory;
+        $this->couponFactory = $couponFactory;
+        $this->couponRepository = $couponRepository;
+        $this->resultJsonFactory = $resultJsonFactory;
     }
 
     public function execute()
@@ -457,6 +471,90 @@ class Index extends \Magento\Framework\App\Action\Action
                     echo json_encode("Imported successfully", JSON_PRETTY_PRINT);  
 
                     break;
+
+                    case "coupons.json":
+
+                        $resultJson = $this->resultJsonFactory->create();
+
+                        try {
+                            $discountType = !isset($_GET["type"]) ? -1 : (int)$_GET["type"];
+                            $value = !isset($_GET["value"]) ? -1 : (int)$_GET["value"];
+                            $batch_size = !isset($_GET["batch_size"]) ? 1 : (int)$_GET["batch_size"];
+                            $prefix = !isset($_GET["prefix"]) ? "" : $_GET["prefix"];
+                            $expire_date = isset($_GET['expire_date']) ? $_GET['expire_date'] : null;
+                            $min_amount = !isset($_GET["min_amount"]) ? -1 : (float)$_GET["min_amount"];
+
+                            if($discountType == -1)
+                            {
+                                return $resultJson->setData([
+                                    "status" => 0,
+                                    "msg" => "Missing type param"
+                                ]);
+                            }
+                            elseif($value == -1)
+                            {
+                                return $resultJson->setData([
+                                    "status" => 0,
+                                    "msg" => "Missing value param"
+                                ]);
+                            }
+
+                            $couponsList = [];
+
+                            for($int = 0; $int < $batch_size; $int++)
+                            {
+                                $coupon = $this->couponFactory->create();
+
+                                switch($discountType)
+                                {
+                                    case 1:
+                                        $coupon->setDiscountType('by_percent');
+                                        break;
+                                    case 0:
+                                        $coupon->setDiscountType('by_fixed');
+                                        break;
+                                }
+
+                                $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                                $coupon_code = '';
+                            
+                                do {
+                                    $coupon_code = '';
+                                    for ($i = 0; $i < 8; $i++) {
+                                        $coupon_code .= $characters[rand(0, strlen($characters) - 1)];
+                                    }
+                                    $full_coupon_code = $prefix . $coupon_code;
+                                    $existing_coupon = $this->couponRepository->get($full_coupon_code);
+                                } while ($existing_coupon->getId());
+
+                                $rule = $this->ruleFactory->create();
+                                $rule->setName('NewsMAN generated coupon code')
+                                    ->setDescription('Generated Coupon Code')
+                                    ->setCouponType(($discountType == 1) ? 'by_percent' : 'by_fixed')
+                                    ->setCouponCode($full_coupon_code)
+                                    ->setDiscountAmount($value)
+                                    ->setFromDate(date('Y-m-d'))
+                                    ->setToDate($expire_date)
+                                    ->setUsesPerCoupon(1)
+                                    ->setUsesPerCustomer(1)
+                                    ->setIsActive(true)
+                                    ->save();
+
+                                $couponsList[] = $full_coupon_code;
+                            }
+
+                            return $resultJson->setData([
+                                "status" => 1,
+                                "codes" => $couponsList
+                            ]);
+                        } catch (\Exception $e) {
+                            return $resultJson->setData([
+                                "status" => 0,
+                                "msg" => $e->getMessage()
+                            ]);
+                        }
+
+                        break;
             }
         } else {
             http_response_code(403);

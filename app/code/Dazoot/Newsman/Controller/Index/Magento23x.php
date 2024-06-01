@@ -3,10 +3,15 @@
 namespace Dazoot\Newsman\Controller\Index;
 
 use \DateTime;
+use Magento\Framework\App\Action\Action;
+use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Request\InvalidRequestException;
 use Dazoot\Newsman\Helper\Apiclient;
+use Magento\SalesRule\Model\CouponFactory;
+use Magento\SalesRule\Model\RuleFactory;
+use Magento\Framework\Controller\Result\JsonFactory;
 
 class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareActionInterface
 {
@@ -21,6 +26,9 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
     private $_cartSession;
     protected $client;
 	protected $subscriberCollectionFactory;
+    protected $couponFactory;
+    protected $ruleFactory;
+    protected $resultJsonFactory;
 
     public function __construct(   
         \Psr\Log\LoggerInterface $logger,
@@ -30,7 +38,10 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
         \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
         \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productsCollectionFactory,
         \Magento\Newsletter\Model\Subscriber $subscriber,
-        \Magento\Checkout\Model\Session\Proxy $cartSession
+        \Magento\Checkout\Model\Session\Proxy $cartSession,
+        CouponFactory $couponFactory,
+        RuleFactory $ruleFactory,
+        JsonFactory $resultJsonFactory
     )
     {
         parent::__construct($context);
@@ -44,6 +55,9 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
         $this->_subscriber= $subscriber;
         $this->_cartSession = $cartSession;
         $this->subscriberCollectionFactory = $customerCollectionFactory;
+        $this->couponFactory = $couponFactory;
+        $this->ruleFactory = $ruleFactory;
+        $this->resultJsonFactory = $resultJsonFactory;
 
         // CsrfAwareAction Magento -> 2.3 compatibility
         if (interface_exists("\Magento\Framework\App\CsrfAwareActionInterface")) {
@@ -470,6 +484,74 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
 
                     header('Content-Type: application/json');
                     echo json_encode("Imported successfully", JSON_PRETTY_PRINT);  
+
+                    break;
+
+                    case "coupons.json":
+
+                        $resultJson = $this->resultJsonFactory->create();
+
+                        try {
+                            $discountType = (int)$this->getRequest()->getParam('type', -1);
+                            $value = (int)$this->getRequest()->getParam('value', -1);
+                            $batchSize = (int)$this->getRequest()->getParam('batch_size', 1);
+                            $prefix = $this->getRequest()->getParam('prefix', '');
+                            $expireDate = $this->getRequest()->getParam('expire_date');
+                            $minAmount = (float)$this->getRequest()->getParam('min_amount', -1);
+
+                            if ($discountType == -1) {
+                                return $resultJson->setData(['status' => 0, 'msg' => 'Missing type param']);
+                            }
+                            if ($value == -1) {
+                                return $resultJson->setData(['status' => 0, 'msg' => 'Missing value param']);
+                            }
+
+                            $couponsList = [];
+
+                            for ($int = 0; $int < $batchSize; $int++) {
+                                $coupon = $this->couponFactory->create();
+
+                                switch($discountType) {
+                                    case 1:
+                                        $coupon->setDiscountType('by_percent');
+                                        break;
+                                    case 0:
+                                        $coupon->setDiscountType('by_fixed');
+                                        break;
+                                }
+
+                                $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                                $couponCode = '';
+
+                                do {
+                                    $couponCode = '';
+                                    for ($i = 0; $i < 8; $i++) {
+                                        $couponCode .= $characters[rand(0, strlen($characters) - 1)];
+                                    }
+                                    $fullCouponCode = $prefix . $couponCode;
+                                    $existingCoupon = $this->couponFactory->create()->loadByCode($fullCouponCode);
+                                } while ($existingCoupon->getId());
+
+                                $rule = $this->ruleFactory->create();
+                                $rule->setName('NewsMAN generated coupon code')
+                                    ->setDescription('Generated Coupon Code')
+                                    ->setCouponType(($discountType == 1) ? 'by_percent' : 'by_fixed')
+                                    ->setCouponCode($fullCouponCode)
+                                    ->setDiscountAmount($value)
+                                    ->setFromDate(date('Y-m-d'))
+                                    ->setToDate($expireDate)
+                                    ->setUsesPerCoupon(1)
+                                    ->setUsesPerCustomer(1)
+                                    ->setIsActive(true)
+                                    ->save();
+
+                                $couponsList[] = $fullCouponCode;
+                            }
+
+                            return $resultJson->setData(['status' => 1, 'codes' => $couponsList]);
+                        } catch (\Exception $e) {
+                            return $resultJson->setData(['status' => 0, 'msg' => $e->getMessage()]);
+                        }
 
                     break;
             }
