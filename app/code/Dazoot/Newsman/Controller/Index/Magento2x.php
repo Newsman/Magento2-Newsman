@@ -105,7 +105,11 @@ class Index extends \Magento\Framework\App\Action\Action
 
     public function NewsmanFetch($_apikey)
     {
-        $apikey = (empty($_GET["apikey"])) ? "" : $_GET["apikey"];
+        $apikey = (empty($_GET["nzmhash"])) ? "" : $_GET["nzmhash"];
+        $authorizationHeader = isset($_SERVER['HTTP_AUTHORIZATION']) ? $_SERVER['HTTP_AUTHORIZATION'] : '';
+        if (strpos($authorizationHeader, 'Bearer') !== false) {
+            $apikey = trim(str_replace('Bearer', '', $authorizationHeader));
+        }
         $newsman = (empty($_GET["newsman"])) ? "" : $_GET["newsman"];
         $start = (!empty($_GET["start"]) && $_GET["start"] >= 0) ? $_GET["start"] : 1;
         $limit = (empty($_GET["limit"])) ? 1000 : $_GET["limit"];        
@@ -113,7 +117,6 @@ class Index extends \Magento\Framework\App\Action\Action
         $product_id = (empty($_GET["product_id"])) ? "" : $_GET["product_id"];
 
         if (!empty($newsman) && !empty($apikey) || strpos($_GET["newsman"], 'getCart.json') !== false) {
-            $apikey = $_GET["apikey"] ?? "";
             $currApiKey = $_apikey;
 
             if(strpos($_GET["newsman"], 'getCart.json') !== false)

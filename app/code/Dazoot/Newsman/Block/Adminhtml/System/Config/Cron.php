@@ -48,7 +48,7 @@ class Cron extends \Magento\Backend\Block\AbstractBlock implements
 		$apiKey = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue("newsman/credentials/apiKey", $storeScope, $storeId);
 
 		$html = 'CRON Sync url: </br>
-<a target="_blank" href="' . $url . 'newsman/index/index?newsman=cron.json&apikey=' . $apiKey . '&start=1&limit=1000">' . $url . 'newsman/index/index?newsman=cron.json&apikey=' . $apiKey . '&start=1&limit=1000</a>
+<a target="_blank" href="' . $url . 'newsman/index/index?newsman=cron.json&nzmhash=' . $apiKey . '&start=1&limit=1000">' . $url . 'newsman/index/index?newsman=cron.json&nzmhash=' . $apiKey . '&start=1&limit=1000</a>
 ';
 		return $html;
 	}
