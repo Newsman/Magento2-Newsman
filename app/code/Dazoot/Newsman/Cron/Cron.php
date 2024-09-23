@@ -7,7 +7,7 @@ use Magento\Backend\App\Action\Context;
 use Dazoot\Newsman\Helper\Apiclient;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 
-class Cron extends \Magento\Backend\App\Action
+class Cron
 {
 	/**
 	 * @var \Psr\Log\LoggerInterface
