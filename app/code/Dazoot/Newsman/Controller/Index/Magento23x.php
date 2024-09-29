@@ -125,6 +125,10 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
         {
             $apikey = empty($_POST['nzmhash']) ? '' : $_POST['nzmhash'];
         }
+        $authorizationHeader = isset($_SERVER['HTTP_AUTHORIZATION']) ? $_SERVER['HTTP_AUTHORIZATION'] : '';
+        if (strpos($authorizationHeader, 'Bearer') !== false) {
+            $apikey = trim(str_replace('Bearer', '', $authorizationHeader));
+        }	    
         $newsman = (empty($_GET["newsman"])) ? "" : $_GET["newsman"];
         if(empty($newsman))
         {
