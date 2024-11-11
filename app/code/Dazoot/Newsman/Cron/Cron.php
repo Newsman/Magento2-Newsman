@@ -53,7 +53,6 @@ class Cron
 		$this->_subscriberCollectionFactory = $__subscriberCollectionFactory;
 		$this->configWriter = $configWriter;
 		$this->timezone = $timezone;
-		parent::__construct($context);
 	}
 
 	public function execute()
