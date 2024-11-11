@@ -57,6 +57,8 @@ class Cron
 
 	public function execute()
 	{		
+		//obsolete, cron is executed via UI url
+		return;
 		//customers import
 
 		$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
