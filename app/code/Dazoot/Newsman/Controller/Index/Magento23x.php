@@ -120,7 +120,7 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
 
     public function NewsmanFetch($_apikey)
     {
-        $apikey = (empty($_GET["apikey"])) ? "" : $_GET["apikey"];
+        $apikey = (empty($_GET["nzmhash"])) ? "" : $_GET["nzmhash"];
         if(empty($apikey))
         {
             $apikey = empty($_POST['nzmhash']) ? '' : $_POST['nzmhash'];
