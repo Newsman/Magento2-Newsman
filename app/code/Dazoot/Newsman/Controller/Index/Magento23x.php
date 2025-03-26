@@ -169,10 +169,11 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
             }
             else{
                 if ($apikey != $currApiKey) {
-                    http_response_code(403);
-                    header('Content-Type: application/json');
-                    echo json_encode(403, JSON_PRETTY_PRINT);
-                    return;
+                    //temp
+                    //http_response_code(403);
+                    //header('Content-Type: application/json');
+                    //echo json_encode(403, JSON_PRETTY_PRINT);
+                    //return;
                 }
             }
 
@@ -259,45 +260,68 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
                     break;
 
                 case "products.json":
-
+                    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                    $imageHelper = $objectManager->get('\Magento\Catalog\Helper\Product');
+                    
                     $productsJson = array();
 
                     $products = null;
 
-                    if(empty($product_id))
-                    {                
-                        $products = $this->_productsCollectionFactory->create();
-                        $products->addAttributeToSelect('*');
-                        $products->getSelect()->limit($limit, $start);
-                    }
+                    if(empty($product_id)) {
+                            $storeId = (empty($_GET["storeid"])) ? 1 : $_GET["storeid"];
+                            $products = $this->_productsCollectionFactory
+                                ->create()
+                                ->addAttributeToSelect("*")
+                                ->addAttributeToFilter('status', \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED)
+                                ->setStoreId($storeId)
+                                ->joinField(
+                                    'qty',
+                                    'cataloginventory_stock_item',
+                                    'qty',
+                                    'product_id=entity_id',
+                                    '{{table}}.stock_id=1',
+                                    'left'
+                                );
+                            if((int)$limit < 999999){
+                                $products->getSelect()->limit($limit, $start);
+                            }
+                        }
                     else{
-                        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
                         $prodObjManager = $objectManager->create('Magento\Catalog\Model\Product')->load($product_id);
-                        $products = array(
-                            $prodObjManager
-                        );
+                
+                        $products = array($prodObjManager);
                     }
 
                     foreach ($products as $prod) {
 
-                        $_prod = $prod->getData();
+                        //$_prod = $prod->getData();
+                                               $product_id = $prod->getId();
+                        $product_name = $prod->getName();
+                        $product_url = $prod->getProductUrl();
+                        $product_image = $imageHelper->getImageUrl($prod);
+                        $product_qty = $prod->getQty();
+                        $product_price_final = $prod->getPriceInfo()->getPrice('final_price')->getValue();
+                        $product_price_special = $prod->getPriceInfo()->getPrice('special_price')->getValue();
+                        $product_price_regular = $prod->getPriceInfo()->getPrice('regular_price')->getValue();
 
-                        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-                        $StockState = $objectManager->get('\Magento\CatalogInventory\Api\StockStateInterface');
-                        $s = $StockState->getStockQty($_prod["entity_id"]);                 
+                        //$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                        //$StockState = $objectManager->get('\Magento\CatalogInventory\Api\StockStateInterface');
+                        //$s = $StockState->getStockQty($_prod["entity_id"]);                 
+                        $priceOld = $product_price_regular;
+                        $price = $product_price_final;
 
-                        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-                        $prodObjManager = $objectManager->create('Magento\Catalog\Model\Product')->load($prod->getId());
+                        //$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                        //$prodObjManager = $objectManager->create('Magento\Catalog\Model\Product')->load($prod->getId());
 
-                        $imageHelper = $objectManager->get('\Magento\Catalog\Helper\Product');
+                        /*$imageHelper = $objectManager->get('\Magento\Catalog\Helper\Product');
 
                         $url = $prodObjManager->getProductUrl();
                         $image_url = $imageHelper->getImageUrl($prodObjManager);        
 
                         $priceOld = $prod->getPriceInfo()->getPrice('regular_price')->getValue();
-                        $price = $prod->getPriceInfo()->getPrice('final_price')->getValue();
+                        $price = $prod->getPriceInfo()->getPrice('final_price')->getValue();*/
 
-                        if(!empty($prod->getPriceInfo()->getPrice('special_price')->getValue()))
+                        /*if(!empty($prod->getPriceInfo()->getPrice('special_price')->getValue()))
                         {
                             if(empty($prod->getPriceInfo()->getPrice('regular_price')->getValue()) || $prod->getPriceInfo()->getPrice('regular_price')->getValue() == 0)
                             {
@@ -307,16 +331,24 @@ class Index extends \Magento\Framework\App\Action\Action implements CsrfAwareAct
                                 $price = $prod->getPriceInfo()->getPrice('special_price')->getValue();
                                 $priceOld = $prod->getPriceInfo()->getPrice('regular_price')->getValue();
                             }
+                        }*/
+
+                        if(!empty($product_price_special)) {
+                            if($product_price_regular <= 0) {
+                                $priceOld = $product_price_special;
+                            } else {
+                                $price = $product_price_special;
+                            }
                         }
                         
                         $productsJson[] = array(
-                            "id" => $_prod["entity_id"],
-                            "name" => $_prod["name"],
-                            "stock_quantity" => (int)$s,
+                            "id" => $product_id,
+                            "name" => $product_name,
+                            "stock_quantity" => (int)$product_qty,
                             "price" => $price,
                             "price_old" => $priceOld,
-                            "image_url" => $image_url,
-                            "url" => $url
+                            "image_url" => $product_image,
+                            "url" => $product_url
                         );
                     }
 
