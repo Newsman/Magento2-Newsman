@@ -11,7 +11,8 @@
     <consumer name="dazoot_newsman_marketing.export.order.state"
               queue="dazoot_newsman_marketing.export.order.state"
               handler="Dazoot\Newsmanmarketing\Model\Export\Order\State\Consumer::execute"
-              connection="db"
               maxMessages="100"
-              consumerInstance="Magento\Framework\MessageQueue\Consumer" />
+              maxIdleTime="60"
+              sleep="5"
+              onlySpawnWhenMessageAvailable="1" />
 </config>
