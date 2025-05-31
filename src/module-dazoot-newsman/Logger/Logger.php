@@ -29,14 +29,16 @@ class Logger extends \Monolog\Logger
      * @param string $name
      * @param array $handlers
      * @param array $processors
+     * @param DateTimeZone|null $timezone
      */
     public function __construct(
         Config $config,
         string $name,
         array $handlers = [],
-        array $processors = []
+        array $processors = [],
+        ?DateTimeZone $timezone = null
     ) {
-        parent::__construct($name, $handlers, $processors);
+        parent::__construct($name, $handlers, $processors, $timezone);
 
         $this->config = $config;
     }
