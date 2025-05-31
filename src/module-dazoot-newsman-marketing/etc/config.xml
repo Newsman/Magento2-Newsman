@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!--
+/**
+* Copyright © Dazoot Software S.R.L. rights reserved.
+* See LICENSE.txt for license details.
+*
+* @website https://www.newsman.ro/
+*/
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <newsmanmarketing>
+            <general>
+                <enable>0</enable>
+                <ua_id />
+                <use_tunnel>1</use_tunnel>
+                <anonymize_ip>0</anonymize_ip>
+                <brand_attribute>manufacturer</brand_attribute>
+                <script_js><![CDATA[var _nzm = _nzm || [],
+    _nzm_config = _nzm_config || [];
+
+{{nzmConfigJs}}
+
+(function(w, d, e, u, f, c, l, n, a, m) {
+    w[f] = w[f] || [],
+    w[c] = w[c] || [],
+    a=function(x) {
+        return function() {
+            w[f].push([x].concat(Array.prototype.slice.call(arguments, 0)));
+        }
+    },
+    m = ["identify", "track", "run"];
+    if ({{conditionTunnelScript}}) {
+        w[c].js_prefix = '{{resourcesBaseUrl}}';
+        w[c].tr_prefix = '{{trackingBaseUrl}}';
+    }
+    for(var i = 0; i < m.length; i++) {
+        w[f][m[i]] = a(m[i]);
+    }
+    l = d.createElement(e),
+    l.async = 1,
+    l.src = u,
+    l.id="nzm-tracker",
+    l.setAttribute("data-site-id", '{{remarketingId}}'),
+    n = d.getElementsByTagName(e)[0],
+    n.parentNode.insertBefore(l, n);
+
+})(window, document, 'script', '{{trackingScriptUrl}}', '_nzm', '_nzm_config');]]></script_js>
+            </general>
+            <tracking>
+                <script_url><![CDATA[https://retargeting.newsmanapp.com/js/retargeting/track.js]]></script_url>
+            </tracking>
+            <http>
+                <resources_url><![CDATA[https://retargeting.newsmanapp.com/]]></resources_url>
+                <tracking_url><![CDATA[https://rtrack.newsmanapp.com/]]></tracking_url>
+                <required_file_patterns><![CDATA[js/retargeting/track.js
+js/retargeting/nzm_custom_{{api_key}}.js
+js/retargeting/ecommerce.js
+js/retargeting/modal_{{api_key}}.js]]></required_file_patterns>
+            </http>
+        </newsmanmarketing>
+    </default>
+</config>

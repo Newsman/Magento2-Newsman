@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+* Copyright © Dazoot Software S.R.L. rights reserved.
+* See LICENSE.txt for license details.
+*
+* @website https://www.newsman.ro/
+*/
+-->
+<csp_whitelist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Csp:etc/csp_whitelist.xsd">
+    <policies>
+        <policy id="img-src">
+            <values>
+                <value id="dazoot_s1-cdn-nl-nzmt-eu" type="host">s1-cdn.nl.nzmt.eu</value>
+            </values>
+        </policy>
+    </policies>
+</csp_whitelist>

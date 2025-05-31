@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!--
+/**
+* Copyright © Dazoot Software S.R.L. rights reserved.
+* See LICENSE.txt for license details.
+*
+* @website https://www.newsman.ro/
+*/
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="dazoot_nm_order_queue" resource="sales" engine="innodb"
+           comment="Dazoot Newsman Marketing Order Queue">
+        <column xsi:type="int" name="queue_id" unsigned="true" nullable="false" identity="true"
+                comment="Queue ID"/>
+        <column xsi:type="int" name="order_id" unsigned="true" nullable="false" identity="false"
+                default="0" comment="Order ID"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="true" identity="false"
+                comment="Store ID"/>
+        <column xsi:type="varchar" name="state" nullable="true" length="32" comment="State"/>
+        <column xsi:type="varchar" name="increment_id" nullable="true" length="50" comment="Increment ID"/>
+        <column xsi:type="smallint" name="sent" unsigned="true" nullable="false"
+                identity="false" default="0" comment="Sent"/>
+        <column xsi:type="smallint" name="failures" unsigned="true" nullable="true" identity="false"
+                comment="Failures"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Updated At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="queue_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="DAZOOT_NM_ORDER_QUEUE_ORDER_ID_SALES_ORDER_ENTITY_ID"
+                    table="dazoot_nm_order_queue" column="order_id" referenceTable="sales_order"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+        <index referenceId="DAZOOT_NM_ORDER_QUEUE_ORDER_ID_STATE" indexType="btree">
+            <column name="order_id"/>
+            <column name="state"/>
+        </index>
+    </table>
+</schema>

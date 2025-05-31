@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+/**
+* Copyright © Dazoot Software S.R.L. rights reserved.
+* See LICENSE.txt for license details.
+*
+* @website https://www.newsman.ro/
+*/
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="checkout_onepage_controller_success_action">
+        <observer name="dazoot_newsman_marketing_purchase_order_success"
+                  instance="Dazoot\Newsmanmarketing\Observer\SetPurchaseDataOnOrderSuccessPageViewObserver" />
+    </event>
+    <event name="multishipping_checkout_controller_success_action">
+        <observer name="dazoot_newsman_marketing_purchase_order_success"
+                  instance="Dazoot\Newsmanmarketing\Observer\SetPurchaseDataOnOrderSuccessPageViewObserver" />
+    </event>
+    <event name="checkout_cart_product_add_before">
+        <observer name="dazoot_newsman_marketing_capture_qty"
+                  instance="Dazoot\Newsmanmarketing\Observer\CaptureQtyBeforeAddCartObserver" />
+    </event>
+    <event name="checkout_cart_product_add_after">
+        <observer name="dazoot_newsman_marketing_notify_add_cart"
+                  instance="Dazoot\Newsmanmarketing\Observer\NotifyAddCartObserver" />
+    </event>
+</config>

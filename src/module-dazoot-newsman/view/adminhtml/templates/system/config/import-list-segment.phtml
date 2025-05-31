@@ -1,0 +1,32 @@
+<?php
+/**
+ * Copyright © Dazoot Software S.R.L. rights reserved.
+ * See LICENSE.txt for license details.
+ *
+ * @website https://www.newsman.ro/
+ */
+
+use Dazoot\Newsman\Block\Adminhtml\System\Config\SynchronizeListSegment;
+use Magento\Framework\Escaper;
+
+/** @var SynchronizeListSegment $block */
+/** @var Escaper $escaper */
+
+?>
+<button class="scalable" type="button" id="<?= $block->getHtmlId() ?>" data-mage-init='{"newsmanImportListSegment":{
+    "url": "<?= $escaper->escapeUrl($block->getAjaxUrl()) ?>",
+    "elementId": "<?= /* @noEscape */ $block->getHtmlId() ?>",
+    "successText": "<?= $escaper->escapeHtmlAttr(
+        __('The lists and segments were synchronized.')
+    ) ?>",
+    "failedText": "<?= $escaper->escapeHtmlAttr(__('Something went wrong. Please try again.')) ?>",
+    "userElementId": "newsman_credentials_userId",
+    "listElementId": "newsman_credentials_listId",
+    "listEmptyLabel": "<?= $escaper->escapeHtml(__('Please choose a list')) ?>",
+    "segmentElementId": "newsman_credentials_segmentId",
+    "segmentEmptyLabel": "<?= $escaper->escapeHtml(__('Please choose a segment')) ?>",
+    "fieldMapping": "<?= /* @noEscape */ $block->getFieldMapping() ?>"}, "validation": {}}'>
+    <span id="<?= /* @noEscape */ $block->getHtmlId() ?>_result"
+        ><?= $escaper->escapeHtml($block->getButtonLabel()) ?></span>
+    <span id="<?= /* @noEscape */ $block->getHtmlId() ?>_error"></span>
+</button>

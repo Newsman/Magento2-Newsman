@@ -1,0 +1,16 @@
+<?php
+/**
+ * Copyright © Dazoot Software S.R.L. rights reserved.
+ * See LICENSE.txt for license details.
+ *
+ * @website https://www.newsman.ro/
+ */
+
+/** @var \Magento\Framework\View\Element\Template $block */
+/** @var \Magento\Framework\Escaper $escaper */
+
+?>
+<?= $escaper->escapeHtml(__('Please visit')) ?>&nbsp;
+<a target="_blank" href="<?= $escaper->escapeUrl($block->getData('bulk_actions_log')) ?>"
+    ><?= $escaper->escapeHtml(__('Bulk Actions Log')) ?></a>
+<?= $escaper->escapeHtml(__('to see the status of the export.')) ?>

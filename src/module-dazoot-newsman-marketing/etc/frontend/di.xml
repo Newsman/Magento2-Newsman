@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Dazoot Software S.R.L. rights reserved.
+ * See LICENSE.txt for license details.
+ *
+ * @website https://www.newsman.ro/
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Customer\CustomerData\SectionPoolInterface">
+        <arguments>
+            <argument name="sectionSourceMap" xsi:type="array">
+                <item name="dazoot-marketing" xsi:type="string">Dazoot\Newsmanmarketing\CustomerData\Marketing</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Dazoot\Newsmanmarketing\CustomerData\Marketing">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Dazoot\Newsmanmarketing\Observer\CaptureQtyBeforeAddCartObserver">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Dazoot\Newsmanmarketing\Observer\NotifyAddCartObserver">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Magento\Checkout\Model\Cart">
+        <plugin name="dazoot_newsman_notify_remove_item" disabled="false"
+                type="Dazoot\Newsmanmarketing\Plugin\Model\Checkout\Cart\NotifyChangesCart" />
+    </type>
+    <type name="Dazoot\Newsmanmarketing\Plugin\Model\Checkout\Cart\NotifyChangesCart">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Magento\Customer\CustomerData\Customer">
+        <plugin name="dazoot_newsman_add_customer_data" disabled="false"
+                type="Dazoot\Newsmanmarketing\Plugin\CustomerData\Customer\AddCustomerData" />
+    </type>
+    <type name="Magento\Framework\App\RouterList">
+        <arguments>
+            <argument name="routerList" xsi:type="array">
+                <item name="newsmanmarketing" xsi:type="array">
+                    <item name="class" xsi:type="string">Dazoot\Newsmanmarketing\Controller\Router</item>
+                    <item name="disable" xsi:type="boolean">false</item>
+                    <item name="sortOrder" xsi:type="string">10</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+</config>

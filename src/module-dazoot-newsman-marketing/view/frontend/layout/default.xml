@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Dazoot Software S.R.L. rights reserved.
+ * See LICENSE.txt for license details.
+ *
+ * @website https://www.newsman.ro/
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="head.additional">
+            <block class="Dazoot\Newsmanmarketing\Block\EnhancedEcommerce"
+                   name="newsman.remarketing.script-js"
+                   template="Dazoot_Newsmanmarketing::html/script-js.phtml"
+                   ifconfig="newsmanmarketing/general/enable">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Dazoot\Newsmanmarketing\ViewModel\Tracking</argument>
+                </arguments>
+                <block class="Magento\Framework\View\Element\Template"
+                       name="newsman.remarketing.no-track-js"
+                       template="Dazoot_Newsmanmarketing::html/no-track-js.phtml"
+                       ifconfig="newsmanmarketing/general/enable">
+                    <arguments>
+                        <argument name="cache_lifetime" xsi:type="number">86400</argument>
+                    </arguments>
+                </block>
+            </block>
+        </referenceBlock>
+        <referenceContainer name="before.body.end">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="newsman.remarketing.cart-actions"
+                   before="-"
+                   template="Dazoot_Newsmanmarketing::checkout/cart-actions.phtml"
+                   ifconfig="newsmanmarketing/general/enable">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Dazoot\Newsmanmarketing\ViewModel\Marketing</argument>
+                </arguments>
+            </block>
+            <block class="Magento\Framework\View\Element\Template"
+                   name="newsman.remarketing.customer.identify"
+                   before="-"
+                   template="Dazoot_Newsmanmarketing::customer/identify.phtml"
+                   ifconfig="newsmanmarketing/general/enable">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Dazoot\Newsmanmarketing\ViewModel\Marketing</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

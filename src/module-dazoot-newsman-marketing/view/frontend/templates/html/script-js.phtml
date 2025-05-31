@@ -1,0 +1,54 @@
+<?php
+/**
+ * Copyright © Dazoot Software S.R.L. rights reserved.
+ * See LICENSE.txt for license details.
+ *
+ * @website https://www.newsman.ro/
+ */
+
+/** @var \Dazoot\Newsmanmarketing\Block\EnhancedEcommerce $block */
+/** @var Magento\Framework\Escaper $escaper */
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
+
+/** @var \Dazoot\Newsmanmarketing\ViewModel\Tracking $viewModel */
+$viewModel = $block->getViewModel();
+if (!$viewModel->isActive()) {
+    return '';
+}
+
+$conditionTunnelScript = 'false';
+$resourcesBaseUrl = $trackingBaseUrl = '';
+if ($viewModel->useTunnel()) {
+    $conditionTunnelScript = 'true';
+    $resourcesBaseUrl = $escaper->escapeJsQuote($escaper->escapeHtml($viewModel->getResourcesUrl()));
+    $trackingBaseUrl = $escaper->escapeJsQuote($escaper->escapeHtml($viewModel->getTrackingUrl()));
+}
+
+$nzmConfigJs = $viewModel->getNewsmanConfigJs();
+
+$scriptString = strtr($viewModel->getScriptJs(), [
+    '{{nzmConfigJs}}' => $nzmConfigJs,
+    '{{conditionTunnelScript}}' => $conditionTunnelScript,
+    '{{resourcesBaseUrl}}' => $resourcesBaseUrl,
+    '{{trackingBaseUrl}}' => $trackingBaseUrl,
+    '{{remarketingId}}' => $escaper->escapeJsQuote($escaper->escapeHtml($viewModel->getUaId())),
+    '{{trackingScriptUrl}}' => $escaper->escapeJsQuote($escaper->escapeUrl($viewModel->getScriptFinalUrl()))
+
+]);
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false); ?>
+<?php
+$anonymizeIpScript = '';
+if ($viewModel->getAnynymizeIp()) {
+    $anonymizeIpScript = "_nzm.run('set', 'anonymizeIp', true);";
+}
+$noTrackingScript = $block->getChildHtml('newsman.remarketing.no-track-js');
+$currencyCode = $viewModel->getCurrencyCode();
+
+$scriptString = <<<EOT
+    {$noTrackingScript}
+    {$anonymizeIpScript}
+    _nzm.run( 'set', 'currencyCode', '{$escaper->escapeJsQuote($currencyCode)}' );
+EOT;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false);

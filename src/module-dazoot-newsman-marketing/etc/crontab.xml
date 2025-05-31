@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Dazoot Software S.R.L. rights reserved.
+ * See LICENSE.txt for license details.
+ *
+ * @website https://www.newsman.ro/
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="default">
+        <job name="dazoot_newsmanmarketing_clean_assets" instance="Dazoot\Newsmanmarketing\Cron\CleanAssets" method="execute">
+            <schedule>0 3 * * *</schedule>
+        </job>
+    </group>
+</config>

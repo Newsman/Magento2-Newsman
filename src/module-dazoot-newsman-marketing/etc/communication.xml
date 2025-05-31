@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!--
+/**
+* Copyright © Dazoot Software S.R.L. rights reserved.
+* See LICENSE.txt for license details.
+*
+* @website https://www.newsman.ro/
+*/
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Communication/etc/communication.xsd">
+    <topic name="dazoot_newsman_marketing.export.order.state" is_synchronous="false" request="int">
+        <handler name="dazoot_newsman_marketing.export.order.state" type="Dazoot\Newsmanmarketing\Model\Export\Order\State\Consumer" method="execute" />
+    </topic>
+</config>

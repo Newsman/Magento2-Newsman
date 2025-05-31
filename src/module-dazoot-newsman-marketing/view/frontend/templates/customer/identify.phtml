@@ -1,0 +1,22 @@
+<?php
+/**
+ * Copyright © Dazoot Software S.R.L. rights reserved.
+ * See LICENSE.txt for license details.
+ *
+ * @website https://www.newsman.ro/
+ */
+
+/** @var \Magento\Framework\View\Element\Template $block */
+/** @var \Dazoot\Newsmanmarketing\ViewModel\Marketing $viewModel */
+$viewModel = $block->getViewModel();
+if (!$viewModel->isActive()) {
+    return '';
+}
+?>
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Dazoot_Newsmanmarketing/js/customer/identify": {}
+    }
+}
+</script>

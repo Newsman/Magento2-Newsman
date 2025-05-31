@@ -1,0 +1,34 @@
+<?php
+/**
+ * Copyright © Dazoot Software S.R.L. rights reserved.
+ * See LICENSE.txt for license details.
+ *
+ * @website https://www.newsman.ro/
+ */
+
+/** @var \Dazoot\Newsmanmarketing\Block\Adminhtml\Cache\Permissions|null $permissions */
+/** @var Magento\Framework\Escaper $escaper */
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
+/** @var \Dazoot\Newsmanmarketing\Block\Adminhtml\Cache\Additional\Assets $block */
+
+/** @var \Dazoot\Newsmanmarketing\ViewModel\Configuration $configurationViewModel */
+$configurationViewModel = $block->getConfigurationViewModel();
+if (!$configurationViewModel->isAnyActive()) {
+    return '';
+}
+
+$permissions = $block->getData('permissions');
+?>
+<?php if ($permissions->hasAccessToFlushAssets()): ?>
+    <p>
+        <button id="flushJsCss" type="button">
+            <?= $escaper->escapeHtml(__('Flush Newsman Remarketing JavaScript Files')); ?>
+        </button>
+        <?= /* @noEscape */ $secureRenderer->renderEventListenerAsTag(
+            'onclick',
+            'setLocation(\'' . $escaper->escapeJs($block->getCleanAssetsUrl()) . '\')',
+            'button#flushJsCss'
+        ) ?>
+        <span><?= $escaper->escapeHtml(__('Cached JavaScript files for tracking')) ?></span>
+    </p>
+<?php endif; ?>

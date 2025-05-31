@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+/**
+* Copyright © Dazoot Software S.R.L. rights reserved.
+* See LICENSE.txt for license details.
+*
+* @website https://www.newsman.ro/
+*/
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/topology.xsd">
+    <exchange name="magento-db" type="topic" connection="db">
+        <binding id="dazoot_newsman_newsletter_bulk_unsubscribe" topic="dazoot_newsman.newsletter.bulk.unsubscribe" destinationType="queue" destination="dazoot_newsman.newsletter.bulk.unsubscribe"/>
+        <binding id="dazoot_newsman_newsletter_bulk_delete" topic="dazoot_newsman.newsletter.bulk.delete" destinationType="queue" destination="dazoot_newsman.newsletter.bulk.delete"/>
+        <binding id="dazoot_newsman_newsletter_bulk_export_list" topic="dazoot_newsman.newsletter.bulk.export.list" destinationType="queue" destination="dazoot_newsman.newsletter.bulk.export.list"/>
+    </exchange>
+</config>

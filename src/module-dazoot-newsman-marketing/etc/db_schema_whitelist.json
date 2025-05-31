@@ -1,0 +1,22 @@
+{
+    "dazoot_nm_order_queue": {
+        "column": {
+            "queue_id": true,
+            "order_id": true,
+            "store_id": true,
+            "state": true,
+            "increment_id": true,
+            "sent": true,
+            "failures": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "DAZOOT_NM_ORDER_QUEUE_ORDER_ID_STATE": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "DAZOOT_NM_ORDER_QUEUE_ORDER_ID_SALES_ORDER_ENTITY_ID": true
+        }
+    }
+}

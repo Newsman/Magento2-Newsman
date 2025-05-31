@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+<!--
+/**
+* Copyright © Dazoot Software S.R.L. rights reserved.
+* See LICENSE.txt for license details.
+*
+* @website https://www.newsman.ro/
+*/
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="newsman" translate="label" sortOrder="507000">
+            <label>Newsman</label>
+        </tab>
+        <section id="newsman" translate="label" sortOrder="100" showInDefault="1"
+                 showInWebsite="1" showInStore="1">
+            <label>General</label>
+            <tab>newsman</tab>
+            <resource>Dazoot_Newsman::config_newsman</resource>
+            <group id="about" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <frontend_model>Dazoot\Newsman\Block\Adminhtml\System\Config\Info</frontend_model>
+            </group>
+            <group id="general" translate="label" type="text" sortOrder="20" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                <label>General</label>
+                <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Active</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Disable or enable Newsman features.]]></comment>
+                </field>
+                <field id="send_user_ip" translate="label" type="select" sortOrder="20" showInDefault="1"
+                       showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Send User IP Address</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Send user IP address to Newsman.]]></comment>
+                </field>
+                <field id="server_ip" translate="label" type="text" sortOrder="30" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Server IP address</label>
+                    <comment><![CDATA[IP address of the server where Magento is hosted. It is used instead of users IP addresses.]]></comment>
+                    <depends>
+                        <field id="send_user_ip">0</field>
+                    </depends>
+                </field>
+                <field id="order_after_date" translate="label" type="date" sortOrder="40" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Export Orders After Date</label>
+                    <frontend_model>Dazoot\Newsman\Block\Adminhtml\System\Config\Frontend\Date</frontend_model>
+                    <comment><![CDATA[Export orders created after date set. Leave empty field to export all orders.]]></comment>
+                </field>
+            </group>
+            <group id="credentials" translate="label" type="text" sortOrder="30" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                <label>API</label>
+                <field id="userId" translate="label" type="text" sortOrder="10" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>User ID</label>
+                    <comment><![CDATA[User Id from your Newsman account.]]></comment>
+                </field>
+                <field id="apiKey" translate="label" type="obscure" sortOrder="20" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>API Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <comment><![CDATA[API Key from your Newsman account.]]></comment>
+                </field>
+                <field id="api_timeout" translate="label" type="text" sortOrder="30" showInDefault="1"
+                       canRestore="1">
+                    <label>API Timeout</label>
+                    <validate>required-entry validate-number</validate>
+                    <comment><![CDATA[API HTTP request timeout in seconds. Minimum 5 seconds.]]></comment>
+                </field>
+                <field id="synchronize_list_segment" translate="button_label" sortOrder="40" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label/>
+                    <button_label>Synchronize Lists and Segments</button_label>
+                    <frontend_model>Dazoot\Newsman\Block\Adminhtml\System\Config\SynchronizeListSegment</frontend_model>
+                    <comment><![CDATA[Please import in Magento all lists and segments without subscribers from Newsman.]]></comment>
+                </field>
+                <field id="listId" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>List ID</label>
+                    <source_model>Dazoot\Newsman\Model\Config\Source\Lists</source_model>
+                    <comment><![CDATA[All Newsman lists.]]></comment>
+                </field>
+                <field id="segmentId" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>Segment ID</label>
+                    <source_model>Dazoot\Newsman\Model\Config\Source\Segments</source_model>
+                    <comment><![CDATA[All Newsman segments. Selecting a segment is not mandatory. The segment ID must match corresponding list ID.]]></comment>
+                </field>
+                <field id="export_newsletter_subscribers" type="Dazoot\Newsman\Block\Adminhtml\Form\Field\ExportNewsletterSubscribers" sortOrder="70" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Export</label>
+                    <comment><![CDATA[The export of newsletter subscribers uses saved API list ID and segment ID configuration.<br />It exports the subscribers from all stores associated with current list ID.<br />Please save first the settings before exporting.]]></comment>
+                </field>
+            </group>
+            <group id="newsletter" translate="label" type="text" sortOrder="40" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                <label>Newsletter</label>
+                <field id="send_subscribe_newsman" translate="label" type="select" sortOrder="10" showInDefault="1"
+                       canRestore="1">
+                    <label>Send Subscribe/Unsubscribe Emails From Newsman</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Newsman sends the emails subscribe to newsletter confirmation and unsubscribe from newsletter.]]></comment>
+                </field>
+            </group>
+            <group id="developer" translate="label" type="text" sortOrder="100" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                <label>Developer</label>
+                <field id="active_user_ip" translate="label" type="select" sortOrder="10" showInDefault="1"
+                       canRestore="1">
+                    <label>Activate Test User IP</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Warning, do not use this IP address in production because it is used by API endpoint subscriber.saveSubscribe.]]></comment>
+                </field>
+                <field id="user_ip" translate="label" type="text" sortOrder="20" showInDefault="1" canRestore="1">
+                    <label>Test User IP address</label>
+                    <comment><![CDATA[Valid user IP address.]]></comment>
+                    <depends>
+                        <field id="active_user_ip">1</field>
+                    </depends>
+                </field>
+                <field id="log_mode" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="0"
+                       showInStore="0" canRestore="1">
+                    <label>Logging Mode</label>
+                    <source_model>Dazoot\Newsman\Model\Config\Source\Logging</source_model>
+                </field>
+                <field id="log_clean" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="0"
+                       showInStore="0" canRestore="1">
+                    <label>Log Clean</label>
+                    <comment><![CDATA[Clean old log files older than X days.]]></comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

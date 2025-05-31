@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Dazoot Software S.R.L. rights reserved.
+ * See LICENSE.txt for license details.
+ *
+ * @website https://www.newsman.ro/
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="before.body.end">
+            <block class="Dazoot\Newsmanmarketing\Block\Category\View"
+                   name="newsman.remarketing.category-view"
+                   before="-"
+                   template="Dazoot_Newsmanmarketing::category/view.phtml"
+                   ifconfig="newsmanmarketing/general/enable">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Dazoot\Newsmanmarketing\ViewModel\Category\View</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

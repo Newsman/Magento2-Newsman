@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Dazoot Software S.R.L. rights reserved.
+ * See LICENSE.txt for license details.
+ *
+ * @website https://www.newsman.ro/
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="newsman.remarketing.no-track-js">
+            <arguments>
+                <!-- Check if tracking JS files should be cached and try to cache them. -->
+                <argument name="cache_lifetime" xsi:type="boolean">false</argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

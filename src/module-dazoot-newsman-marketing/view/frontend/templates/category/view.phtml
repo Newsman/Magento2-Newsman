@@ -1,0 +1,26 @@
+<?php
+/**
+ * Copyright © Dazoot Software S.R.L. rights reserved.
+ * See LICENSE.txt for license details.
+ *
+ * @website https://www.newsman.ro/
+ */
+
+/** @var \Dazoot\Newsmanmarketing\Block\Category\View $block */
+/** @var \Dazoot\Newsmanmarketing\ViewModel\Category\View $viewModel */
+$viewModel = $block->getViewModel();
+if (!$viewModel->isActive()) {
+    return '';
+}
+
+$category = $block->getCategory();
+$serializer = $viewModel->getSerializer();
+$categoryData = $viewModel->getMarketingData($category, $block->getLayout());
+?>
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Dazoot_Newsmanmarketing/js/product/list": <?= /* @noEscape */ $serializer->serialize($categoryData) ?>
+    }
+}
+</script>

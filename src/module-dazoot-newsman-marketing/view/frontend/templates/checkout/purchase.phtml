@@ -1,0 +1,41 @@
+<?php
+/**
+ * Copyright © Dazoot Software S.R.L. rights reserved.
+ * See LICENSE.txt for license details.
+ *
+ * @website https://www.newsman.ro/
+ */
+
+/** @var \Magento\Framework\View\Element\Template $block */
+/** @var \Dazoot\Newsmanmarketing\ViewModel\Checkout\Purchase $viewModel */
+$viewModel = $block->getViewModel();
+if (!$viewModel->isActive()) {
+    return '';
+}
+
+$serializer = $viewModel->getSerializer();
+$orderIds = $block->getOrderIds();
+if (empty($orderIds)) {
+    return '';
+}
+$ordersData = $viewModel->getMarketingData($orderIds);
+if (empty($ordersData)) {
+    return '';
+}
+?>
+<script>
+if (typeof _nzm !== 'undefined') {
+    <?php foreach ($ordersData as $order): ?>
+        <?php if (!(isset($order['products']) && !empty($order['products']))) {
+            continue;
+        } ?>
+        <?php /* To track an order, a user has to be identified. */ ?>
+        _nzm.identify(<?= /* @noEscape */ $serializer->serialize($order['buyer']) ?>);
+        <?php foreach ($order['products'] as $product): ?>
+            _nzm.run('ec:addProduct', <?= /* @noEscape */ $serializer->serialize($product) ?>);
+        <?php endforeach ?>
+        _nzm.run('ec:setAction', 'purchase', <?= /* @noEscape */ $serializer->serialize($order['order']) ?>);
+    <?php endforeach ?>
+    _nzm.run('send', 'pageview');
+}
+</script>

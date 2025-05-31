@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+/**
+* Copyright © Dazoot Software S.R.L. rights reserved.
+* See LICENSE.txt for license details.
+*
+* @website https://www.newsman.ro/
+*/
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/consumer.xsd">
+    <consumer name="dazoot_newsman.newsletter.bulk.unsubscribe"
+              queue="dazoot_newsman.newsletter.bulk.unsubscribe"
+              handler="Dazoot\Newsman\Model\Newsletter\Bulk\Unsubscribe\Consumer::process"
+              connection="db"
+              maxMessages="500"
+              consumerInstance="Magento\Framework\MessageQueue\Consumer" />
+    <consumer name="dazoot_newsman.newsletter.bulk.delete"
+              queue="dazoot_newsman.newsletter.bulk.delete"
+              handler="Dazoot\Newsman\Model\Newsletter\Bulk\Delete\Consumer::process"
+              connection="db"
+              maxMessages="500"
+              consumerInstance="Magento\Framework\MessageQueue\Consumer" />
+    <consumer name="dazoot_newsman.newsletter.bulk.export.list"
+              queue="dazoot_newsman.newsletter.bulk.export.list"
+              handler="Dazoot\Newsman\Model\Newsletter\Bulk\Export\Consumer::process"
+              connection="db"
+              maxMessages="100"
+              consumerInstance="Magento\Framework\MessageQueue\Consumer" />
+</config>

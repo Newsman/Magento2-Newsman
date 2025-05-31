@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Dazoot Software S.R.L. rights reserved.
+ * See LICENSE.txt for license details.
+ *
+ * @website https://www.newsman.ro/
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Dazoot\Newsman\Model\Api\ContextInterface" type="Dazoot\Newsman\Model\Api\Context" />
+    <preference for="Dazoot\Newsman\Model\Api\ClientInterface" type="Dazoot\Newsman\Model\Api\Client" />
+    <preference for="Dazoot\Newsman\Model\User\IpAddressInterface" type="Dazoot\Newsman\Model\User\IpAddress" />
+    <type name="Dazoot\Newsman\Logger\Logger">
+        <arguments>
+            <argument name="config" xsi:type="object">Dazoot\Newsman\Model\Config\Proxy</argument>
+            <argument name="name" xsi:type="string">newsman</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="notice" xsi:type="object">Dazoot\Newsman\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Newsletter\Model\Subscriber">
+        <plugin name="dazoot_newsman_suppress_send_email" disabled="false"
+                type="Dazoot\Newsman\Plugin\Model\Newsletter\Subscriber\SuppressSendEmail" />
+    </type>
+    <type name="Dazoot\Newsman\Model\Export\Retriever\Pool">
+        <arguments>
+            <argument name="retrieverList" xsi:type="array">
+                <item name="version" xsi:type="array">
+                    <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\Version</item>
+                    <item name="code" xsi:type="string">version</item>
+                </item>
+                <item name="orders" xsi:type="array">
+                    <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\Orders</item>
+                    <item name="code" xsi:type="string">orders</item>
+                </item>
+                <item name="products" xsi:type="array">
+                    <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\Products</item>
+                    <item name="code" xsi:type="string">products</item>
+                </item>
+                <item name="customers" xsi:type="array">
+                    <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\Customers</item>
+                    <item name="code" xsi:type="string">customers</item>
+                </item>
+                <item name="subscribers" xsi:type="array">
+                    <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\Subscribers</item>
+                    <item name="code" xsi:type="string">subscribers</item>
+                </item>
+                <item name="count" xsi:type="array">
+                    <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\CountSubscribers</item>
+                    <item name="code" xsi:type="string">count</item>
+                </item>
+                <item name="coupons" xsi:type="array">
+                    <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\Coupons</item>
+                    <item name="code" xsi:type="string">coupons</item>
+                </item>
+                <item name="config" xsi:type="array">
+                    <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\Config</item>
+                    <item name="code" xsi:type="string">config</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Dazoot\Newsman\Model\Export\Retriever\Config">
+        <arguments>
+            <argument name="configWhitelist" xsi:type="array">
+                <item name="newsman/general/active" xsi:type="string">newsman/general/active</item>
+                <item name="newsman/general/send_user_ip" xsi:type="string">newsman/general/send_user_ip</item>
+                <item name="newsman/general/server_ip" xsi:type="string">newsman/general/server_ip</item>
+                <item name="newsman/api/url" xsi:type="string">newsman/api/url</item>
+                <item name="newsman/api/version" xsi:type="string">newsman/api/version</item>
+                <item name="newsman/api/mass_unsubscribe_limit" xsi:type="string">newsman/api/mass_unsubscribe_limit</item>
+                <item name="newsman/api/export_subscribers_batch_size" xsi:type="string">newsman/api/export_subscribers_batch_size</item>
+                <item name="newsman/credentials/api_timeout" xsi:type="string">newsman/credentials/api_timeout</item>
+                <item name="newsman/credentials/listId" xsi:type="string">newsman/credentials/listId</item>
+                <item name="newsman/credentials/segmentId" xsi:type="string">newsman/credentials/segmentId</item>
+                <item name="newsman/newsletter/send_subscribe_newsman" xsi:type="string">newsman/newsletter/send_subscribe_newsman</item>
+                <item name="newsman/developer/log_mode" xsi:type="string">newsman/developer/log_mode</item>
+                <item name="newsman/developer/log_clean" xsi:type="string">newsman/developer/log_clean</item>
+                <item name="newsmanmarketing/general/enable" xsi:type="string">newsmanmarketing/general/enable</item>
+                <item name="newsmanmarketing/general/ua_id" xsi:type="string">newsmanmarketing/general/ua_id</item>
+                <item name="newsmanmarketing/general/use_tunnel" xsi:type="string">newsmanmarketing/general/use_tunnel</item>
+                <item name="newsmanmarketing/general/brand_attribute" xsi:type="string">newsmanmarketing/general/brand_attribute</item>
+                <item name="newsmanmarketing/general/script_js" xsi:type="string">newsmanmarketing/general/script_js</item>
+                <item name="newsmanmarketing/tracking/script_url" xsi:type="string">newsmanmarketing/tracking/script_url</item>
+                <item name="newsmanmarketing/http/resources_url" xsi:type="string">newsmanmarketing/http/resources_url</item>
+                <item name="newsmanmarketing/http/tracking_url" xsi:type="string">newsmanmarketing/http/tracking_url</item>
+                <item name="newsmanmarketing/http/required_file_patterns" xsi:type="string">newsmanmarketing/http/required_file_patterns</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

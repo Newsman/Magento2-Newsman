@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!--
+/**
+* Copyright © Dazoot Software S.R.L. rights reserved.
+* See LICENSE.txt for license details.
+*
+* @website https://www.newsman.ro/
+*/
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <newsman>
+            <general>
+                <active>1</active>
+                <send_user_ip>0</send_user_ip>
+                <server_ip><![CDATA[]]></server_ip>
+            </general>
+            <api>
+                <url><![CDATA[https://ssl.newsman.app/api/]]></url>
+                <version><![CDATA[1.2]]></version>
+                <mass_unsubscribe_limit>10</mass_unsubscribe_limit>
+                <export_subscribers_batch_size>1000</export_subscribers_batch_size>
+            </api>
+            <credentials>
+                <userId />
+                <apiKey backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <api_timeout>60</api_timeout>
+                <listId />
+                <segmentId />
+            </credentials>
+            <newsletter>
+                <send_subscribe_newsman>1</send_subscribe_newsman>
+            </newsletter>
+            <developer>
+                <active_user_ip>0</active_user_ip>
+                <user_ip><![CDATA[]]></user_ip>
+                <log_mode>400</log_mode><!-- \Monolog\Logger::ERROR -->
+                <log_clean>90</log_clean>
+            </developer>
+        </newsman>
+    </default>
+</config>

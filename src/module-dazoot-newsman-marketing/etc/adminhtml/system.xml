@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!--
+/**
+* Copyright © Dazoot Software S.R.L. rights reserved.
+* See LICENSE.txt for license details.
+*
+* @website https://www.newsman.ro/
+*/
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="newsmanmarketing" translate="label" sortOrder="200" showInDefault="1"
+                 showInWebsite="1" showInStore="1">
+            <label>Remarketing</label>
+            <tab>newsman</tab>
+            <resource>Dazoot_Newsman::config_newsman_marketing</resource>
+            <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                <label>General</label>
+                <field id="enable" translate="label" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Active</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Disable or enable Newsman Remarketing features.]]></comment>
+                </field>
+                <field id="ua_id" translate="label" type="text" sortOrder="20" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Newsman Remarketing ID</label>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+                <field id="use_tunnel" translate="label" type="select" sortOrder="30" showInDefault="1"
+                       showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Use Proxy</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[All requests (JavaScript, images, data, etc) are fetched or sent through Magento to Newsman app. Otherwise, an external JavaScript is included in page (browser client side).]]></comment>
+                </field>
+                <field id="anonymize_ip" translate="label" type="select" sortOrder="40" showInDefault="1"
+                       showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Anonymize IP Address</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="brand_attribute" translate="label" type="select" sortOrder="50" showInDefault="1"
+                       showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Brand Attribute</label>
+                    <source_model>Dazoot\Newsmanmarketing\Model\Config\Source\Product\Attribute</source_model>
+                    <can_be_empty>1</can_be_empty>
+                </field>
+                <field id="script_js" translate="label" type="textarea" sortOrder="60" showInDefault="1"
+                       showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Script</label>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                    <comment><![CDATA[Please do not change unless instructed. Please do not copy paste the script from Newsman web interface here.]]></comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

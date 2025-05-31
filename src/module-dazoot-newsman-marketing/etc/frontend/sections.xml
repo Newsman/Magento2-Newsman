@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!--
+/**
+* Copyright © Dazoot Software S.R.L. rights reserved.
+* See LICENSE.txt for license details.
+*
+* @website https://www.newsman.ro/
+*/
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Customer:etc/sections.xsd">
+    <action name="checkout/cart/add">
+        <section name="dazoot-marketing"/>
+    </action>
+    <action name="checkout/cart/delete">
+        <section name="dazoot-marketing"/>
+    </action>
+    <action name="checkout/cart/updatePost">
+        <section name="dazoot-marketing"/>
+    </action>
+    <action name="checkout/cart/updateItemOptions">
+        <section name="dazoot-marketing"/>
+    </action>
+    <action name="checkout/sidebar/updateItemQty">
+        <section name="dazoot-marketing"/>
+    </action>
+    <action name="checkout/sidebar/removeItem">
+        <section name="dazoot-marketing"/>
+    </action>
+</config>
