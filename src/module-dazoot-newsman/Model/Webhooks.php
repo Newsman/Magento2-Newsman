@@ -9,6 +9,12 @@ namespace Dazoot\Newsman\Model;
 
 use Dazoot\Newsman\Logger\Logger;
 use Dazoot\Newsman\Model\Validator\EmailAddress as EmailAddressValidator;
+use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Customer\Api\AccountManagementInterface as CustomerAccountManagement;
+use Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Customer\Api\Data\CustomerInterface as CustomerData;
+use Magento\Customer\Model\Customer;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\MailException;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Newsletter\Model\Subscriber;
@@ -51,12 +57,24 @@ class Webhooks
     protected $logger;
 
     /**
+     * @var CustomerAccountManagement
+     */
+    protected $customerAccountManagement;
+
+    /**
+     * @var CustomerRepositoryInterface
+     */
+    protected $customerRepository;
+
+    /**
      * @param SubscriberFactory $subscriberFactory
      * @param EmailAddressValidator $emailAddressValidator
      * @param StoreManagerInterface $storeManager
      * @param Config $config
      * @param Json $serializer
      * @param Logger $logger
+     * @param CustomerAccountManagement $customerAccountManagement
+     * @param CustomerRepositoryInterface $customerRepository
      */
     public function __construct(
         SubscriberFactory $subscriberFactory,
@@ -64,7 +82,9 @@ class Webhooks
         StoreManagerInterface $storeManager,
         Config $config,
         Json $serializer,
-        Logger $logger
+        Logger $logger,
+        CustomerAccountManagement $customerAccountManagement,
+        CustomerRepositoryInterface $customerRepository
     ) {
         $this->subscriberFactory = $subscriberFactory;
         $this->emailAddressValidator = $emailAddressValidator;
@@ -72,6 +92,8 @@ class Webhooks
         $this->config = $config;
         $this->serializer = $serializer;
         $this->logger = $logger;
+        $this->customerAccountManagement = $customerAccountManagement;
+        $this->customerRepository = $customerRepository;
     }
 
     /**
@@ -166,6 +188,7 @@ class Webhooks
             $storeId = $this->storeManager->getStore()->getId();
         }
         $websiteId = (int) $this->storeManager->getStore($storeId)->getWebsiteId();
+        $customer = $this->getCustomer($email, $websiteId);
 
         try {
             /** @var Subscriber $subscriber */
@@ -179,8 +202,14 @@ class Webhooks
                 $subscriber->setSubscriberEmail($email);
                 $subscriber->setNewsmanSkipSubscribeFlag(true);
                 $subscriber->setStatus($status)
-                    ->setStoreId($storeId)
-                    ->save();
+                    ->setStoreId($storeId);
+
+                if ((($customer instanceof Customer) || ($customer instanceof CustomerData)) &&
+                    $customer->getId() > 0) {
+                    $subscriber->setCustomerId($customer->getId());
+                }
+
+                $subscriber->save();
                 $this->sendEmailAfterChangeStatus($subscriber);
 
                 $this->logger->info(__('Created subscriber with email %1', $email));
@@ -248,6 +277,25 @@ class Webhooks
         } catch (MailException $e) {
             // If we are not able to send a new account email, this should be ignored
             $this->logger->critical($e);
+        }
+    }
+
+    /**
+     * @param string $email
+     * @param int $websiteId
+     * @return CustomerInterface|null
+     * @throws LocalizedException
+     */
+    public function getCustomer($email, $websiteId)
+    {
+        if (!$this->customerAccountManagement->isEmailAvailable($email, $websiteId)) {
+            return null;
+        }
+
+        try {
+            return $this->customerRepository->get($email, $websiteId);
+        } catch (\Exception $e) {
+            return null;
         }
     }
 }
