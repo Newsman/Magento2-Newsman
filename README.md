@@ -6,17 +6,17 @@ Simplify the connection between your shop and NewsMAN platform using this straig
 
 # Compatibility
 
-| Magento Version | Extension / Metapackage version  |
-|-----------------|----------------------------------|
-| 2.4.0 to  2.4.3 | 2.3.0 - 2.3.x                    |
-| 2.4.4           | 2.4.0 - 2.4.x                    |
-| 2.4.5 to 2.4.8  | 2.5.0 - 2.5.x                    |
+| Magento Version | Extension version  |
+|-----------------|--------------------------------|
+| 2.4.0 to  2.4.3 | 2.3.0 - 2.3.x                  |
+| 2.4.4           | 2.4.0 - 2.4.x                  |
+| 2.4.5 to 2.4.8  | 2.5.0 - 2.5.x                  |
 
 
 # Installation with Composer
 
 ```
-composer require dazoot/module-newsman-metapackage
+composer require newsman/magento2x
 php bin/magento module:enable Dazoot_Newsman Dazoot_Newsmanmarketing
 php bin/magento setup:upgrade
 php bin/magento cache:clean
