@@ -23,7 +23,6 @@ use Dazoot\Newsman\Model\Service\Context\InitSubscribeEmailContextFactory;
 use Dazoot\Newsman\Model\Service\InitUnsubscribeEmail;
 use Dazoot\Newsman\Model\Service\Context\InitUnsubscribeEmailContext;
 use Dazoot\Newsman\Model\Service\Context\InitUnsubscribeEmailContextFactory;
-use Exception;
 use Magento\Customer\Api\Data\CustomerInterface as CustomerData;
 use Magento\Customer\Model\Customer;
 use Magento\Customer\Model\Session as CustomerSession;
@@ -180,10 +179,7 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
 
         $store = $this->storeManager->getStore($storeId);
         $ip = $this->ipAddress->getIp();
-        $customer = null;
-        if ($this->customerSession->isLoggedIn()) {
-            $customer = $this->customerSession->getCustomer();
-        }
+        $customer = $this->getCustomer($subscriber->getEmail(), $store);
 
         try {
             if ($this->config->isNewsletterNewsmanSendSub($store)) {
@@ -210,7 +206,7 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
                     );
                 }
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->logger->error($e);
         }
     }
@@ -301,5 +297,22 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
             ->setEmail($subscriber->getEmail())
             ->setStore($store)
             ->setIp($ip);
+    }
+
+    /**
+     * @param string $email
+     * @param StoreInterface $store
+     * @return Customer|null
+     */
+    public function getCustomer($email, $store)
+    {
+        if ($this->customerSession->isLoggedIn()) {
+            $customer = $this->customerSession->getCustomer();
+            if ($customer->getEmail() === $email) {
+                return $customer;
+            }
+        }
+
+        return null;
     }
 }
