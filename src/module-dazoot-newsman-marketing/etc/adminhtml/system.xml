@@ -57,6 +57,15 @@
                     <comment><![CDATA[Please do not change unless instructed. Please do not copy paste the script from Newsman web interface here.]]></comment>
                 </field>
             </group>
+            <group id="developer" translate="label" type="text" sortOrder="100" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                <label>Developer</label>
+                <field id="log_tunnel" translate="label" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Log Proxy Requests</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
         </section>
     </system>
 </config>
