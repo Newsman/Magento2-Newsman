@@ -68,6 +68,11 @@ class Config
     public const XML_PATH_HTTP_REQUIRED_FILES_PATTERNS = 'newsmanmarketing/http/required_file_patterns';
 
     /**
+     * Developer log tunnel
+     */
+    public const XML_PATH_DEVELOPER_LOG_TUNNEL = 'newsmanmarketing/developer/log_tunnel';
+
+    /**
      * @var ScopeConfigInterface
      */
     protected $scopeConfig;
@@ -299,5 +304,18 @@ class Config
             return $urlInfo['path'];
         }
         return '';
+    }
+
+    /**
+     * @param null|string|bool|int|Store $store
+     * @return bool
+     */
+    public function isLogTunnel($store = null)
+    {
+        return $this->scopeConfig->isSetFlag(
+            self::XML_PATH_DEVELOPER_LOG_TUNNEL,
+            ScopeInterface::SCOPE_STORE,
+            $store
+        );
     }
 }

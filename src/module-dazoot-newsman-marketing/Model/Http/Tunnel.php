@@ -129,10 +129,12 @@ class Tunnel
                 throw new LocalizedException(__('Invalid request method'));
             }
 
-            $this->logger->debug(
-                $url . ' ' . $method . ' ' . $this->json->serialize($postParams) . ' ' .
-                $this->json->serialize($getParams) . ' ' . $this->json->serialize($headers)
-            );
+            if ($this->config->isLogTunnel()) {
+                $this->logger->debug(
+                    $url . ' ' . $method . ' ' . $this->json->serialize($postParams) . ' ' .
+                    $this->json->serialize($getParams) . ' ' . $this->json->serialize($headers)
+                );
+            }
 
             $status = $httpClient->getStatus();
             $body = $httpClient->getBody();
@@ -150,10 +152,12 @@ class Tunnel
                     'headers' => $this->filterReceivedHeaders($httpClient->getHeaders(), $url)
                 ]);
 
-                $this->logger->debug(
-                    $url . ' ' . $status . ' ' . $this->json->serialize($return->getData('headers')) . ' ' .
+                if ($this->config->isLogTunnel()) {
+                    $this->logger->debug(
+                        $url . ' ' . $status . ' ' . $this->json->serialize($return->getData('headers')) . ' ' .
                         $this->json->serialize($return->getData('cookies'))
-                );
+                    );
+                }
 
                 return $return;
             } else {
@@ -162,10 +166,12 @@ class Tunnel
                 ]);
             }
         } catch (\Exception $e) {
-            $this->logger->debug(
-                $e->getMessage() . ' ' . $url . ' ' . $method . ' ' . $this->json->serialize($postParams) . ' ' .
+            if ($this->config->isLogTunnel()) {
+                $this->logger->debug(
+                    $e->getMessage() . ' ' . $url . ' ' . $method . ' ' . $this->json->serialize($postParams) . ' ' .
                     $this->json->serialize($getParams) . ' ' . $this->json->serialize($headers)
-            );
+                );
+            }
             return false;
         }
     }
