@@ -14,6 +14,7 @@ use Magento\Customer\Api\AccountManagementInterface as CustomerAccountManagement
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Api\Data\CustomerInterface as CustomerData;
 use Magento\Customer\Model\Customer;
+use Magento\Framework\Event\ManagerInterface as EventManagerInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\MailException;
 use Magento\Framework\Serialize\Serializer\Json;
@@ -67,6 +68,11 @@ class Webhooks
     protected $customerRepository;
 
     /**
+     * @var EventManagerInterface
+     */
+    protected $eventManager;
+
+    /**
      * @param SubscriberFactory $subscriberFactory
      * @param EmailAddressValidator $emailAddressValidator
      * @param StoreManagerInterface $storeManager
@@ -75,6 +81,7 @@ class Webhooks
      * @param Logger $logger
      * @param CustomerAccountManagement $customerAccountManagement
      * @param CustomerRepositoryInterface $customerRepository
+     * @param EventManagerInterface $eventManager
      */
     public function __construct(
         SubscriberFactory $subscriberFactory,
@@ -84,7 +91,8 @@ class Webhooks
         Json $serializer,
         Logger $logger,
         CustomerAccountManagement $customerAccountManagement,
-        CustomerRepositoryInterface $customerRepository
+        CustomerRepositoryInterface $customerRepository,
+        EventManagerInterface $eventManager
     ) {
         $this->subscriberFactory = $subscriberFactory;
         $this->emailAddressValidator = $emailAddressValidator;
@@ -94,6 +102,7 @@ class Webhooks
         $this->logger = $logger;
         $this->customerAccountManagement = $customerAccountManagement;
         $this->customerRepository = $customerRepository;
+        $this->eventManager = $eventManager;
     }
 
     /**
@@ -159,7 +168,10 @@ class Webhooks
 
             /* @see \Magento\Newsletter\Model\SubscriptionManager::unsubscribe() */
             $subscriber->setCheckCode($subscriber->getSubscriberConfirmCode());
+
+            $this->eventManager->dispatch('newsman_webhook_before_unsubscribe', ['subscriber' => $subscriber]);
             $subscriber->unsubscribe();
+            $this->eventManager->dispatch('newsman_webhook_after_unsubscribe', ['subscriber' => $subscriber]);
         } catch (\Exception $e) {
             $this->logger->error($e);
             return [
@@ -189,6 +201,7 @@ class Webhooks
         }
         $websiteId = (int) $this->storeManager->getStore($storeId)->getWebsiteId();
         $customer = $this->getCustomer($email, $websiteId);
+        $isCreatedSubscriber = false;
 
         try {
             /** @var Subscriber $subscriber */
@@ -209,12 +222,31 @@ class Webhooks
                     $subscriber->setCustomerId($customer->getId());
                 }
 
+                $this->eventManager->dispatch(
+                    'newsman_webhook_before_create',
+                    ['subscriber' => $subscriber, 'customer' => $customer]
+                );
                 $subscriber->save();
+                $this->eventManager->dispatch(
+                    'newsman_webhook_after_create',
+                    ['subscriber' => $subscriber, 'customer' => $customer]
+                );
+
+                $isCreatedSubscriber = true;
                 $this->sendEmailAfterChangeStatus($subscriber);
 
                 $this->logger->info(__('Created subscriber with email %1', $email));
             }
+
+            $this->eventManager->dispatch(
+                'newsman_webhook_before_confirm',
+                ['subscriber' => $subscriber, 'customer' => $customer, 'created' => $isCreatedSubscriber]
+            );
             $subscriber->confirm($subscriber->getSubscriberConfirmCode());
+            $this->eventManager->dispatch(
+                'newsman_webhook_after_confirm',
+                ['subscriber' => $subscriber, 'customer' => $customer, 'created' => $isCreatedSubscriber]
+            );
         } catch (\Exception $e) {
             $this->logger->error($e);
             return [
