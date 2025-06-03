@@ -177,7 +177,7 @@ class Client implements ClientInterface
         }
 
         return [
-            'code' => isset($result['code']) ?? 0,
+            'code' => isset($result['code']) ? $result['code'] : 0,
             'message' => $result['message'] ?? ''
         ];
     }

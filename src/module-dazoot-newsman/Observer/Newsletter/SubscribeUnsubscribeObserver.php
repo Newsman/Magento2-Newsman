@@ -10,6 +10,7 @@ declare(strict_types = 1);
 namespace Dazoot\Newsman\Observer\Newsletter;
 
 use Dazoot\Newsman\Logger\Logger;
+use Dazoot\Newsman\Model\Api\ErrorCode\InitSubscribe as InitSubscribeError;
 use Dazoot\Newsman\Model\Config;
 use Dazoot\Newsman\Model\Service\SubscribeEmail;
 use Dazoot\Newsman\Model\Service\Context\SubscribeEmailContext;
@@ -180,10 +181,12 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
         $store = $this->storeManager->getStore($storeId);
         $ip = $this->ipAddress->getIp();
         $customer = $this->getCustomer($subscriber->getEmail(), $store);
+        $isInitSubscribe = false;
 
         try {
             if ($this->config->isNewsletterNewsmanSendSub($store)) {
                 if ($this->isInitSubscribeAction($subscriber, $storeId)) {
+                    $isInitSubscribe = true;
                     $this->initSubscribeEmail->execute(
                         $this->getInitSubscribeEmailContext($subscriber, $store, $ip, $customer)
                     );
@@ -205,6 +208,11 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
                         $this->getUnsubscribeEmailContext($subscriber, $store, $ip)
                     );
                 }
+            }
+        } catch (LocalizedException $e) {
+            $this->logger->error($e);
+            if ($isInitSubscribe && $e->getCode() === InitSubscribeError::TOO_MANY_REQUESTS) {
+                throw $e;
             }
         } catch (\Exception $e) {
             $this->logger->error($e);
