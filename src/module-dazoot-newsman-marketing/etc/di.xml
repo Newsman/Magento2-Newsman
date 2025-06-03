@@ -44,4 +44,20 @@
             </argument>
         </arguments>
     </type>
+    <type name="Dazoot\Newsman\Model\Export\Retriever\Config">
+        <arguments>
+            <argument name="configWhitelist" xsi:type="array">
+                <item name="newsmanmarketing/general/enable" xsi:type="string">newsmanmarketing/general/enable</item>
+                <item name="newsmanmarketing/general/ua_id" xsi:type="string">newsmanmarketing/general/ua_id</item>
+                <item name="newsmanmarketing/general/use_tunnel" xsi:type="string">newsmanmarketing/general/use_tunnel</item>
+                <item name="newsmanmarketing/general/brand_attribute" xsi:type="string">newsmanmarketing/general/brand_attribute</item>
+                <item name="newsmanmarketing/general/script_js" xsi:type="string">newsmanmarketing/general/script_js</item>
+                <item name="newsmanmarketing/tracking/script_url" xsi:type="string">newsmanmarketing/tracking/script_url</item>
+                <item name="newsmanmarketing/http/resources_url" xsi:type="string">newsmanmarketing/http/resources_url</item>
+                <item name="newsmanmarketing/http/tracking_url" xsi:type="string">newsmanmarketing/http/tracking_url</item>
+                <item name="newsmanmarketing/http/required_file_patterns" xsi:type="string">newsmanmarketing/http/required_file_patterns</item>
+                <item name="newsmanmarketing/developer/log_tunnel" xsi:type="string">newsmanmarketing/developer/log_tunnel</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
