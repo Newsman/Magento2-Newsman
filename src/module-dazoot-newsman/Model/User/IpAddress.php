@@ -82,6 +82,31 @@ class IpAddress implements IpAddressInterface
             return $this->hostIpAddress->getIp();
         }
 
+        if (!empty($ip)) {
+            $ip = $this->getOneIp($ip);
+        }
+
         return $ip;
+    }
+
+    /**
+     * @param string $ip
+     * @return string
+     */
+    public function getOneIp($ip)
+    {
+        if (empty($ip) || !is_string($ip)) {
+            return $ip;
+        }
+
+        $ip = trim(trim(trim($ip), ','));
+        $arr = explode(',', $ip);
+        if (!(is_array($ip) && count($arr) > 1)) {
+            return $ip;
+        }
+
+        reset($arr);
+        $return = current($arr);
+        return trim($return);
     }
 }
