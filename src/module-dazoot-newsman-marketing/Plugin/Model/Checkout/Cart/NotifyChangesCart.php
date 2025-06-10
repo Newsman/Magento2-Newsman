@@ -8,8 +8,10 @@
 namespace Dazoot\Newsmanmarketing\Plugin\Model\Checkout\Cart;
 
 use Dazoot\Newsmanmarketing\Model\Config;
+use Magento\Catalog\Model\Product;
 use Magento\Checkout\Model\Cart;
 use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Quote\Model\Quote\Item;
 
 /**
  * Notify product removed from cart plugin
@@ -51,6 +53,11 @@ class NotifyChangesCart
 
         try {
             $item = $subject->getQuote()->getItemById($itemId);
+
+            if (!($item instanceof Item && $item->getProduct() instanceof Product &&
+                $item->getProduct()->getId() > 0)) {
+                return [$itemId];
+            }
 
             $productData = [
                 'id' => $item->getProduct()->getSku(),
@@ -98,6 +105,11 @@ class NotifyChangesCart
                     $diff = $row['qty'] - $item->getQty();
 
                     if ($diff == 0) {
+                        continue;
+                    }
+
+                    if (!($item instanceof Item && $item->getProduct() instanceof Product) &&
+                        $item->getProduct()->getId() > 0) {
                         continue;
                     }
 

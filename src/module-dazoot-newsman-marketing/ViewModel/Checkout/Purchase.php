@@ -9,6 +9,7 @@ namespace Dazoot\Newsmanmarketing\ViewModel\Checkout;
 
 use Dazoot\Newsmanmarketing\Model\Config;
 use Dazoot\Newsmanmarketing\ViewModel\Marketing;
+use Magento\Catalog\Model\Product;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Escaper;
 use Magento\Framework\Registry;
@@ -79,6 +80,10 @@ class Purchase extends Marketing
             $productsData = [];
             /** @var Item $item */
             foreach ($order->getAllVisibleItems() as $item) {
+                if (!($item->getProduct() instanceof Product && $item->getProduct()->getId() > 0)) {
+                    continue;
+                }
+
                 $productData = [
                     'id' => $this->escapeValue($item->getProduct()->getSku()),
                     'name' => $this->escapeValue($item->getName()),
