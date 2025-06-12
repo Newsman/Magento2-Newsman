@@ -33,6 +33,11 @@ class IpAddress implements IpAddressInterface
     protected $hostIpAddress;
 
     /**
+     * @var RemoteAddress
+     */
+    protected $remoteAddress;
+
+    /**
      * @param RequestInterface $request
      * @param Config $config
      * @param HostIpAddress $hostIpAddress
@@ -40,11 +45,13 @@ class IpAddress implements IpAddressInterface
     public function __construct(
         RequestInterface $request,
         Config $config,
-        HostIpAddress $hostIpAddress
+        HostIpAddress $hostIpAddress,
+        RemoteAddress $remoteAddress
     ) {
         $this->request = $request;
         $this->config = $config;
         $this->hostIpAddress = $hostIpAddress;
+        $this->remoteAddress = $remoteAddress;
     }
 
     /**
@@ -60,53 +67,12 @@ class IpAddress implements IpAddressInterface
             return $this->hostIpAddress->getIp();
         }
 
-        if ($this->request->getServer('HTTP_X_REAL_IP')) {
-            $ip = $this->request->getServer('HTTP_X_REAL_IP');
-        } elseif ($this->request->getServer('HTTP_CLIENT_IP')) {
-            $ip = $this->request->getServer('HTTP_CLIENT_IP');
-        } elseif ($this->request->getServer('HTTP_X_FORWARDED_FOR')) {
-            $ip = $this->request->getServer('HTTP_X_FORWARDED_FOR');
-        } elseif ($this->request->getServer('HTTP_X_FORWARDED')) {
-            $ip = $this->request->getServer('HTTP_X_FORWARDED');
-        } elseif ($this->request->getServer('HTTP_FORWARDED_FOR')) {
-            $ip = $this->request->getServer('HTTP_FORWARDED_FOR');
-        } elseif ($this->request->getServer('HTTP_FORWARDED')) {
-            $ip = $this->request->getServer('HTTP_FORWARDED');
-        } elseif ($this->request->getServer('REMOTE_ADDR')) {
-            $ip = $this->request->getServer('REMOTE_ADDR');
-        } else {
-            $ip = false;
-        }
+        $ip = $this->remoteAddress->getRemoteAddress();
 
-        if ($ip === '127.0.0.1' || $ip === false) {
+        if ($ip === '127.0.0.1' || empty($ip)) {
             return $this->hostIpAddress->getIp();
         }
 
-        if (!empty($ip)) {
-            $ip = $this->getOneIp($ip);
-        }
-
         return $ip;
-    }
-
-    /**
-     * @param string $ip
-     * @return string
-     */
-    public function getOneIp($ip)
-    {
-        if (empty($ip) || !is_string($ip)) {
-            return $ip;
-        }
-
-        $ip = trim(trim(trim($ip), ','));
-        $arr = explode(',', $ip);
-        if (!(is_array($ip) && count($arr) > 1)) {
-            return $ip;
-        }
-
-        reset($arr);
-        $return = current($arr);
-        return trim($return);
     }
 }
