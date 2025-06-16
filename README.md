@@ -9,7 +9,7 @@ Simplify the connection between your shop and NewsMAN platform using this straig
 | Magento Version | Extension version           |
 |-----------------|-----------------------------|
 | 2.4.0 to  2.4.3 | 2.3.0 - 2.3.x               |
-| 2.4.4           | 2.4.0 < 2.4.200 (excluding) |
+| 2.4.4           | 2.4.0 < 2.4.100 (excluding) |
 | 2.4.5 to 2.4.6  | 2.4.100 < 2.5.0 (excluding) |
 | 2.4.7 to 2.4.8  | 2.5.0 - 2.5.x               |
 
