@@ -6,14 +6,13 @@
 namespace Dazoot\Newsman\Model\User;
 
 use Magento\Framework\App\RequestInterface;
-use Magento\Framework\ObjectManager\ResetAfterRequestInterface;
 
 /**
  * Changes:
  * - Get last proxy from HTTP_X_FORWARDED_FOR as it may be a real IP address.
  * - Added FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE on filter_var.
   */
-class RemoteAddress implements ResetAfterRequestInterface
+class RemoteAddress
 {
     /**
      * Request object.
@@ -55,14 +54,6 @@ class RemoteAddress implements ResetAfterRequestInterface
         $this->request = $httpRequest;
         $this->alternativeHeaders = $alternativeHeaders;
         $this->trustedProxies = $trustedProxies;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function _resetState(): void
-    {
-        $this->remoteAddress = null;
     }
 
     /**
