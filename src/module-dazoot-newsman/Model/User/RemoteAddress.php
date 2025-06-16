@@ -1,24 +1,76 @@
 <?php
-
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 namespace Dazoot\Newsman\Model\User;
+
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\ObjectManager\ResetAfterRequestInterface;
 
 /**
  * Changes:
  * - Get last proxy from HTTP_X_FORWARDED_FOR as it may be a real IP address.
  * - Added FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE on filter_var.
- * @note A preference can be created on this class and $trustedProxies can be initialized in __construct().
- */
-class RemoteAddress extends \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress
+  */
+class RemoteAddress implements ResetAfterRequestInterface
 {
+    /**
+     * Request object.
+     *
+     * @var RequestInterface
+     */
+    protected $request;
+
+    /**
+     * Remote address cache.
+     *
+     * @var string|null|bool|number
+     */
+    protected $remoteAddress;
+
     /**
      * @var array
      */
-    protected $trustedProxies;
+    protected $alternativeHeaders;
 
     /**
-     * @inheritdoc
+     * @var string[]|null
      */
-    protected function readAddress()
+    protected $trustedProxies;
+
+
+    /**
+     * Constructor
+     *
+     * @param RequestInterface $httpRequest
+     * @param array $alternativeHeaders
+     * @param string[]|null $trustedProxies
+     */
+    public function __construct(
+        RequestInterface $httpRequest,
+        $alternativeHeaders = [],
+        $trustedProxies = null
+    ) {
+        $this->request = $httpRequest;
+        $this->alternativeHeaders = $alternativeHeaders;
+        $this->trustedProxies = $trustedProxies;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function _resetState(): void
+    {
+        $this->remoteAddress = null;
+    }
+
+    /**
+     * Read address based on settings.
+     *
+     * @return string|null
+     */
+    public function readAddress()
     {
         $remoteAddress = null;
         foreach ($this->alternativeHeaders as $var) {
@@ -36,9 +88,12 @@ class RemoteAddress extends \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress
     }
 
     /**
-     * @inheritdoc
+     * Filter addresses by trusted proxies list.
+     *
+     * @param string $remoteAddress
+     * @return string|null
      */
-    protected function filterAddress(string $remoteAddress)
+    public function filterAddress($remoteAddress)
     {
         if (strpos($remoteAddress, ',') !== false) {
             $ipList = explode(',', $remoteAddress);
@@ -69,13 +124,20 @@ class RemoteAddress extends \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress
             $remoteAddress = trim(end($ipList));
         }
 
-        return $remoteAddress ?: null;
+        return $remoteAddress ? $remoteAddress : null;
     }
 
     /**
-     * @inheritdoc
+     * Retrieve Client Remote Address.
+     * If alternative headers are used and said headers allow multiple IPs
+     * it is suggested that trusted proxies is also used
+     * for more accurate IP recognition.
+     *
+     * @param bool $ipToLong converting IP to long format
+     *
+     * @return string IPv4|long
      */
-    public function getRemoteAddress(bool $ipToLong = false)
+    public function getRemoteAddress($ipToLong = false)
     {
         if ($this->remoteAddress !== null) {
             return $ipToLong ? ip2long($this->remoteAddress) : $this->remoteAddress;
@@ -98,5 +160,25 @@ class RemoteAddress extends \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress
         $this->remoteAddress = $remoteAddress;
 
         return $ipToLong ? ip2long($this->remoteAddress) : $this->remoteAddress;
+    }
+
+    /**
+     * Returns internet host name corresponding to remote server
+     *
+     * @return string|null
+     */
+    public function getRemoteHost()
+    {
+        return $this->getRemoteAddress()
+            ? gethostbyaddr($this->getRemoteAddress())
+            : null;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAlternativeHeaders()
+    {
+        return $this->alternativeHeaders;
     }
 }
