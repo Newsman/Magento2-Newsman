@@ -73,7 +73,7 @@ class RemoteAddress implements ResetAfterRequestInterface
     public function readAddress()
     {
         $remoteAddress = null;
-        foreach ($this->alternativeHeaders as $var) {
+        foreach ($this->getAlternativeHeaders() as $var) {
             if ($this->request->getServer($var, false)) {
                 $remoteAddress = $this->request->getServer($var);
                 break;
