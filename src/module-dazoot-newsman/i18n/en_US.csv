@@ -126,3 +126,8 @@
 "Deleted %1 log files","Deleted %1 log files"
 "Export Orders After Date","Export Orders After Date"
 "Export orders created after date set. Leave empty field to export all orders.","Export orders created after date set. Leave empty field to export all orders."
+"Export","Export"
+"Authorization Header Name","Authorization Header Name"
+"Authorization in HTTP header as name. Format alpanumeric separated by hyphen-minus. Please also set it in Newsman App > E-Commerce > Coupons > Authorisation Header name, Newsman App > E-Commerce > Feed > a feed > Header Authorization, etc,","Authorization in HTTP header as name. Format alpanumeric separated by hyphen-minus. Please also set it in Newsman App > E-Commerce > Coupons > Authorisation Header name, Newsman App > E-Commerce > Feed > a feed > Header Authorization, etc,"
+"Authorization Header Key","Authorization Header Key"
+"Authorization in HTTP header as value. Format alpanumeric separated by hyphen-minus. Please also set it in Newsman App > E-Commerce > Coupons > Authorisation Header value, Newsman App > E-Commerce > Feed > a feed > Header Authorization, etc.","Authorization in HTTP header as value. Format alpanumeric separated by hyphen-minus. Please also set it in Newsman App > E-Commerce > Coupons > Authorisation Header value, Newsman App > E-Commerce > Feed > a feed > Header Authorization, etc."

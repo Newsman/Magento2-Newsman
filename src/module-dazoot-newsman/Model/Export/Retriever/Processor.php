@@ -11,6 +11,7 @@ use Dazoot\Newsman\Logger\Logger;
 use Dazoot\Newsman\Model\Config;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Store\Api\Data\StoreInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Class Retriever Processor
@@ -43,24 +44,32 @@ class Processor
     protected $logger;
 
     /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
      * @param Pool $pool
      * @param Authenticator $authenticator
      * @param Config $config
      * @param Json $serializer
      * @param Logger $logger
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         Pool $pool,
         Authenticator $authenticator,
         Config $config,
         Json $serializer,
-        Logger $logger
+        Logger $logger,
+        StoreManagerInterface $storeManager
     ) {
         $this->pool = $pool;
         $this->authenticator = $authenticator;
         $this->config = $config;
         $this->serializer = $serializer;
         $this->logger = $logger;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -90,8 +99,11 @@ class Processor
 
         $storeIds = $this->config->getStoreIdsByApiKey($apiKey);
         if (empty($storeIds)) {
-            $this->logger->notice(__('No store IDs found for retriever'));
-            return [];
+            $storeIds = $this->config->getStoreIdsByApiKey($this->config->getApiKey($this->storeManager->getStore()));
+            if (empty($storeIds)) {
+                $this->logger->notice(__('No store IDs found for retriever'));
+                return [];
+            }
         }
 
         $retriever = $this->pool->getRetrieverByCode($code);
