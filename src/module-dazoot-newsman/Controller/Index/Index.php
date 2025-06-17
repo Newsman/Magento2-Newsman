@@ -7,6 +7,7 @@
  */
 namespace Dazoot\Newsman\Controller\Index;
 
+use Dazoot\Newsman\Model\Config;
 use Dazoot\Newsman\Model\Export\Retriever\Processor;
 use Dazoot\Newsman\Model\WebhooksFactory;
 use Magento\Framework\App\Response\Http;
@@ -63,6 +64,11 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
     protected $logger;
 
     /**
+     * @var Config
+     */
+    protected $config;
+
+    /**
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
      * @param Json $serializer
@@ -70,6 +76,7 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
      * @param Processor $retrieverProcessor
      * @param StoreManagerInterface $storeManager
      * @param Logger $logger
+     * @param Config $config
      */
     public function __construct(
         Context $context,
@@ -78,7 +85,8 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
         WebhooksFactory $webhooksFactory,
         Processor $retrieverProcessor,
         StoreManagerInterface $storeManager,
-        Logger $logger
+        Logger $logger,
+        Config $config
     ) {
         $this->resultJsonFactory = $resultJsonFactory;
         $this->serializer = $serializer;
@@ -86,6 +94,7 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
         $this->retrieverProcessor = $retrieverProcessor;
         $this->storeManager = $storeManager;
         $this->logger = $logger;
+        $this->config = $config;
 
         parent::__construct($context);
     }
@@ -158,6 +167,13 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
         if (empty($auth)) {
             $auth = $this->getRequest()->getHeader('Authorization');
             if (empty($auth)) {
+                $name = $this->config->getExportAuthorizeHeaderName();
+                if (!empty($name)) {
+                    $auth =  trim((string) $this->getRequest()->getHeader($name));
+                    if (!empty($auth)) {
+                        return $auth;
+                    }
+                }
                 return '';
             }
         }

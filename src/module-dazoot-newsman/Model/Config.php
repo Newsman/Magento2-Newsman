@@ -107,6 +107,16 @@ class Config
     public const XML_PATH_DEVELOPER_LOG_CLEAN = 'newsman/developer/log_clean';
 
     /**
+     * Export authorizationHTTP Header name path
+     */
+    public const XML_PATH_EXPORT_AUTHORIZE_HEADER_NAME = 'newsman/export/authorize_header_name';
+
+    /**
+     * Export authorizationHTTP Header value as secret key path
+     */
+    public const XML_PATH_EXPORT_AUTHORIZE_HEADER_KEY = 'newsman/export/authorize_header_key';
+
+    /**
      * Newsletter send subscribe and unsubscribe emails from Newsman
      */
     public const XML_PATH_NEWSLETTER_NEWSMAN_SENDS_SUB = 'newsman/newsletter/send_subscribe_newsman';
@@ -387,6 +397,36 @@ class Config
             ScopeInterface::SCOPE_STORE,
             $store
         );
+    }
+
+    /**
+     * Get export authorize HTTP header name
+     *
+     * @param null|string|bool|int|Store $store
+     * @return int
+     */
+    public function getExportAuthorizeHeaderName($store = null)
+    {
+        return trim((string) $this->scopeConfig->getValue(
+            self::XML_PATH_EXPORT_AUTHORIZE_HEADER_NAME,
+            ScopeInterface::SCOPE_STORE,
+            $store
+        ));
+    }
+
+    /**
+     * Get export authorize HTTP header name
+     *
+     * @param null|string|bool|int|Store $store
+     * @return int
+     */
+    public function getExportAuthorizeHeaderKey($store = null)
+    {
+        return trim((string) $this->scopeConfig->getValue(
+            self::XML_PATH_EXPORT_AUTHORIZE_HEADER_KEY,
+            ScopeInterface::SCOPE_STORE,
+            $store
+        ));
     }
 
     /**

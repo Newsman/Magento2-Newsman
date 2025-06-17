@@ -41,7 +41,16 @@ class Authenticator
             throw new AuthenticatorException(__('Empty API key provided.'));
         }
 
-        if ($this->config->getApiKey($store) !== $apiKey) {
+        $configApiKey = $this->config->getApiKey($store);
+
+        $alternateName = $this->config->getExportAuthorizeHeaderName($store);
+        $alternateKey = $this->config->getExportAuthorizeHeaderKey($store);
+        $isAlternate = false;
+        if (!empty($alternateName) && !empty($alternateKey)) {
+            $isAlternate = true;
+        }
+
+        if ($configApiKey !== $apiKey && ($isAlternate && $alternateKey !== $apiKey)) {
             throw new AuthenticatorException(
                 __('Invalid API key for store ' . $store->getName() . ' (' . $store->getId() . ').')
             );
