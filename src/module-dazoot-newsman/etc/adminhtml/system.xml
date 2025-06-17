@@ -97,7 +97,20 @@
                     <comment><![CDATA[The export of newsletter subscribers uses saved API list ID and segment ID configuration.<br />It exports the subscribers from all stores associated with current list ID.<br />Please save first the settings before exporting.]]></comment>
                 </field>
             </group>
-            <group id="newsletter" translate="label" type="text" sortOrder="40" showInDefault="1"
+            <group id="export" translate="label" type="text" sortOrder="40" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                <label>Export</label>
+                <field id="authorize_header_name" translate="label" type="text" sortOrder="10" showInDefault="1">
+                    <label>Authorization Header Name</label>
+                    <comment><![CDATA[Authorization in HTTP header as name. Format alpanumeric separated by hyphen-minus. Please also set it in Newsman App > E-Commerce > Coupons > Authorisation Header name, Newsman App > E-Commerce > Feed > a feed > Header Authorization, etc,]]></comment>
+                </field>
+                <field id="authorize_header_key" translate="label" type="obscure" sortOrder="20" showInDefault="1">
+                    <label>Authorization Header Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <comment><![CDATA[Authorization in HTTP header as value. Format alpanumeric separated by hyphen-minus. Please also set it in Newsman App > E-Commerce > Coupons > Authorisation Header value, Newsman App > E-Commerce > Feed > a feed > Header Authorization, etc.]]></comment>
+                </field>
+            </group>
+            <group id="newsletter" translate="label" type="text" sortOrder="50" showInDefault="1"
                    showInWebsite="1" showInStore="1">
                 <label>Newsletter</label>
                 <field id="send_subscribe_newsman" translate="label" type="select" sortOrder="10" showInDefault="1"
