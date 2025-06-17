@@ -28,6 +28,10 @@
                 <listId />
                 <segmentId />
             </credentials>
+            <export>
+                <authorize_header_name />
+                <authorize_header_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+            </export>
             <newsletter>
                 <send_subscribe_newsman>1</send_subscribe_newsman>
             </newsletter>

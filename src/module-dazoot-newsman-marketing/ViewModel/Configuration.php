@@ -8,11 +8,7 @@
 namespace Dazoot\Newsmanmarketing\ViewModel;
 
 use Dazoot\Newsmanmarketing\Model\Config;
-use Magento\Framework\Registry;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
-use Magento\Framework\Escaper;
-use Magento\Framework\Serialize\SerializerInterface;
-use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Configuration view model
