@@ -62,7 +62,7 @@ class CountSubscribers implements RetrieverInterface
             $collection->addFieldToFilter('store_id', ['in' => $storeIds]);
         }
 
-        $count = $collection->count();
+        $count = $collection->getSize();
         $result = ['subscribers' => $count];
         $this->logger->info(__('Exported count subscribers store IDs %1: %2', implode(",", $storeIds), $count));
 

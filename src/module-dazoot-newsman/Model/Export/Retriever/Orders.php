@@ -150,8 +150,13 @@ class Orders implements RetrieverInterface
             return $result;
         }
 
-        $currentPage = (!empty($data['start']) && $data['start'] >= 0) ? $data['start'] : 1;
-        $pageSize = (empty($data['limit'])) ? self::DEFAULT_PAGE_SIZE : $data['limit'];
+        $pageSize = self::DEFAULT_PAGE_SIZE;
+        if (!empty($data['limit']) && (int) $data['limit'] > 0) {
+            $pageSize = (int) $data['limit'];
+        }
+        $start = (!empty($data['start']) && (int) $data['start'] >= 0) ? (int) $data['start'] : 0;
+        $currentPage = (int) floor($start / $pageSize) + 1;
+
         $this->logger->info(__('Export orders %1, %2, storeIds %3', $currentPage, $pageSize, implode(",", $storeIds)));
 
         $storeFilter = $this->filterBuilder
@@ -184,16 +189,23 @@ class Orders implements RetrieverInterface
         }
         $searchCriteria = $searchCriteriaBuilder->create();
 
-        $orders = $this->orderRepository->getList($searchCriteria)->getItems();
         $result = [];
-        /** @var OrderInterface $order */
-        foreach ($orders as $order) {
-            try {
-                $result[] = $this->processOrder($order);
-            } catch (\Exception $e) {
-                $this->logger->error($e->getMessage());
+        $count = $this->orderRepository->getList($searchCriteria)->getTotalCount();
+
+        if (($count >= $currentPage * $pageSize)
+            || (($count < $currentPage * $pageSize) && ($count > ($currentPage - 1) * $pageSize))
+        ) {
+            $orders = $this->orderRepository->getList($searchCriteria)->getItems();
+            /** @var OrderInterface $order */
+            foreach ($orders as $order) {
+                try {
+                    $result[] = $this->processOrder($order);
+                } catch (\Exception $e) {
+                    $this->logger->error($e->getMessage());
+                }
             }
         }
+
         $this->logger->info(
             __(
                 'Exported orders %1, %2, store IDs %3: %4',

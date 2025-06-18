@@ -55,8 +55,17 @@ class Subscribers implements RetrieverInterface
      */
     public function process($data = [], $storeIds = [])
     {
-        $currentPage = (!empty($data['start']) && $data['start'] >= 0) ? $data['start'] : 1;
-        $pageSize = (empty($data['limit'])) ? self::DEFAULT_PAGE_SIZE : $data['limit'];
+        $pageSize = false;
+        $currentPage = false;
+        if (isset($data['start']) && isset($data['limit'])) {
+            $pageSize = self::DEFAULT_PAGE_SIZE;
+            if (!empty($data['limit']) && (int) $data['limit'] > 0) {
+                $pageSize = (int) $data['limit'];
+            }
+            $start = (!empty($data['start']) && (int) $data['start'] >= 0) ? (int) $data['start'] : 0;
+            $currentPage = (int) floor($start / $pageSize) + 1;
+        }
+
         $this->logger->info(
             __('Export subscribers %1, %2, store IDs %3', $currentPage, $pageSize, implode(",", $storeIds))
         );
@@ -69,14 +78,34 @@ class Subscribers implements RetrieverInterface
         }
 
         $result = [];
-        /** @var Subscriber $subscriber */
-        foreach ($collection as $subscriber) {
-            try {
-                $result[] = $this->processCustomer($subscriber);
-            } catch (\Exception $e) {
-                $this->logger->error($e->getMessage());
+        if ($pageSize !== false && $currentPage !== false) {
+            $collection->setPageSize($pageSize);
+            $collection->setCurPage($currentPage);
+
+            $count = $collection->getSize();
+            if (($count >= $currentPage * $pageSize)
+                || (($count < $currentPage * $pageSize) && ($count > ($currentPage - 1) * $pageSize))
+            ) {
+                /** @var Subscriber $subscriber */
+                foreach ($collection as $subscriber) {
+                    try {
+                        $result[] = $this->processCustomer($subscriber);
+                    } catch (\Exception $e) {
+                        $this->logger->error($e->getMessage());
+                    }
+                }
+            }
+        } else {
+            /** @var Subscriber $subscriber */
+            foreach ($collection as $subscriber) {
+                try {
+                    $result[] = $this->processCustomer($subscriber);
+                } catch (\Exception $e) {
+                    $this->logger->error($e->getMessage());
+                }
             }
         }
+
         $this->logger->info(
             __(
                 'Exported subscribers %1, %2, store IDs %3: %4',
