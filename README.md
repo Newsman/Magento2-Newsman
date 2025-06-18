@@ -57,8 +57,18 @@ php bin/magento deploy:mode:set production
     - Set Authorization Header Name. The configuration has to be the same as in Newsman App > E-Commerce > Coupons > Authorisation Header name, Newsman App > E-Commerce > Feed > a feed > Header Authorization, etc.
     - Set Authorization Header Key. The configuration has to be the same as in Newsman App > E-Commerce > Coupons > Authorisation Header value, Newsman App > E-Commerce > Feed > a feed > Header Authorization, etc.
    
-    The URL (Webhook URL) in Magento is https://example.com/newsman/.
-    In Newsman App > E-Commerce > Feeds > edit a feed, please select the type of file "NewsMAN API".
+    Settings in Newsman App:
+    - In Newsman App > E-Commerce > Feeds > edit a feed, please select the type of file "NewsMAN API".
+    - The Feed URL is https://example.com/newsman/?newsman=products.json
+    - In Newsman App > E-Commerce > Coupons > URL Webhook is https://example.com/newsman/?newsman=coupons.json
+
+    Other URLs available:
+    - https://example.com/newsman/?newsman=orders.json 
+    - https://example.com/newsman/?newsman=customers.json 
+    - https://example.com/newsman/?newsman=subscribers.json 
+    - https://example.com/newsman/?newsman=count.json (count subscribers)
+    Data lists work with pagination and Newsman App uses it.
+    The endpoints require authentication (see above). 
 4. Go to **Admin >Stores > Configuration > NEWSMAN > Remarketing > General**
    ![Newsman Configuration General](./assets/newsman-remarketing.png)
    - Please paste your Newsman Remarketing ID from [Newsman](https://newsman.app/) and set it in this section.
