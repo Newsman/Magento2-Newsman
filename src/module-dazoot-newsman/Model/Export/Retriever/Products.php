@@ -109,8 +109,13 @@ class Products implements RetrieverInterface
             return $result;
         }
 
-        $currentPage = (!empty($data['start']) && $data['start'] >= 0) ? $data['start'] : 1;
-        $pageSize = (empty($data['limit'])) ? self::DEFAULT_PAGE_SIZE : $data['limit'];
+        $pageSize = self::DEFAULT_PAGE_SIZE;
+        if (!empty($data['limit']) && (int) $data['limit'] > 1) {
+            $pageSize = (int) $data['limit'];
+        }
+        $start = (!empty($data['start']) && (int) $data['start'] >= 0) ? (int) $data['start'] : 0;
+        $currentPage = (int) floor($start / $pageSize) + 1;
+
         $this->logger->info(
             __(
                 'Export products %1, %2, storeIDs %3',
@@ -152,16 +157,22 @@ class Products implements RetrieverInterface
 
         $searchCriteria = $searchCriteriaBuilder->create();
 
-        $products = $this->productRepository->getList($searchCriteria)->getItems();
+        $count = $this->productRepository->getList($searchCriteria)->getTotalCount();
         $result = [];
-        /** @var ProductInterface $product */
-        foreach ($products as $product) {
-            try {
-                $result[] = $this->processProduct($product);
-            } catch (\Exception $e) {
-                $this->logger->error($e->getMessage());
+        if (($count >= $currentPage * $pageSize)
+            || (($count < $currentPage * $pageSize) && ($count > ($currentPage - 1) * $pageSize))
+        ) {
+            $products = $this->productRepository->getList($searchCriteria)->getItems();
+            /** @var ProductInterface $product */
+            foreach ($products as $product) {
+                try {
+                    $result[] = $this->processProduct($product);
+                } catch (\Exception $e) {
+                    $this->logger->error($e->getMessage());
+                }
             }
         }
+
         $this->logger->info(
             __(
                 'Exported products %1, %2, storeIDs %3: %4',
