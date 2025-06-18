@@ -75,8 +75,13 @@ class Customers implements RetrieverInterface
      */
     public function process($data = [], $storeIds = [])
     {
-        $currentPage = (!empty($data['start']) && $data['start'] >= 0) ? $data['start'] : 1;
-        $pageSize = (empty($data['limit'])) ? self::DEFAULT_PAGE_SIZE : $data['limit'];
+        $pageSize = self::DEFAULT_PAGE_SIZE;
+        if (!empty($data['limit']) && (int) $data['limit'] > 0) {
+            $pageSize = (int) $data['limit'];
+        }
+        $start = (!empty($data['start']) && (int) $data['start'] >= 0) ? (int) $data['start'] : 0;
+        $currentPage = (int) floor($start / $pageSize) + 1;
+
         $this->logger->info(__('Export customers %1, %2, store IDs', $currentPage, $pageSize, implode(",", $storeIds)));
 
         $websiteIds = [];
@@ -101,16 +106,23 @@ class Customers implements RetrieverInterface
         $searchCriteria = $searchCriteriaBuilder->addFilters([$websitesFilter])
             ->create();
 
-        $customers = $this->customerRepository->getList($searchCriteria)->getItems();
+        $count = $this->customerRepository->getList($searchCriteria)->getTotalCount();
         $result = [];
-        /** @var CustomerInterface $customer */
-        foreach ($customers as $customer) {
-            try {
-                $result[] = $this->processCustomer($customer);
-            } catch (\Exception $e) {
-                $this->logger->error($e->getMessage());
+
+        if (($count >= $currentPage * $pageSize)
+            || (($count < $currentPage * $pageSize) && ($count > ($currentPage - 1) * $pageSize))
+        ) {
+            $customers = $this->customerRepository->getList($searchCriteria)->getItems();
+            /** @var CustomerInterface $customer */
+            foreach ($customers as $customer) {
+                try {
+                    $result[] = $this->processCustomer($customer);
+                } catch (\Exception $e) {
+                    $this->logger->error($e->getMessage());
+                }
             }
         }
+
         $this->logger->info(
             __(
                 'Exported customers %1, %2, store IDs %3: %4',
