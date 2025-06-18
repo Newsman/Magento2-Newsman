@@ -133,6 +133,10 @@ class Webhooks
                     $result[] = $this->processSubscribe($event, $storeId);
                     break;
 
+                case 'import':
+                    $result[] = $this->processImportNotifier($event, $storeId);
+                    break;
+
                 default:
                     $this->logger->error(__('Unknown webhook type %1', $event['type']));
                     $result[] = ['error' => __('Unknown webhook type %1', $event['type'])];
@@ -329,5 +333,16 @@ class Webhooks
         } catch (\Exception $e) {
             return null;
         }
+    }
+
+    /**
+     * @param array $event
+     * @param int|null $storeId
+     * @return array
+     */
+    public function processImportNotifier($event, $storeId = null)
+    {
+        $this->logger->info(__('Processing import notifier:' . $this->serializer->serialize($event)));
+        return [];
     }
 }
