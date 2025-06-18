@@ -110,7 +110,7 @@ class Products implements RetrieverInterface
         }
 
         $pageSize = self::DEFAULT_PAGE_SIZE;
-        if (!empty($data['limit']) && (int) $data['limit'] > 1) {
+        if (!empty($data['limit']) && (int) $data['limit'] > 0) {
             $pageSize = (int) $data['limit'];
         }
         $start = (!empty($data['start']) && (int) $data['start'] >= 0) ? (int) $data['start'] : 0;
