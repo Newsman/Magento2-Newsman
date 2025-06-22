@@ -90,7 +90,7 @@ class Tunnel
      * @param string $method
      * @param string $requestUri
      * @param array $getParams
-     * @param array $postParams
+     * @param array|string $postParams
      * @param array $headers
      * @return DataObject|false
      */
@@ -114,13 +114,21 @@ class Tunnel
         $httpClient = $this->httpClientFactory->create();
         $httpClient->setTimeout($this->getTimeout());
         $httpClient->setOption(CURLOPT_FOLLOWLOCATION, true);
+        $this->addAdditionalOptions($httpClient, $url, $method, $getParams, $postParams);
         foreach ($headers as $name => $value) {
             $httpClient->addHeader($name, $value);
         }
+        $this->addAdditionalHeaders($httpClient, $url, $method, $getParams, $postParams);
 
         try {
             if ($method == Request::METHOD_POST) {
-                $httpClient->post($url, $postParams);
+                $sendPostParams = [];
+                if (is_array($postParams)) {
+                    $sendPostParams = $postParams;
+                } elseif (is_string($postParams)) {
+                    $httpClient->setOption(CURLOPT_POSTFIELDS, $postParams);
+                }
+                $httpClient->post($url, $sendPostParams);
             } elseif ($method == Request::METHOD_GET) {
                 $httpClient->get($url);
             } elseif ($method == Request::METHOD_HEAD) {
@@ -172,13 +180,36 @@ class Tunnel
                     $this->json->serialize($getParams) . ' ' . $this->json->serialize($headers)
                 );
             }
+
             return false;
         }
     }
 
     /**
-     * TODO Set-Cookie
-     *
+     * @param Curl $httpClient
+     * @param string $url
+     * @param string $method
+     * @param array $getParams
+     * @param array|string $postParams
+     * @return void
+     */
+    public function addAdditionalOptions($httpClient, $url, $method, $getParams, $postParams)
+    {
+    }
+
+    /**
+     * @param Curl $httpClient
+     * @param string $url
+     * @param string $method
+     * @param array $getParams
+     * @param array|string $postParams
+     * @return void
+     */
+    public function addAdditionalHeaders($httpClient, $url, $method, $getParams, $postParams)
+    {
+    }
+
+    /**
      * @param array $headers
      * @return array
      */
@@ -214,6 +245,7 @@ class Tunnel
             'Host',
             'Accept-Encoding',
             'Content-Encoding',
+            'Content-Length',
         ];
     }
 
