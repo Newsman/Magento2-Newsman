@@ -228,10 +228,17 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
         $postParams = [];
         if ($this->getRequest()->getMethod() === Request::METHOD_POST) {
             $postParams = $this->getRequest()->getPost();
-            if (!empty($postParams)) {
+            if (!empty($postParams) && $postParams instanceof \Laminas\Stdlib\Parameters && $postParams->count() > 0) {
                 $postParams = $postParams->toArray();
+            } elseif (!empty($postParams) && is_array($postParams)) {
+                // pass through
             } else {
-                $postParams = [];
+                $content = $this->getRequest()->getContent();
+                if (!empty($content)) {
+                    $postParams = $content;
+                } else {
+                    $postParams = [];
+                }
             }
         }
 
