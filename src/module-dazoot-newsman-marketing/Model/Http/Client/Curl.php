@@ -26,9 +26,9 @@ class Curl extends \Magento\Framework\HTTP\Client\Curl
     public function makeCustomRequest($method, $uri, $params = [])
     {
         if ($method == 'HEAD') {
-            $this->dzMakeHeadRequest($method, $uri, $params = []);
+            $this->dzMakeHeadRequest($method, $uri, $params);
         } else {
-            return $this->makeRequest($method, $uri, $params);
+            $this->makeRequest($method, $uri, $params);
         }
     }
 
