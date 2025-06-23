@@ -109,6 +109,13 @@
                     <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                     <comment><![CDATA[Authorization in HTTP header as value. Format alpanumeric separated by hyphen-minus. Please also set it in Newsman App > E-Commerce > Coupons > Authorisation Header value, Newsman App > E-Commerce > Feed > a feed > Header Authorization, etc.]]></comment>
                 </field>
+                <field id="customer_attributes_map" translate="label" type="text" sortOrder="30" showInDefault="1"
+                       showInWebsite="1" showInStore="1" canRestore="0">
+                    <label>Customer Attributes Map</label>
+                    <frontend_model>Dazoot\Newsman\Block\Adminhtml\Form\Field\Customer\AttributesMap</frontend_model>
+                    <backend_model>Dazoot\Newsman\Model\System\Config\Backend\Customer\AttributesMap</backend_model>
+                    <comment><![CDATA[Export customer attributes map. Used for subscribers and customers exports. Newsman field can contain letters and underscore charcter.]]></comment>
+                </field>
             </group>
             <group id="newsletter" translate="label" type="text" sortOrder="50" showInDefault="1"
                    showInWebsite="1" showInStore="1">
