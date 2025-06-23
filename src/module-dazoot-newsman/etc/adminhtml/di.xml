@@ -30,4 +30,9 @@
             </argument>
         </arguments>
     </type>
+    <virtualType name="Dazoot\Newsman\Model\System\Config\Backend\Customer\AttributesMap" type="Dazoot\Newsman\Model\System\Config\Backend\ValueMap">
+        <arguments>
+            <argument name="mapHelper" xsi:type="object">Dazoot\Newsman\Helper\Customer\AttributesMap</argument>
+        </arguments>
+    </virtualType>
 </config>
