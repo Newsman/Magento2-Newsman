@@ -132,7 +132,7 @@
 "Authorization Header Key","Authorization Header Key"
 "Authorization in HTTP header as value. Format alpanumeric separated by hyphen-minus. Please also set it in Newsman App > E-Commerce > Coupons > Authorisation Header value, Newsman App > E-Commerce > Feed > a feed > Header Authorization, etc.","Authorization in HTTP header as value. Format alpanumeric separated by hyphen-minus. Please also set it in Newsman App > E-Commerce > Coupons > Authorisation Header value, Newsman App > E-Commerce > Feed > a feed > Header Authorization, etc."
 "Customer Attributes Map","Customer Attributes Map"
-"Export customer attributes map. Used for subscribers and customers exports. Newsman field can contain letters and underscore charcter.","Export customer attributes map. Used for subscribers and customers exports. Newsman field can contain letters and underscore charcter."
+"Export customer attributes map. Used for subscribers and customers exports. Newsman field can contain letters and underscore character.","Export customer attributes map. Used for subscribers and customers exports. Newsman field can contain letters and underscore character."
 "Attribute","Attribute"
 "Field in Newsman","Field in Newsman"
 "Add","Add"
