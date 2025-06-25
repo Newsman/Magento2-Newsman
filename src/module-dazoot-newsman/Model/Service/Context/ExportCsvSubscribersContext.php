@@ -17,6 +17,11 @@ class ExportCsvSubscribersContext extends StoreContext
     protected $csvData;
 
     /**
+     * @var array
+     */
+    protected $additionalFields = [];
+
+    /**
      * @param array $data
      * @return ContextInterface
      */
@@ -32,5 +37,23 @@ class ExportCsvSubscribersContext extends StoreContext
     public function getCsvData()
     {
         return $this->csvData;
+    }
+
+    /**
+     * @param array $data
+     * @return ContextInterface
+    */
+    public function setAdditionalFields($data)
+    {
+        $this->additionalFields = $data;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAdditionalFields()
+    {
+        return $this->additionalFields;
     }
 }
