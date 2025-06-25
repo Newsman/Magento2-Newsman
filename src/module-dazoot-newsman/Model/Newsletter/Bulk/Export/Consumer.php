@@ -290,6 +290,7 @@ class Consumer
             $csvData[$iter] = $this->getRowData($subscriber, $firstname, $lastname, $customersData, $storeIds, $iter);
             $iter++;
         }
+        $count = $iter;
 
         $this->logger->info(__(
             '%1 | Exporting %2 subscribers to Newsman, step %3, chunk size %4',

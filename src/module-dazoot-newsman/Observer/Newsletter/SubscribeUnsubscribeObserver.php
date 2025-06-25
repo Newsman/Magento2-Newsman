@@ -9,6 +9,7 @@ declare(strict_types = 1);
 
 namespace Dazoot\Newsman\Observer\Newsletter;
 
+use Dazoot\Newsman\Helper\Customer\AttributesMap;
 use Dazoot\Newsman\Logger\Logger;
 use Dazoot\Newsman\Model\Api\ErrorCode\InitSubscribe as InitSubscribeError;
 use Dazoot\Newsman\Model\Config;
@@ -107,6 +108,11 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
     protected $logger;
 
     /**
+     * @var AttributesMap
+     */
+    protected $attributesMap;
+
+    /**
      * @param StoreManagerInterface $storeManager
      * @param SubscribeEmail $subscribeEmail
      * @param SubscribeEmailContextFactory $subscribeEmailContextFactory
@@ -120,6 +126,7 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
      * @param CustomerSession $customerSession
      * @param Config $config
      * @param Logger $logger
+     * @param AttributesMap $attributesMap
      */
     public function __construct(
         StoreManagerInterface $storeManager,
@@ -134,7 +141,8 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
         IpAddressInterface $ipAddress,
         CustomerSession $customerSession,
         Config $config,
-        Logger $logger
+        Logger $logger,
+        AttributesMap $attributesMap
     ) {
         $this->storeManager = $storeManager;
         $this->subscribeEmail = $subscribeEmail;
@@ -149,6 +157,7 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
         $this->customerSession = $customerSession;
         $this->config = $config;
         $this->logger = $logger;
+        $this->attributesMap = $attributesMap;
     }
 
     /**
@@ -252,6 +261,7 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
             $context->setFirstname($customer->getFirstname());
             $context->setLastname($customer->getLastname());
         }
+        $context->setProperties($this->getProperties($subscriber, $store, $customer));
 
         return $context;
     }
@@ -289,6 +299,7 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
             $context->setFirstname($customer->getFirstname());
             $context->setLastname($customer->getLastname());
         }
+        $context->setProperties($this->getProperties($subscriber, $store, $customer));
 
         return $context;
     }
@@ -322,5 +333,39 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
         }
 
         return null;
+    }
+
+    /**
+     * @param Subscriber $subscriber
+     * @param StoreInterface $store
+     * @param Customer|CustomerData|null $customer
+     * @return array
+     */
+    public function getProperties($subscriber, $store, $customer = null)
+    {
+        if ($customer === null) {
+            return [];
+        }
+
+        if (!(($customer instanceof Customer) || ($customer instanceof CustomerData))) {
+            return [];
+        }
+
+        $properties = [];
+        $attributesFields = $this->attributesMap->getConfigValuebyStoreId($store);
+        foreach ($attributesFields as $row) {
+            if (empty($row['a']) || empty($row['f'])) {
+                continue;
+            }
+
+            $attributeCode = $row['a'];
+            $fieldName = $row['f'];
+            $properties[$fieldName] = $customer->getResource()
+                ->getAttribute($attributeCode)
+                ->getFrontend()
+                ->getValue($customer);
+        }
+
+        return $properties;
     }
 }
