@@ -114,7 +114,7 @@
                     <label>Customer Attributes Map</label>
                     <frontend_model>Dazoot\Newsman\Block\Adminhtml\Form\Field\Customer\AttributesMap</frontend_model>
                     <backend_model>Dazoot\Newsman\Model\System\Config\Backend\Customer\AttributesMap</backend_model>
-                    <comment><![CDATA[Export customer attributes map. Used for subscribers and customers exports. Newsman field can contain letters and underscore charcter.]]></comment>
+                    <comment><![CDATA[Export customer attributes map. Used for subscribers and customers exports. Newsman field can contain letters and underscore character.]]></comment>
                 </field>
             </group>
             <group id="newsletter" translate="label" type="text" sortOrder="50" showInDefault="1"
