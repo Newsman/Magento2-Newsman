@@ -7,10 +7,12 @@
  */
 namespace Dazoot\Newsman\Model\Newsletter\Bulk\Export;
 
+use Dazoot\Newsman\Helper\Customer\AttributesMap;
 use Dazoot\Newsman\Model\Config;
 use Dazoot\Newsman\Model\Service\Context\ExportCsvSubscribersContext;
 use Dazoot\Newsman\Model\Service\Context\ExportCsvSubscribersContextFactory;
 use Dazoot\Newsman\Model\Service\ExportCsvSubscribers;
+use Magento\Customer\Model\Customer;
 use Magento\Framework\Bulk\OperationInterface;
 use Magento\Framework\Bulk\OperationManagementInterface;
 use Magento\Framework\DB\Adapter\ConnectionException;
@@ -87,6 +89,16 @@ class Consumer
     protected $logger;
 
     /**
+     * @var AttributesMap
+     */
+    protected $attributesMap;
+
+    /**
+     * @var array
+     */
+    protected $additionalAttributes;
+
+    /**
      * @var string
      */
     protected $name = 'Bulk Export Subscribers Consumer';
@@ -113,7 +125,8 @@ class Consumer
         ExportCsvSubscribersContextFactory $exportContextFactory,
         Config $config,
         CustomerCollectionFactory $customerCollectionFactory,
-        Logger $logger
+        Logger $logger,
+        AttributesMap $attributesMap
     ) {
         $this->storeManager = $storeManager;
         $this->serializer = $serializer;
@@ -125,6 +138,7 @@ class Consumer
         $this->config = $config;
         $this->customerCollectionFactory = $customerCollectionFactory;
         $this->logger = $logger;
+        $this->attributesMap = $attributesMap;
     }
 
     /**
@@ -185,7 +199,7 @@ class Consumer
     }
 
     /**
-     * Execute
+     * Execute export subscribers CSV
      *
      * @param array $data
      * @return int
@@ -223,28 +237,48 @@ class Consumer
             ->addFieldToFilter('store_id', ['in' => $storeIds])
             ->setPageSize($chunkSize)
             ->setCurPage($step);
+        $this->processSubscriberCollection($collection, $storeIds, $chunkSize, $step);
 
         $emails = $collection->getColumnValues('subscriber_email');
         if (empty($emails)) {
             return 0;
         }
 
+        $additionalAttributes = $this->getAdditionalAttributes($storeIds);
+
         /** @var CustomerCollection $customerCollection */
         $customerCollection = $this->customerCollectionFactory->create();
-        $customerCollection->addAttributeToSelect(['email', 'firstname', 'lastname'])
+        $customerCollection->addAttributeToSelect(['entity_id', 'email', 'firstname', 'lastname'])
             ->addAttributeToSelect('email', ['in' => $emails])
             ->addAttributeToFilter('store_id', ['in' => $storeIds]);
+
+        if (!empty($additionalAttributes)) {
+            $customerCollection->addAttributeToSelect(array_keys($additionalAttributes));
+        }
+
+        $this->processCustomerCollection($customerCollection, $storeIds, $emails);
+
         $customersData = [];
+        /** @var Customer $customer */
         foreach ($customerCollection as $customer) {
             $customersData[$customer->getEmail()] = [
+                'entity_id' => $customer->getEmail(),
                 'email' => $customer->getEmail(),
                 'firstname' => $customer->getFirstname(),
-                'lastname' => $customer->getLastname()
+                'lastname' => $customer->getLastname(),
             ];
+
+            foreach ($additionalAttributes as $attributeCode => $field) {
+                $customersData[$customer->getEmail()][$attributeCode] = $customer->getResource()
+                    ->getAttribute($attributeCode)
+                    ->getFrontend()
+                    ->getValue($customer);
+            }
         }
 
         $count = 0;
         $csvData = [];
+        $iter = 0;
         /** @var Subscriber $subscriber */
         foreach ($collection as $subscriber) {
             $firstname = '';
@@ -253,7 +287,8 @@ class Consumer
                 $firstname = $customersData[$subscriber->getSubscriberEmail()]['firstname'];
                 $lastname = $customersData[$subscriber->getSubscriberEmail()]['lastname'];
             }
-            $csvData[] = $this->getRowData($subscriber, $firstname, $lastname);
+            $csvData[$iter] = $this->getRowData($subscriber, $firstname, $lastname, $customersData, $storeIds, $iter);
+            $iter++;
         }
 
         $this->logger->info(__(
@@ -267,7 +302,7 @@ class Consumer
         // Assumes all in $storeIds have same API configuration
         $store = $this->storeManager->getStore(current($storeIds));
         $this->exportCsvSubscribers->execute(
-            $this->getExportContext($csvData, $store)
+            $this->getExportContext($csvData, $store, $storeIds)
         );
 
         $this->logger->info(__(
@@ -284,27 +319,100 @@ class Consumer
     /**
      * @param array $data
      * @param StoreInterface $store
+     * @param array $storeIds
      * @return ExportCsvSubscribersContext
      */
-    public function getExportContext($data, $store)
+    public function getExportContext($data, $store, $storeIds)
     {
         return $this->exportContextFactory->create()
             ->setCsvData($data)
-            ->setStore($store);
+            ->setStore($store)
+            ->setAdditionalFields($this->getAdditionalAttributes($storeIds));
     }
 
     /**
      * @param Subscriber $subscriber
      * @param string $firstname
      * @param string $lastname
+     * @param array $customersData
+     * @param array $storeIds
+     * @param int $iteration
      * @return array
      */
-    public function getRowData($subscriber, $firstname, $lastname)
+    public function getRowData($subscriber, $firstname, $lastname, $customersData, $storeIds, $iteration)
     {
-        return [
+        $row = [
             'email' => $subscriber->getSubscriberEmail(),
             'firstname' => $firstname,
             'lastname' => $lastname,
+            'additional' => [],
         ];
+
+        foreach ($this->getAdditionalAttributes($storeIds) as $attributeCode => $field) {
+            $row['additional'][$attributeCode] = '';
+        }
+
+        if (isset($customersData[$subscriber->getSubscriberEmail()])) {
+            foreach ($this->getAdditionalAttributes($storeIds) as $attributeCode => $field) {
+                $value = $customersData[$subscriber->getSubscriberEmail()][$attributeCode];
+                if ($value === null) {
+                    $value = '';
+                }
+                $row['additional'][$attributeCode] = $value;
+            }
+        }
+
+        return $row;
+    }
+
+    /**
+     * Process subscriber collection for 3rd party plugins
+     *
+     * @param Collection $collection
+     * @param array $storeIds
+     * @param int $chunkSize
+     * @param int $step
+     * @return void
+     */
+    public function processSubscriberCollection($collection, $storeIds, $chunkSize, $step)
+    {
+        // Add custom logic
+    }
+
+    /**
+     * Process customer collection for 3rd party plugins
+     *
+     * @param CustomerCollection $collection
+     * @param array $storeIds
+     * @param array $emails
+     * @return void
+     */
+    public function processCustomerCollection($collection, $storeIds, $emails)
+    {
+        // Add custom logic
+    }
+
+    /**
+     * @param array $storeIds
+     * @return array
+     */
+    public function getAdditionalAttributes($storeIds)
+    {
+        if ($this->additionalAttributes !== null) {
+            return $this->additionalAttributes;
+        }
+        $this->additionalAttributes = [];
+        foreach ($storeIds as $storeId) {
+            $data = $this->attributesMap->getConfigValuebyStoreId($storeId);
+            if (empty($data)) {
+                continue;
+            }
+            foreach ($data as $key => $row) {
+                if (!empty($row['a']) && !empty($row['f']) && !isset($this->additionalAttributes[$row['a']])) {
+                    $this->additionalAttributes[$row['a']] = $row['f'];
+                }
+            }
+        }
+        return $this->additionalAttributes;
     }
 }
