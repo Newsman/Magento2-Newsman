@@ -6,13 +6,13 @@
  * @website https://www.newsman.ro/
  */
 
-namespace Dazoot\Newsman\Model\Config\Customer;
+namespace Dazoot\Newsman\Model\Config\Product;
 
-use Dazoot\Newsman\Helper\Customer\AttributesMap;
+use Dazoot\Newsman\Helper\Product\AttributesMap;
 use Magento\Framework\Exception\LocalizedException;
 
 /**
- * Customer get additional attributes mapped to fields
+ * Product get additional attributes mapped to fields
  */
 class GetAdditionalAttributes extends \Dazoot\Newsman\Model\Config\GetAdditionalAttributes
 {
