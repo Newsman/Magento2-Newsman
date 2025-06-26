@@ -5,9 +5,9 @@
  *
  * @website https://www.newsman.ro/
  */
-namespace Dazoot\Newsman\Block\Adminhtml\Form\Field\Customer;
+namespace Dazoot\Newsman\Block\Adminhtml\Form\Field\Product;
 
-use Dazoot\Newsman\Block\Adminhtml\Form\Field\Customer\Attributes as CustomerAttributes;
+use Dazoot\Newsman\Block\Adminhtml\Form\Field\Product\Attributes as ProductAttributes;
 
 class AttributesMap extends \Dazoot\Newsman\Block\Adminhtml\Form\Field\AttributesMap
 {
@@ -16,6 +16,6 @@ class AttributesMap extends \Dazoot\Newsman\Block\Adminhtml\Form\Field\Attribute
      */
     public function getAttributesRendererClass()
     {
-        return CustomerAttributes::class;
+        return ProductAttributes::class;
     }
 }

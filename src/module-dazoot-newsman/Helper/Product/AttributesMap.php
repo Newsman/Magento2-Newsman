@@ -5,10 +5,10 @@
  *
  * @website https://www.newsman.ro/
  */
-namespace Dazoot\Newsman\Helper\Customer;
+namespace Dazoot\Newsman\Helper\Product;
 
 /**
- * Customer config map additional attributes to fields
+ * Product config map additional attributes to fields
  */
 class AttributesMap extends \Dazoot\Newsman\Helper\AttributesMap
 {

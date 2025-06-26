@@ -116,6 +116,13 @@
                     <backend_model>Dazoot\Newsman\Model\System\Config\Backend\Customer\AttributesMap</backend_model>
                     <comment><![CDATA[Export customer attributes map. Used for subscribers and customers exports. Newsman field can contain letters and underscore character.]]></comment>
                 </field>
+                <field id="product_attributes_map" translate="label" type="text" sortOrder="40" showInDefault="1"
+                       showInWebsite="1" showInStore="1" canRestore="0">
+                    <label>Product Attributes Map</label>
+                    <frontend_model>Dazoot\Newsman\Block\Adminhtml\Form\Field\Product\AttributesMap</frontend_model>
+                    <backend_model>Dazoot\Newsman\Model\System\Config\Backend\Product\AttributesMap</backend_model>
+                    <comment><![CDATA[Export product attributes map. Used for subscribers and products exports. Newsman field can contain letters and underscore character.]]></comment>
+                </field>
             </group>
             <group id="newsletter" translate="label" type="text" sortOrder="50" showInDefault="1"
                    showInWebsite="1" showInStore="1">

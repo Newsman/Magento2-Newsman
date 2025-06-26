@@ -169,7 +169,11 @@ class Customers implements RetrieverInterface
             $row[$fieldName] = $customer->getResource()
                 ->getAttribute($attributeCode)
                 ->getFrontend()
-                ->getValue($customer);;
+                ->getValue($customer);
+            
+            if ($row[$fieldName] === false) {
+                $row[$fieldName] = '';
+            }
         }
 
         return $row;

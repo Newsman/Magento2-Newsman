@@ -105,4 +105,14 @@
             </argument>
         </arguments>
     </type>
+    <type name="Dazoot\Newsman\Helper\Customer\AttributesMap">
+        <arguments>
+            <argument name="path" xsi:type="const">Dazoot\Newsman\Model\Config::XML_PATH_EXPORT_CUSTOMER_ATTRIBUTES_MAP</argument>
+        </arguments>
+    </type>
+    <type name="Dazoot\Newsman\Helper\Product\AttributesMap">
+        <arguments>
+            <argument name="path" xsi:type="const">Dazoot\Newsman\Model\Config::XML_PATH_EXPORT_PRODUCT_ATTRIBUTES_MAP</argument>
+        </arguments>
+    </type>
 </config>
