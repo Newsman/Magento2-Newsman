@@ -364,6 +364,10 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
                 ->getAttribute($attributeCode)
                 ->getFrontend()
                 ->getValue($customer);
+
+            if ($properties[$fieldName] === false) {
+                $properties[$fieldName] = '';
+            }
         }
 
         return $properties;

@@ -8,6 +8,7 @@
 namespace Dazoot\Newsman\Model\Export\Retriever;
 
 use Dazoot\Newsman\Logger\Logger;
+use Dazoot\Newsman\Model\Config\Product\GetAdditionalAttributes;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ProductFactory;
 use Magento\Framework\Api\SearchCriteriaBuilder;
@@ -16,6 +17,7 @@ use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Helper\ProductFactory as ProductHelperFactory;
 
@@ -62,6 +64,11 @@ class Products implements RetrieverInterface
     protected $logger;
 
     /**
+     * @var GetAdditionalAttributes
+     */
+    protected $getAdditionalAttributes;
+
+    /**
      * @param SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory
      * @param FilterBuilder $filterBuilder
      * @param ProductRepositoryInterface $productRepository
@@ -69,6 +76,7 @@ class Products implements RetrieverInterface
      * @param ProductFactory $productFactory
      * @param ProductHelperFactory $productHelperFactory
      * @param Logger $logger
+     * @param GetAdditionalAttributes $getAdditionalAttributes
      */
     public function __construct(
         SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
@@ -77,7 +85,8 @@ class Products implements RetrieverInterface
         StoreManagerInterface $storeManager,
         ProductFactory $productFactory,
         ProductHelperFactory $productHelperFactory,
-        Logger $logger
+        Logger $logger,
+        GetAdditionalAttributes $getAdditionalAttributes
     ) {
         $this->searchCriteriaBuilderFactory = $searchCriteriaBuilderFactory;
         $this->filterBuilder = $filterBuilder;
@@ -86,6 +95,7 @@ class Products implements RetrieverInterface
         $this->productFactory = $productFactory;
         $this->productHelperFactory = $productHelperFactory;
         $this->logger = $logger;
+        $this->getAdditionalAttributes = $getAdditionalAttributes;
     }
 
     /**
@@ -104,7 +114,7 @@ class Products implements RetrieverInterface
             }
             $this->logger->info(__('Export product %1, store ID %2', $data['product_id'], $oneStoreId));
             $product = $this->productRepository->getById($data['product_id'], $oneStoreId);
-            $result = [$this->processProduct($product)];
+            $result = [$this->processProduct($product, [$oneStoreId])];
             $this->logger->info(__('Exported product %1, store ID %2', $data['product_id'], $oneStoreId));
             return $result;
         }
@@ -166,7 +176,7 @@ class Products implements RetrieverInterface
             /** @var ProductInterface $product */
             foreach ($products as $product) {
                 try {
-                    $result[] = $this->processProduct($product);
+                    $result[] = $this->processProduct($product, [$oneStoreId]);
                 } catch (\Exception $e) {
                     $this->logger->error($e->getMessage());
                 }
@@ -188,9 +198,10 @@ class Products implements RetrieverInterface
 
     /**
      * @param ProductInterface|Product $product
+     * @param array $storeIds
      * @return array
      */
-    public function processProduct($product)
+    public function processProduct($product, $storeIds)
     {
         $imageUrl = $this->productHelperFactory->create()
             ->getImageUrl($product);
@@ -210,7 +221,7 @@ class Products implements RetrieverInterface
             }
         }
 
-        return [
+        $row = [
             'id' => $product->getId(),
             'name' => $product->getName(),
             'stock_quantity' => (float) $product->getQty(),
@@ -219,5 +230,28 @@ class Products implements RetrieverInterface
             'image_url' => $imageUrl,
             'url' => $product->getProductUrl()
         ];
+
+        foreach ($this->getAdditionalAttributes($storeIds) as $attributeCode => $fieldName) {
+            $row[$fieldName] = $product->getResource()
+                ->getAttribute($attributeCode)
+                ->getFrontend()
+                ->getValue($product);
+
+            if ($row[$fieldName] === false) {
+                $row[$fieldName] = '';
+            }
+        }
+
+        return $row;
+    }
+
+    /**
+     * @param array $storeIds
+     * @return array
+     * @throws LocalizedException
+     */
+    public function getAdditionalAttributes($storeIds)
+    {
+        return $this->getAdditionalAttributes->get($storeIds);
     }
 }

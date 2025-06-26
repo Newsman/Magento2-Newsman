@@ -122,6 +122,11 @@ class Config
     public const XML_PATH_EXPORT_CUSTOMER_ATTRIBUTES_MAP = 'newsman/export/customer_attributes_map';
 
     /**
+     * Export product attributes map path
+     */
+    public const XML_PATH_EXPORT_PRODUCT_ATTRIBUTES_MAP = 'newsman/export/product_attributes_map';
+
+    /**
      * Newsletter send subscribe and unsubscribe emails from Newsman
      */
     public const XML_PATH_NEWSLETTER_NEWSMAN_SENDS_SUB = 'newsman/newsletter/send_subscribe_newsman';
