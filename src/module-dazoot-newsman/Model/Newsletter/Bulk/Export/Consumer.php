@@ -439,6 +439,10 @@ class Consumer
                     ->getAttribute($attributeCode)
                     ->getFrontend()
                     ->getValue($customer);
+
+                if ($customersData[$customer->getEmail()][$attributeCode] === false) {
+                    $customersData[$customer->getEmail()][$attributeCode] = '';
+                }
             }
         }
 
