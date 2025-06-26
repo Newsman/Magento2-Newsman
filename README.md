@@ -67,8 +67,11 @@ php bin/magento deploy:mode:set production
     - https://example.com/newsman/?newsman=customers.json 
     - https://example.com/newsman/?newsman=subscribers.json 
     - https://example.com/newsman/?newsman=count.json (count subscribers)
-    Data lists work with pagination and Newsman App uses it.
+    
+      Data lists work with pagination and Newsman App uses it.
     The endpoints require authentication (see above). 
+   
+    - Set "Customer Attributes Map" to send customer attributes to Newsman.
 4. Go to **Admin >Stores > Configuration > NEWSMAN > Remarketing > General**
    ![Newsman Configuration General](./assets/newsman-remarketing.png)
    - Please paste your Newsman Remarketing ID from [Newsman](https://newsman.app/) and set it in this section.
