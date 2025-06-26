@@ -7,8 +7,8 @@
  */
 namespace Dazoot\Newsman\Model\Newsletter\Bulk\Export;
 
-use Dazoot\Newsman\Helper\Customer\AttributesMap;
 use Dazoot\Newsman\Model\Config;
+use Dazoot\Newsman\Model\Config\Customer\GetAdditionalAttributes;
 use Dazoot\Newsman\Model\Service\Context\ExportCsvSubscribersContext;
 use Dazoot\Newsman\Model\Service\Context\ExportCsvSubscribersContextFactory;
 use Dazoot\Newsman\Model\Service\ExportCsvSubscribers;
@@ -89,14 +89,9 @@ class Consumer
     protected $logger;
 
     /**
-     * @var AttributesMap
+     * @var GetAdditionalAttributes
      */
-    protected $attributesMap;
-
-    /**
-     * @var array
-     */
-    protected $additionalAttributes;
+    protected $getAdditionalAttributes;
 
     /**
      * @var string
@@ -114,6 +109,7 @@ class Consumer
      * @param Config $config
      * @param CustomerCollectionFactory $customerCollectionFactory
      * @param Logger $logger
+     * @param GetAdditionalAttributes $getAdditionalAttributes
      */
     public function __construct(
         StoreManagerInterface $storeManager,
@@ -126,7 +122,7 @@ class Consumer
         Config $config,
         CustomerCollectionFactory $customerCollectionFactory,
         Logger $logger,
-        AttributesMap $attributesMap
+        GetAdditionalAttributes $getAdditionalAttributes
     ) {
         $this->storeManager = $storeManager;
         $this->serializer = $serializer;
@@ -138,7 +134,7 @@ class Consumer
         $this->config = $config;
         $this->customerCollectionFactory = $customerCollectionFactory;
         $this->logger = $logger;
-        $this->attributesMap = $attributesMap;
+        $this->getAdditionalAttributes = $getAdditionalAttributes;
     }
 
     /**
@@ -203,80 +199,26 @@ class Consumer
      *
      * @param array $data
      * @return int
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function execute($data)
     {
-        $listId = $data['list_id'];
+        $this->validateData($data);
+
         $storeIds = $data['store_ids'];
         $chunkSize = $data['chunk_size'];
         $step = $data['step'];
 
-        if (empty($listId)) {
-            throw new LocalizedException(__('List ID is empty.'));
-        }
-        if (empty($storeIds)) {
-            throw new LocalizedException(__('No Store IDs found for List ID %1.', $listId));
-        }
-        if ($chunkSize <= 1) {
-            throw new LocalizedException(__('Empty chunk size %1.', $chunkSize));
-        }
-        if ($step <= 0) {
-            throw new LocalizedException(__('Empty step %1.', $step));
-        }
-
-        $userIds = $this->config->getUserIdsByStoreIds($storeIds);
-        if (count($userIds) != 1) {
-            throw new LocalizedException(
-                __('Too many user IDs %1 in stores: %2.', implode(', ', $userIds), implode(', ', $storeIds))
-            );
-        }
-
-        /** @var Collection $collection */
-        $collection = $this->collectionFactory->create()
-            ->addFieldToFilter('subscriber_status', Subscriber::STATUS_SUBSCRIBED)
-            ->addFieldToFilter('store_id', ['in' => $storeIds])
-            ->setPageSize($chunkSize)
-            ->setCurPage($step);
-        $this->processSubscriberCollection($collection, $storeIds, $chunkSize, $step);
-
+        $collection = $this->createSubscriberCollection($storeIds, $chunkSize, $step);
         $emails = $collection->getColumnValues('subscriber_email');
         if (empty($emails)) {
             return 0;
         }
 
-        $additionalAttributes = $this->getAdditionalAttributes($storeIds);
+        $customerCollection = $this->createCustomerCollection($storeIds, $emails);
+        $customersData = $this->getCustomerData($customerCollection, $storeIds);
 
-        /** @var CustomerCollection $customerCollection */
-        $customerCollection = $this->customerCollectionFactory->create();
-        $customerCollection->addAttributeToSelect(['entity_id', 'email', 'firstname', 'lastname'])
-            ->addAttributeToSelect('email', ['in' => $emails])
-            ->addAttributeToFilter('store_id', ['in' => $storeIds]);
-
-        if (!empty($additionalAttributes)) {
-            $customerCollection->addAttributeToSelect(array_keys($additionalAttributes));
-        }
-
-        $this->processCustomerCollection($customerCollection, $storeIds, $emails);
-
-        $customersData = [];
-        /** @var Customer $customer */
-        foreach ($customerCollection as $customer) {
-            $customersData[$customer->getEmail()] = [
-                'entity_id' => $customer->getEmail(),
-                'email' => $customer->getEmail(),
-                'firstname' => $customer->getFirstname(),
-                'lastname' => $customer->getLastname(),
-            ];
-
-            foreach ($additionalAttributes as $attributeCode => $field) {
-                $customersData[$customer->getEmail()][$attributeCode] = $customer->getResource()
-                    ->getAttribute($attributeCode)
-                    ->getFrontend()
-                    ->getValue($customer);
-            }
-        }
-
-        $count = 0;
         $csvData = [];
         $iter = 0;
         /** @var Subscriber $subscriber */
@@ -319,9 +261,43 @@ class Consumer
 
     /**
      * @param array $data
+     * @return void
+     * @throws LocalizedException
+     */
+    public function validateData($data)
+    {
+        $listId = $data['list_id'];
+        $storeIds = $data['store_ids'];
+        $chunkSize = $data['chunk_size'];
+        $step = $data['step'];
+
+        if (empty($listId)) {
+            throw new LocalizedException(__('List ID is empty.'));
+        }
+        if (empty($storeIds)) {
+            throw new LocalizedException(__('No Store IDs found for List ID %1.', $listId));
+        }
+        if ($chunkSize <= 1) {
+            throw new LocalizedException(__('Empty chunk size %1.', $chunkSize));
+        }
+        if ($step <= 0) {
+            throw new LocalizedException(__('Empty step %1.', $step));
+        }
+
+        $userIds = $this->config->getUserIdsByStoreIds($storeIds);
+        if (count($userIds) != 1) {
+            throw new LocalizedException(
+                __('Too many user IDs %1 in stores: %2.', implode(', ', $userIds), implode(', ', $storeIds))
+            );
+        }
+    }
+
+    /**
+     * @param array $data
      * @param StoreInterface $store
      * @param array $storeIds
      * @return ExportCsvSubscribersContext
+     * @throws LocalizedException
      */
     public function getExportContext($data, $store, $storeIds)
     {
@@ -339,6 +315,7 @@ class Consumer
      * @param array $storeIds
      * @param int $iteration
      * @return array
+     * @throws LocalizedException
      */
     public function getRowData($subscriber, $firstname, $lastname, $customersData, $storeIds, $iteration)
     {
@@ -367,17 +344,62 @@ class Consumer
     }
 
     /**
+     * Create subscriber collection
+     *
+     * @param array $storeIds
+     * @param int $chunkSize
+     * @param int $step
+     * @return Collection
+     */
+    public function createSubscriberCollection($storeIds, $chunkSize, $step)
+    {
+        /** @var Collection $collection */
+        $collection = $this->collectionFactory->create()
+            ->addFieldToFilter('subscriber_status', Subscriber::STATUS_SUBSCRIBED)
+            ->addFieldToFilter('store_id', ['in' => $storeIds])
+            ->setPageSize($chunkSize)
+            ->setCurPage($step);
+
+        return $this->processSubscriberCollection($collection, $storeIds, $chunkSize, $step);
+    }
+
+    /**
      * Process subscriber collection for 3rd party plugins
      *
      * @param Collection $collection
      * @param array $storeIds
      * @param int $chunkSize
      * @param int $step
-     * @return void
+     * @return Collection
      */
     public function processSubscriberCollection($collection, $storeIds, $chunkSize, $step)
     {
-        // Add custom logic
+        return $collection;
+    }
+
+    /**
+     * Create customer collection
+     *
+     * @param array $storeIds
+     * @param array $emails
+     * @return CustomerCollection
+     * @throws LocalizedException
+     */
+    public function createCustomerCollection($storeIds, $emails)
+    {
+        $additionalAttributes = $this->getAdditionalAttributes($storeIds);
+
+        /** @var CustomerCollection $collection */
+        $collection = $this->customerCollectionFactory->create();
+        $collection->addAttributeToSelect(['entity_id', 'email', 'firstname', 'lastname'])
+            ->addAttributeToSelect('email', ['in' => $emails])
+            ->addAttributeToFilter('store_id', ['in' => $storeIds]);
+
+        if (!empty($additionalAttributes)) {
+            $collection->addAttributeToSelect(array_keys($additionalAttributes));
+        }
+
+        return $this->processCustomerCollection($collection, $storeIds, $emails);
     }
 
     /**
@@ -386,34 +408,50 @@ class Consumer
      * @param CustomerCollection $collection
      * @param array $storeIds
      * @param array $emails
-     * @return void
+     * @return CustomerCollection
      */
     public function processCustomerCollection($collection, $storeIds, $emails)
     {
-        // Add custom logic
+        return $collection;
+    }
+
+    /**
+     * @param CustomerCollection $collection
+     * @return array
+     * @throws LocalizedException
+     */
+    public function getCustomerData($collection, $storeIds)
+    {
+        $additionalAttributes = $this->getAdditionalAttributes($storeIds);
+
+        $customersData = [];
+        /** @var Customer $customer */
+        foreach ($collection as $customer) {
+            $customersData[$customer->getEmail()] = [
+                'entity_id' => $customer->getEmail(),
+                'email' => $customer->getEmail(),
+                'firstname' => $customer->getFirstname(),
+                'lastname' => $customer->getLastname(),
+            ];
+
+            foreach ($additionalAttributes as $attributeCode => $field) {
+                $customersData[$customer->getEmail()][$attributeCode] = $customer->getResource()
+                    ->getAttribute($attributeCode)
+                    ->getFrontend()
+                    ->getValue($customer);
+            }
+        }
+
+        return $customersData;
     }
 
     /**
      * @param array $storeIds
      * @return array
+     * @throws LocalizedException
      */
     public function getAdditionalAttributes($storeIds)
     {
-        if ($this->additionalAttributes !== null) {
-            return $this->additionalAttributes;
-        }
-        $this->additionalAttributes = [];
-        foreach ($storeIds as $storeId) {
-            $data = $this->attributesMap->getConfigValuebyStoreId($storeId);
-            if (empty($data)) {
-                continue;
-            }
-            foreach ($data as $key => $row) {
-                if (!empty($row['a']) && !empty($row['f']) && !isset($this->additionalAttributes[$row['a']])) {
-                    $this->additionalAttributes[$row['a']] = $row['f'];
-                }
-            }
-        }
-        return $this->additionalAttributes;
+        return $this->getAdditionalAttributes->get($storeIds);
     }
 }
