@@ -8,13 +8,12 @@
 namespace Dazoot\Newsman\Model\Export\Retriever;
 
 use Dazoot\Newsman\Logger\Logger;
+use Dazoot\Newsman\Model\Config\Customer\GetAdditionalAttributes;
 use Magento\Customer\Model\Customer;
-use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Framework\Api\SearchCriteriaBuilderFactory;
-use Magento\Framework\Api\FilterBuilder;
-use Magento\Framework\Api\SearchCriteriaInterface;
-use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Customer\Model\ResourceModel\Customer\Collection;
+use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory as CollectionFactory;
 use Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Store\Model\StoreManagerInterface;
 
 /**
@@ -25,19 +24,9 @@ class Customers implements RetrieverInterface
     public const DEFAULT_PAGE_SIZE = 1000;
 
     /**
-     * @var SearchCriteriaBuilderFactory
+     * @var CollectionFactory
      */
-    protected $searchCriteriaBuilderFactory;
-
-    /**
-     * @var FilterBuilder
-     */
-    protected $filterBuilder;
-
-    /**
-     * @var CustomerRepositoryInterface
-     */
-    protected $customerRepository;
+    protected $collectionFactory;
 
     /**
      * @var StoreManagerInterface
@@ -50,24 +39,26 @@ class Customers implements RetrieverInterface
     protected $logger;
 
     /**
-     * @param SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory
-     * @param FilterBuilder $filterBuilder
-     * @param CustomerRepositoryInterface $customerRepository
+     * @var GetAdditionalAttributes
+     */
+    protected $getAdditionalAttributes;
+
+    /**
+     * @param CollectionFactory $collectionFactory
      * @param StoreManagerInterface $storeManager
      * @param Logger $logger
+     * @param GetAdditionalAttributes $getAdditionalAttributes
      */
     public function __construct(
-        SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
-        FilterBuilder $filterBuilder,
-        CustomerRepositoryInterface $customerRepository,
+        CollectionFactory $collectionFactory,
         StoreManagerInterface $storeManager,
-        Logger $logger
+        Logger $logger,
+        GetAdditionalAttributes $getAdditionalAttributes
     ) {
-        $this->searchCriteriaBuilderFactory = $searchCriteriaBuilderFactory;
-        $this->filterBuilder = $filterBuilder;
-        $this->customerRepository = $customerRepository;
+        $this->collectionFactory = $collectionFactory;
         $this->storeManager = $storeManager;
         $this->logger = $logger;
+        $this->getAdditionalAttributes = $getAdditionalAttributes;
     }
 
     /**
@@ -89,34 +80,18 @@ class Customers implements RetrieverInterface
             $websiteIds[] = $this->storeManager->getStore($storeId)->getWebsiteId();
         }
         $websiteIds = array_unique($websiteIds);
+        $collection = $this->createCollection($websiteIds, $storeIds, $currentPage, $pageSize);
 
-        $websitesFilter = $this->filterBuilder
-            ->setField('website_id')
-            ->setConditionType('in')
-            ->setValue($websiteIds)
-            ->create();
-
-        /** @var SearchCriteriaBuilder $searchCriteriaBuilder */
-        $searchCriteriaBuilder = $this->searchCriteriaBuilderFactory->create();
-
-        $searchCriteriaBuilder->setPageSize($pageSize)
-            ->setCurrentPage($currentPage);
-
-        /** @var SearchCriteriaInterface $searchCriteria */
-        $searchCriteria = $searchCriteriaBuilder->addFilters([$websitesFilter])
-            ->create();
-
-        $count = $this->customerRepository->getList($searchCriteria)->getTotalCount();
+        $count = $collection->getSize();
         $result = [];
 
         if (($count >= $currentPage * $pageSize)
             || (($count < $currentPage * $pageSize) && ($count > ($currentPage - 1) * $pageSize))
         ) {
-            $customers = $this->customerRepository->getList($searchCriteria)->getItems();
             /** @var CustomerInterface $customer */
-            foreach ($customers as $customer) {
+            foreach ($collection as $customer) {
                 try {
-                    $result[] = $this->processCustomer($customer);
+                    $result[] = $this->processCustomer($customer, $storeIds);
                 } catch (\Exception $e) {
                     $this->logger->error($e->getMessage());
                 }
@@ -137,15 +112,76 @@ class Customers implements RetrieverInterface
     }
 
     /**
+     * Create customer collection
+     *
+     * @param $websiteIds
+     * @param array $storeIds
+     * @param int $currentPage
+     * @param int $pageSize
+     * @return Collection
+     * @throws LocalizedException
+     */
+    public function createCollection($websiteIds, $storeIds, $currentPage, $pageSize)
+    {
+        $additionalAttributes = $this->getAdditionalAttributes($storeIds);
+
+        /** @var Collection $collection */
+        $collection = $this->collectionFactory->create();
+        $collection->addAttributeToSelect(['entity_id', 'email', 'firstname', 'lastname'])
+            ->addAttributeToFilter('website_id', ['in' => $websiteIds])
+            ->setCURPage($currentPage)
+            ->setPageSize($pageSize);
+
+        if (!empty($additionalAttributes)) {
+            $collection->addAttributeToSelect(array_keys($additionalAttributes));
+        }
+
+        return $this->processCollection($collection, $websiteIds, $storeIds);
+    }
+
+    /**
+     * Process customer collection for 3rd party plugins
+     *
+     * @param Collection $collection
+     * @param array $websiteIds
+     * @param array $storeIds
+     * @return Collection
+     */
+    public function processCollection($collection, $websiteIds, $storeIds)
+    {
+        return $collection;
+    }
+
+    /**
      * @param CustomerInterface|Customer $customer
+     * @param array $storeIds
      * @return array
      */
-    public function processCustomer($customer)
+    public function processCustomer($customer, $storeIds)
     {
-        return [
+        $row = [
             'email' => $customer->getEmail(),
             'firstname' => $customer->getFirstname(),
             'lastname' => $customer->getLastname()
         ];
+
+        foreach ($this->getAdditionalAttributes($storeIds) as $attributeCode => $fieldName) {
+            $row[$fieldName] = $customer->getResource()
+                ->getAttribute($attributeCode)
+                ->getFrontend()
+                ->getValue($customer);;
+        }
+
+        return $row;
+    }
+
+    /**
+     * @param array $storeIds
+     * @return array
+     * @throws LocalizedException
+     */
+    public function getAdditionalAttributes($storeIds)
+    {
+        return $this->getAdditionalAttributes->get($storeIds);
     }
 }
