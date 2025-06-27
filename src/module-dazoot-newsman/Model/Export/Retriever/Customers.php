@@ -129,7 +129,7 @@ class Customers implements RetrieverInterface
         $collection = $this->collectionFactory->create();
         $collection->addAttributeToSelect(['entity_id', 'email', 'firstname', 'lastname'])
             ->addAttributeToFilter('website_id', ['in' => $websiteIds])
-            ->setCURPage($currentPage)
+            ->setCurPage($currentPage)
             ->setPageSize($pageSize);
 
         if (!empty($additionalAttributes)) {
@@ -170,7 +170,7 @@ class Customers implements RetrieverInterface
                 ->getAttribute($attributeCode)
                 ->getFrontend()
                 ->getValue($customer);
-            
+
             if ($row[$fieldName] === false) {
                 $row[$fieldName] = '';
             }

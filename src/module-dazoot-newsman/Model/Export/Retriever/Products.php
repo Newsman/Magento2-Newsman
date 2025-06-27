@@ -9,17 +9,16 @@ namespace Dazoot\Newsman\Model\Export\Retriever;
 
 use Dazoot\Newsman\Logger\Logger;
 use Dazoot\Newsman\Model\Config\Product\GetAdditionalAttributes;
+use \Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ProductFactory;
-use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Framework\Api\SearchCriteriaBuilderFactory;
-use Magento\Framework\Api\FilterBuilder;
-use Magento\Framework\Api\SearchCriteriaInterface;
-use Magento\Catalog\Api\ProductRepositoryInterface;
-use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Model\ResourceModel\Product\Collection;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Helper\ProductFactory as ProductHelperFactory;
+use Magento\CatalogInventory\Api\StockRegistryInterface;
 
 /**
  * Get products or a product
@@ -29,19 +28,14 @@ class Products implements RetrieverInterface
     public const DEFAULT_PAGE_SIZE = 1000;
 
     /**
-     * @var SearchCriteriaBuilderFactory
-     */
-    protected $searchCriteriaBuilderFactory;
-
-    /**
-     * @var FilterBuilder
-     */
-    protected $filterBuilder;
-
-    /**
      * @var ProductRepositoryInterface
      */
     protected $productRepository;
+
+    /**
+     * @var CollectionFactory
+     */
+    protected $collectionFactory;
 
     /**
      * @var StoreManagerInterface
@@ -69,33 +63,38 @@ class Products implements RetrieverInterface
     protected $getAdditionalAttributes;
 
     /**
-     * @param SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory
-     * @param FilterBuilder $filterBuilder
+     * @var StockRegistryInterface
+     */
+    protected $stockRegistry;
+
+    /**
      * @param ProductRepositoryInterface $productRepository
+     * @param CollectionFactory $collectionFactory
      * @param StoreManagerInterface $storeManager
      * @param ProductFactory $productFactory
      * @param ProductHelperFactory $productHelperFactory
      * @param Logger $logger
      * @param GetAdditionalAttributes $getAdditionalAttributes
+     * @param StockRegistryInterface $stockRegistry
      */
     public function __construct(
-        SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
-        FilterBuilder $filterBuilder,
         ProductRepositoryInterface $productRepository,
+        CollectionFactory $collectionFactory,
         StoreManagerInterface $storeManager,
         ProductFactory $productFactory,
         ProductHelperFactory $productHelperFactory,
         Logger $logger,
-        GetAdditionalAttributes $getAdditionalAttributes
+        GetAdditionalAttributes $getAdditionalAttributes,
+        StockRegistryInterface $stockRegistry
     ) {
-        $this->searchCriteriaBuilderFactory = $searchCriteriaBuilderFactory;
-        $this->filterBuilder = $filterBuilder;
         $this->productRepository = $productRepository;
+        $this->collectionFactory = $collectionFactory;
         $this->storeManager = $storeManager;
         $this->productFactory = $productFactory;
         $this->productHelperFactory = $productHelperFactory;
         $this->logger = $logger;
         $this->getAdditionalAttributes = $getAdditionalAttributes;
+        $this->stockRegistry = $stockRegistry;
     }
 
     /**
@@ -103,18 +102,25 @@ class Products implements RetrieverInterface
      */
     public function process($data = [], $storeIds = [])
     {
-        $oneStoreId = null;
-        if (!empty($storeIds)) {
-            $oneStoreId = current($storeIds);
+        $websiteIds = [];
+        foreach ($storeIds as $storeId) {
+            $websiteIds[] = $this->storeManager->getStore($storeId)->getWebsiteId();
         }
+        $websiteIds = array_unique($websiteIds);
 
         if (isset($data['product_id'])) {
             if (empty($data['product_id'])) {
                 return [];
             }
+
+            $oneStoreId = null;
+            if (!empty($storeIds)) {
+                $oneStoreId = current($storeIds);
+            }
+
             $this->logger->info(__('Export product %1, store ID %2', $data['product_id'], $oneStoreId));
             $product = $this->productRepository->getById($data['product_id'], $oneStoreId);
-            $result = [$this->processProduct($product, [$oneStoreId])];
+            $result = [$this->processProduct($product, $websiteIds, [$oneStoreId])];
             $this->logger->info(__('Exported product %1, store ID %2', $data['product_id'], $oneStoreId));
             return $result;
         }
@@ -135,48 +141,17 @@ class Products implements RetrieverInterface
             )
         );
 
-        $websiteIds = [];
-        foreach ($storeIds as $storeId) {
-            $websiteIds[] = $this->storeManager->getStore($storeId)->getWebsiteId();
-        }
-        $websiteIds = array_unique($websiteIds);
+        $collection = $this->createCollection($websiteIds, $storeIds, $currentPage, $pageSize);
 
-        $websitesFilter = $this->filterBuilder
-            ->setField('website_id')
-            ->setValue(implode(",", $websiteIds))
-            ->create();
-
-        if ($oneStoreId) {
-            $storeFilter = $this->filterBuilder
-                ->setField('store_id')
-                ->setValue($oneStoreId)
-                ->create();
-        }
-
-        /** @var SearchCriteriaBuilder $searchCriteriaBuilder */
-        $searchCriteriaBuilder = $this->searchCriteriaBuilderFactory->create();
-
-        $searchCriteriaBuilder->setPageSize($pageSize)
-            ->setCurrentPage($currentPage);
-
-        /** @var SearchCriteriaInterface $searchCriteria */
-        $searchCriteriaBuilder->addFilters([$websitesFilter]);
-        if ($oneStoreId) {
-            $searchCriteriaBuilder->addFilters([$storeFilter]);
-        }
-
-        $searchCriteria = $searchCriteriaBuilder->create();
-
-        $count = $this->productRepository->getList($searchCriteria)->getTotalCount();
+        $count = $collection->getSize();
         $result = [];
         if (($count >= $currentPage * $pageSize)
             || (($count < $currentPage * $pageSize) && ($count > ($currentPage - 1) * $pageSize))
         ) {
-            $products = $this->productRepository->getList($searchCriteria)->getItems();
-            /** @var ProductInterface $product */
-            foreach ($products as $product) {
+            /** @var Product $product */
+            foreach ($collection as $product) {
                 try {
-                    $result[] = $this->processProduct($product, [$oneStoreId]);
+                    $result[] = $this->processProduct($product, $websiteIds, $storeIds);
                 } catch (\Exception $e) {
                     $this->logger->error($e->getMessage());
                 }
@@ -197,11 +172,12 @@ class Products implements RetrieverInterface
     }
 
     /**
-     * @param ProductInterface|Product $product
+     * @param Product|ProductInterface $product
+     * @param array $websiteIds
      * @param array $storeIds
      * @return array
      */
-    public function processProduct($product, $storeIds)
+    public function processProduct($product, $websiteIds, $storeIds)
     {
         $imageUrl = $this->productHelperFactory->create()
             ->getImageUrl($product);
@@ -224,7 +200,7 @@ class Products implements RetrieverInterface
         $row = [
             'id' => $product->getId(),
             'name' => $product->getName(),
-            'stock_quantity' => (float) $product->getQty(),
+            'stock_quantity' => $this->getProductQuantity($product, $websiteIds),
             'price' => (float) $price,
             'price_old' => (float) $oldPrice,
             'image_url' => $imageUrl,
@@ -243,6 +219,72 @@ class Products implements RetrieverInterface
         }
 
         return $row;
+    }
+
+    /**
+     * @param Product|ProductInterface $product
+     * @param array $websiteIds
+     * @return float
+     */
+    public function getProductQuantity($product, $websiteIds)
+    {
+        $maxQty = 0.0;
+        foreach ($websiteIds as $websiteId) {
+            $stockStatus = $this->stockRegistry->getStockStatusBySku(
+                $product->getSku(),
+                $websiteId
+            );
+
+            if ((is_object($stockStatus) || is_array($stockStatus))
+                && isset($stockStatus['qty']) && $stockStatus['qty'] > $maxQty) {
+                $maxQty = $stockStatus['qty'];
+            }
+        }
+
+        return (float) $maxQty;
+    }
+
+    /**
+     * Create product collection
+     *
+     * @param $websiteIds
+     * @param array $storeIds
+     * @param int $currentPage
+     * @param int $pageSize
+     * @return Collection
+     * @throws LocalizedException
+     */
+    public function createCollection($websiteIds, $storeIds, $currentPage, $pageSize)
+    {
+        $additionalAttributes = $this->getAdditionalAttributes($storeIds);
+
+        /** @var Collection $collection */
+        $collection = $this->collectionFactory->create();
+        // Get out of stock products too
+        $collection->setFlag('has_stock_status_filter', true);
+        $collection->addAttributeToSelect(['*'])
+            ->addWebsiteFilter($websiteIds)
+            ->setCurPage($currentPage)
+            ->setPageSize($pageSize);
+
+        if (!empty($additionalAttributes)) {
+            $collection->addAttributeToSelect(array_keys($additionalAttributes));
+        }
+
+        return $this->processCollection($collection, $websiteIds, $storeIds);
+    }
+
+    /**
+     * Process product collection for 3rd party plugins
+     *
+     * @param Collection $collection
+     * @param array $websiteIds
+     * @param array $storeIds
+     * @return Collection
+     */
+    public function processCollection($collection, $websiteIds, $storeIds)
+    {
+        return $collection;
     }
 
     /**
