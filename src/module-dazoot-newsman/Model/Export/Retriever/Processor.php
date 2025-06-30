@@ -97,13 +97,12 @@ class Processor
             throw $e;
         }
 
-        $storeIds = $this->config->getStoreIdsByApiKey($apiKey);
+        // Get list ID by specified store (usually the current store).
+        $listId = $this->config->getListId($store);
+        $storeIds = $this->config->getStoreIdsByListId($listId);
         if (empty($storeIds)) {
-            $storeIds = $this->config->getStoreIdsByApiKey($this->config->getApiKey($this->storeManager->getStore()));
-            if (empty($storeIds)) {
-                $this->logger->notice(__('No store IDs found for retriever'));
-                return [];
-            }
+            $this->logger->notice(__('No store IDs found for retriever'));
+            return [];
         }
 
         $retriever = $this->pool->getRetrieverByCode($code);
