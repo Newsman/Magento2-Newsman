@@ -109,9 +109,10 @@ class Coupons implements RetrieverInterface
         }
 
         $websiteIds = [];
-        foreach ($this->storeManager->getWebsites() as $website) {
-            $websiteIds[] = $website->getId();
+        foreach ($storeIds as $storeId) {
+            $websiteIds[] = $this->storeManager->getStore($storeId)->getWebsiteId();
         }
+        $websiteIds = array_unique($websiteIds);
 
         $groupIds = [];
         $groups = $this->groupManagement->getLoggedInGroups();
