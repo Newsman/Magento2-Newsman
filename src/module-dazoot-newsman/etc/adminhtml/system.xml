@@ -100,11 +100,11 @@
             <group id="export" translate="label" type="text" sortOrder="40" showInDefault="1"
                    showInWebsite="1" showInStore="1">
                 <label>Export</label>
-                <field id="authorize_header_name" translate="label" type="text" sortOrder="10" showInDefault="1">
+                <field id="authorize_header_name" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="0">
                     <label>Authorization Header Name</label>
                     <comment><![CDATA[Authorization in HTTP header as name. Format alpanumeric separated by hyphen-minus. Please also set it in Newsman App > E-Commerce > Coupons > Authorisation Header name, Newsman App > E-Commerce > Feed > a feed > Header Authorization, etc,]]></comment>
                 </field>
-                <field id="authorize_header_key" translate="label" type="obscure" sortOrder="20" showInDefault="1">
+                <field id="authorize_header_key" translate="label" type="obscure" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="0">
                     <label>Authorization Header Key</label>
                     <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                     <comment><![CDATA[Authorization in HTTP header as value. Format alpanumeric separated by hyphen-minus. Please also set it in Newsman App > E-Commerce > Coupons > Authorisation Header value, Newsman App > E-Commerce > Feed > a feed > Header Authorization, etc.]]></comment>
