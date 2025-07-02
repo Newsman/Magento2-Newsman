@@ -7,8 +7,10 @@
  */
 namespace Dazoot\Newsmanmarketing\Block\Category;
 
+use Magento\Catalog\Block\Breadcrumbs;
 use Magento\Catalog\Model\Category;
 use Magento\Framework\DataObject\IdentityInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
@@ -38,9 +40,20 @@ class View extends Template implements IdentityInterface
     }
 
     /**
+     * @inheritdoc
+     * @return $this
+     */
+    protected function _prepareLayout()
+    {
+        parent::_prepareLayout();
+        $this->getCurrentCategory();
+        return $this;
+    }
+
+    /**
      * @return Category
      */
-    public function getCategory()
+    public function getCurrentCategory()
     {
         if (!$this->hasData('current_category')) {
             $this->setData('current_category', $this->registry->registry('current_category'));
@@ -49,10 +62,21 @@ class View extends Template implements IdentityInterface
     }
 
     /**
+     * @return Category
+     */
+    public function getCategory()
+    {
+        return $this->getCurrentCategory();
+    }
+
+    /**
      * @return array
      */
     public function getIdentities()
     {
-        return $this->getCurrentCategory()->getIdentities();
+        if ($this->getCurrentCategory()) {
+            return $this->getCurrentCategory()->getIdentities();
+        }
+        return [];
     }
 }
