@@ -123,6 +123,18 @@
                     <backend_model>Dazoot\Newsman\Model\System\Config\Backend\Product\AttributesMap</backend_model>
                     <comment><![CDATA[Export product attributes map. Used for subscribers and products exports. Newsman field can contain letters and underscore character.]]></comment>
                 </field>
+                <field id="customer_send_telephone" translate="label" type="select" sortOrder="50" showInDefault="1"
+                       canRestore="1">
+                    <label>Send customer telephone number</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Send customer billing address and shipping address telephone number.]]></comment>
+                </field>
+                <field id="order_send_telephone" translate="label" type="select" sortOrder="60" showInDefault="1"
+                       canRestore="1">
+                    <label>Send telephone number from order</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Send order billing address and shipping address telephone number.]]></comment>
+                </field>
             </group>
             <group id="newsletter" translate="label" type="text" sortOrder="50" showInDefault="1"
                    showInWebsite="1" showInStore="1">

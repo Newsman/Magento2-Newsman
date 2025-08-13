@@ -93,6 +93,11 @@ class Orders implements RetrieverInterface
     protected $imageId;
 
     /**
+     * @var bool
+     */
+    protected $isAddTelephone = false;
+
+    /**
      * @param SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory
      * @param FilterBuilder $filterBuilder
      * @param OrderRepositoryInterface $orderRepository
@@ -139,6 +144,8 @@ class Orders implements RetrieverInterface
      */
     public function process($data = [], $storeIds = [])
     {
+        $this->isAddTelephone = $this->config->isOrderSendTelephoneByStoreIds($storeIds);
+
         if (isset($data['order_id'])) {
             if (empty($data['order_id'])) {
                 return [];
@@ -281,6 +288,14 @@ class Orders implements RetrieverInterface
         $date = new DateTime($order->getCreatedAt());
         $timestamp = $date->getTimestamp();
 
+        $billingPhone = $shippingPhone = '';
+        if ($this->isAddTelephone) {
+            $billingPhone = $order->getBillingAddress()->getTelephone();
+            if (!$order->getIsVirtual()) {
+                $shippingPhone = $order->getShippingAddress()->getTelephone();
+            }
+        }
+
         $result = [
             'order_no' => $order->getId(),
             'date' => $timestamp,
@@ -288,7 +303,10 @@ class Orders implements RetrieverInterface
             'lastname' => $order->getCustomerFirstname(),
             'firstname' => $order->getCustomerLastname(),
             'email' => $order->getCustomerEmail(),
-            'phone' => '',
+            'phone' => $billingPhone,
+            'telephone' => $billingPhone,
+            'billing_telephone' => $billingPhone,
+            'shipping_telephone' => $shippingPhone,
             'state' => '',
             'city' => '',
             'address' => '',
