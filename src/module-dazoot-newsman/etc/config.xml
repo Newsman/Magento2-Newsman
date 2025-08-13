@@ -33,6 +33,8 @@
                 <authorize_header_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
                 <customer_attributes_map />
                 <product_attributes_map />
+                <customer_send_telephone>0</customer_send_telephone>
+                <order_send_telephone>0</order_send_telephone>
             </export>
             <newsletter>
                 <send_subscribe_newsman>1</send_subscribe_newsman>

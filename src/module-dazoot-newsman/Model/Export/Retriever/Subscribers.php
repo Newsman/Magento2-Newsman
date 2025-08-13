@@ -8,6 +8,7 @@
 namespace Dazoot\Newsman\Model\Export\Retriever;
 
 use Dazoot\Newsman\Logger\Logger;
+use Dazoot\Newsman\Model\Config;
 use Dazoot\Newsman\Model\Config\Customer\GetAdditionalAttributes;
 use Magento\Customer\Model\Customer;
 use Magento\Customer\Model\ResourceModel\Customer\Collection as CustomerCollection;
@@ -51,23 +52,36 @@ class Subscribers implements RetrieverInterface
     protected $getAdditionalAttributes;
 
     /**
+     * @var Config
+     */
+    protected $config;
+
+    /**
+     * @var bool
+     */
+    protected $isAddTelephone = false;
+
+    /**
      * @param CollectionFactory $collectionFactory
      * @param StoreManagerInterface $storeManager
      * @param Logger $logger
      * @param CustomerCollectionFactory $customerCollectionFactory
+     * @param Config $config
      */
     public function __construct(
         CollectionFactory $collectionFactory,
         StoreManagerInterface $storeManager,
         Logger $logger,
         CustomerCollectionFactory $customerCollectionFactory,
-        GetAdditionalAttributes $getAdditionalAttributes
+        GetAdditionalAttributes $getAdditionalAttributes,
+        Config $config
     ) {
         $this->collectionFactory = $collectionFactory;
         $this->storeManager = $storeManager;
         $this->logger = $logger;
         $this->customerCollectionFactory = $customerCollectionFactory;
         $this->getAdditionalAttributes = $getAdditionalAttributes;
+        $this->config = $config;
     }
 
     /**
@@ -75,6 +89,8 @@ class Subscribers implements RetrieverInterface
      */
     public function process($data = [], $storeIds = [])
     {
+        $this->isAddTelephone = $this->config->isCustomerSendTelephoneByStoreIds($storeIds);
+
         $pageSize = false;
         $currentPage = false;
         if (isset($data['start']) && isset($data['limit'])) {
@@ -187,20 +203,37 @@ class Subscribers implements RetrieverInterface
         $customersData = [];
         /** @var Customer $customer */
         foreach ($collection as $customer) {
-            $customersData[$customer->getEmail()] = [
-                'entity_id' => $customer->getEmail(),
-                'email' => $customer->getEmail(),
+            $email = $customer->getEmail();
+            $customersData[$email] = [
+                'entity_id' => $customer->getId(),
+                'email' => $email,
                 'firstname' => $customer->getFirstname(),
                 'lastname' => $customer->getLastname(),
             ];
 
+            if ($this->isAddTelephone) {
+                $customersData[$email]['billing_telephone'] = '';
+                $customersData[$email]['telephone'] = '';
+                $billingAddress = $customer->getPrimaryBillingAddress();
+                if ($billingAddress && $billingAddress->getTelephone()) {
+                    $customersData[$email]['telephone'] = $billingAddress->getTelephone();
+                    $customersData[$email]['billing_telephone'] = $billingAddress->getTelephone();
+                }
+
+                $customersData[$email]['shipping_telephone'] = '';
+                $shippingAddress = $customer->getPrimaryShippingAddress();
+                if ($shippingAddress && $shippingAddress->getTelephone()) {
+                    $customersData[$email]['shipping_telephone'] = $shippingAddress->getTelephone();
+                }
+            }
+
             foreach ($additionalAttributes as $attributeCode => $field) {
-                $customersData[$customer->getEmail()][$attributeCode] = $customer->getResource()
+                $customersData[$email][$attributeCode] = $customer->getResource()
                     ->getAttribute($attributeCode)
                     ->getFrontend()
                     ->getValue($customer);
-                if ($customersData[$customer->getEmail()][$attributeCode] === false) {
-                    $customersData[$customer->getEmail()][$attributeCode] = '';
+                if ($customersData[$email][$attributeCode] === false) {
+                    $customersData[$email][$attributeCode] = '';
                 }
             }
         }
@@ -283,6 +316,12 @@ class Subscribers implements RetrieverInterface
 
         foreach ($this->getAdditionalAttributes($storeIds) as $attributeCode => $field) {
             $row[$field] = isset($cdata[$attributeCode]) ? $cdata[$attributeCode] : '';
+        }
+
+        if ($this->isAddTelephone) {
+            $row['telephone'] = isset($cdata['billing_telephone']) ? $cdata['billing_telephone'] : '';
+            $row['billing_telephone'] = isset($cdata['billing_telephone']) ? $cdata['billing_telephone'] : '';
+            $row['shipping_telephone'] = isset($cdata['shipping_telephone']) ? $cdata['shipping_telephone'] : '';
         }
 
         return $row;

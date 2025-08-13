@@ -343,15 +343,32 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
      */
     public function getProperties($subscriber, $store, $customer = null)
     {
+        $properties = [];
+
         if ($customer === null) {
-            return [];
+            return $properties;
         }
 
         if (!(($customer instanceof Customer) || ($customer instanceof CustomerData))) {
-            return [];
+            return $properties;
         }
 
-        $properties = [];
+        if ($this->config->isCustomerSendTelephone()) {
+            $billingAddress = $customer->getPrimaryBillingAddress();
+            $properties['telephone'] = '';
+            $properties['billing_telephone'] = '';
+            if ($billingAddress) {
+                $properties['telephone'] = $billingAddress->getTelephone();
+                $properties['billing_telephone'] = $billingAddress->getTelephone();
+            }
+
+            $shippingAddress = $customer->getPrimaryShippingAddress();
+            $properties['shipping_telephone'] = '';
+            if ($shippingAddress) {
+                $properties['shipping_telephone'] = $shippingAddress->getTelephone();
+            }
+        }
+
         $attributesFields = $this->attributesMap->getConfigValuebyStoreId($store);
         foreach ($attributesFields as $row) {
             if (empty($row['a']) || empty($row['f'])) {

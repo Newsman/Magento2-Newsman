@@ -105,7 +105,15 @@ class ExportCsvSubscribers extends AbstractService
      */
     public function getCsvHeader($context)
     {
-        $header = ['email', 'firstname', 'lastname', 'source'];
+        $header = [
+            'email',
+            'firstname',
+            'lastname',
+            'telephone',
+            'billing_telephone',
+            'shipping_telephone',
+            'source'
+        ];
         foreach ($this->getAdditionalFieldsNames($context) as $field) {
             if (!in_array($field, $header)) {
                 $header[] = $field;
