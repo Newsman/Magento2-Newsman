@@ -19,6 +19,11 @@ class ExportCsvSubscribersContext extends StoreContext
     /**
      * @var array
      */
+    protected $storeIds = [];
+
+    /**
+     * @var array
+     */
     protected $additionalFields = [];
 
     /**
@@ -37,6 +42,24 @@ class ExportCsvSubscribersContext extends StoreContext
     public function getCsvData()
     {
         return $this->csvData;
+    }
+
+    /**
+     * @param array $storeIds
+     * @return ContextInterface
+    */
+    public function setStoreIds($storeIds)
+    {
+        $this->storeIds = $storeIds;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getStoreids()
+    {
+        return $this->storeIds;
     }
 
     /**
