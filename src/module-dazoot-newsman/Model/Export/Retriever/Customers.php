@@ -8,6 +8,7 @@
 namespace Dazoot\Newsman\Model\Export\Retriever;
 
 use Dazoot\Newsman\Logger\Logger;
+use Dazoot\Newsman\Model\Config;
 use Dazoot\Newsman\Model\Config\Customer\GetAdditionalAttributes;
 use Magento\Customer\Model\Customer;
 use Magento\Customer\Model\ResourceModel\Customer\Collection;
@@ -44,21 +45,34 @@ class Customers implements RetrieverInterface
     protected $getAdditionalAttributes;
 
     /**
+     * @var Config
+     */
+    protected $config;
+
+    /**
+     * @var bool
+     */
+    protected $isAddTelephone = false;
+
+    /**
      * @param CollectionFactory $collectionFactory
      * @param StoreManagerInterface $storeManager
      * @param Logger $logger
      * @param GetAdditionalAttributes $getAdditionalAttributes
+     * @param Config $config
      */
     public function __construct(
         CollectionFactory $collectionFactory,
         StoreManagerInterface $storeManager,
         Logger $logger,
-        GetAdditionalAttributes $getAdditionalAttributes
+        GetAdditionalAttributes $getAdditionalAttributes,
+        Config $config
     ) {
         $this->collectionFactory = $collectionFactory;
         $this->storeManager = $storeManager;
         $this->logger = $logger;
         $this->getAdditionalAttributes = $getAdditionalAttributes;
+        $this->config = $config;
     }
 
     /**
@@ -66,6 +80,8 @@ class Customers implements RetrieverInterface
      */
     public function process($data = [], $storeIds = [])
     {
+        $this->isAddTelephone = $this->config->isCustomerSendTelephoneByStoreIds($storeIds);
+
         $pageSize = self::DEFAULT_PAGE_SIZE;
         if (!empty($data['limit']) && (int) $data['limit'] > 0) {
             $pageSize = (int) $data['limit'];
@@ -165,6 +181,8 @@ class Customers implements RetrieverInterface
             'lastname' => $customer->getLastname()
         ];
 
+        $row = $this->processTelephone($customer, $storeIds, $row);
+
         foreach ($this->getAdditionalAttributes($storeIds) as $attributeCode => $fieldName) {
             $row[$fieldName] = $customer->getResource()
                 ->getAttribute($attributeCode)
@@ -187,5 +205,34 @@ class Customers implements RetrieverInterface
     public function getAdditionalAttributes($storeIds)
     {
         return $this->getAdditionalAttributes->get($storeIds);
+    }
+
+    /**
+     * @param Customer $customer
+     * @param array $storeIds
+     * @param array $row
+     * @return array
+     */
+    public function processTelephone($customer, $storeIds, $row)
+    {
+        if (!$this->isAddTelephone) {
+            return $row;
+        }
+
+        $billingAddress = $customer->getPrimaryBillingAddress();
+        $row['telephone'] = '';
+        $row['billing_telephone'] = '';
+        if ($billingAddress) {
+            $row['telephone'] = $billingAddress->getTelephone();
+            $row['billing_telephone'] = $billingAddress->getTelephone();
+        }
+
+        $shippingAddress = $customer->getPrimaryShippingAddress();
+        $row['shipping_telephone'] = '';
+        if ($shippingAddress) {
+            $row['shipping_telephone'] = $shippingAddress->getTelephone();
+        }
+
+        return $row;
     }
 }

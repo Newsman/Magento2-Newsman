@@ -139,3 +139,7 @@
 "Please Select Attribute","Please Select Attribute"
 "Product Attributes Map","Product Attributes Map"
 "Export product attributes map. Used for subscribers and products exports. Newsman field can contain letters and underscore character.","Export product attributes map. Used for subscribers and products exports. Newsman field can contain letters and underscore character."
+"Send customer telephone number","Send customer telephone number"
+"Send customer billing address and shipping address telephone number.","Send customer billing address and shipping address telephone number."
+"Send telephone number from order","Send telephone number from order"
+"Send order billing address and shipping address telephone number.","Send order billing address and shipping address telephone number."

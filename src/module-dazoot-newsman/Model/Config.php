@@ -127,6 +127,16 @@ class Config
     public const XML_PATH_EXPORT_PRODUCT_ATTRIBUTES_MAP = 'newsman/export/product_attributes_map';
 
     /**
+     * Customer send telephone path
+     */
+    public const XML_PATH_EXPORT_CUSTOMER_SEND_TELEPHONE = 'newsman/export/customer_send_telephone';
+
+    /**
+     * Order send telephone path
+     */
+    public const XML_PATH_EXPORT_ORDER_SEND_TELEPHONE = 'newsman/export/order_send_telephone';
+
+    /**
      * Newsletter send subscribe and unsubscribe emails from Newsman
      */
     public const XML_PATH_NEWSLETTER_NEWSMAN_SENDS_SUB = 'newsman/newsletter/send_subscribe_newsman';
@@ -437,6 +447,74 @@ class Config
             ScopeInterface::SCOPE_STORE,
             $store
         ));
+    }
+
+    /**
+     * Is customer send telephone
+     *
+     * @param null|string|bool|int|Store $store
+     * @return bool
+     */
+    public function isCustomerSendTelephone($store = null)
+    {
+        return $this->scopeConfig->isSetFlag(
+            self::XML_PATH_EXPORT_CUSTOMER_SEND_TELEPHONE,
+            ScopeInterface::SCOPE_STORE,
+            $store
+        );
+    }
+
+    /**
+     * @param array $storeIds
+     * @return bool
+     */
+    public function isCustomerSendTelephoneByStoreIds($storeIds)
+    {
+        if (empty($storeIds)) {
+            return $this->isCustomerSendTelephone();
+        }
+
+        foreach ($storeIds as $storeId) {
+            if ($this->isCustomerSendTelephone($storeId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Is order send telephone
+     *
+     * @param null|string|bool|int|Store $store
+     * @return bool
+     */
+    public function isOrderSendTelephone($store = null)
+    {
+        return $this->scopeConfig->isSetFlag(
+            self::XML_PATH_EXPORT_ORDER_SEND_TELEPHONE,
+            ScopeInterface::SCOPE_STORE,
+            $store
+        );
+    }
+
+    /**
+     * @param array $storeIds
+     * @return bool
+     */
+    public function isOrderSendTelephoneByStoreIds($storeIds)
+    {
+        if (empty($storeIds)) {
+            return $this->isOrderSendTelephone();
+        }
+
+        foreach ($storeIds as $storeId) {
+            if ($this->isOrderSendTelephone($storeId)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

@@ -99,6 +99,11 @@ class Consumer
     protected $name = 'Bulk Export Subscribers Consumer';
 
     /**
+     * @var bool
+     */
+    protected $isAddTelephone = false;
+
+    /**
      * @param StoreManagerInterface $storeManager
      * @param SerializerInterface $serializer
      * @param OperationManagementInterface $operationManagement
@@ -210,6 +215,8 @@ class Consumer
         $chunkSize = $data['chunk_size'];
         $step = $data['step'];
 
+        $this->isAddTelephone = $this->config->isCustomerSendTelephoneByStoreIds($storeIds);
+
         $collection = $this->createSubscriberCollection($storeIds, $chunkSize, $step);
         $emails = $collection->getColumnValues('subscriber_email');
         if (empty($emails)) {
@@ -319,20 +326,31 @@ class Consumer
      */
     public function getRowData($subscriber, $firstname, $lastname, $customersData, $storeIds, $iteration)
     {
+        $email = $subscriber->getSubscriberEmail();
         $row = [
-            'email' => $subscriber->getSubscriberEmail(),
+            'email' => $email,
             'firstname' => $firstname,
             'lastname' => $lastname,
             'additional' => [],
         ];
 
+        $cdata = false;
+        if (isset($customersData[$email])) {
+            $cdata = $customersData[$email];
+        }
+
+        if ($this->isAddTelephone) {
+            $row['billing_telephone'] = isset($cdata['billing_telephone']) ? $cdata['billing_telephone'] : '';
+            $row['shipping_telephone'] = isset($cdata['shipping_telephone']) ? $cdata['shipping_telephone'] : '';
+        }
+
         foreach ($this->getAdditionalAttributes($storeIds) as $attributeCode => $field) {
             $row['additional'][$attributeCode] = '';
         }
 
-        if (isset($customersData[$subscriber->getSubscriberEmail()])) {
+        if ($cdata !== false) {
             foreach ($this->getAdditionalAttributes($storeIds) as $attributeCode => $field) {
-                $value = $customersData[$subscriber->getSubscriberEmail()][$attributeCode];
+                $value = $cdata[$attributeCode];
                 if ($value === null) {
                     $value = '';
                 }
@@ -427,21 +445,38 @@ class Consumer
         $customersData = [];
         /** @var Customer $customer */
         foreach ($collection as $customer) {
-            $customersData[$customer->getEmail()] = [
-                'entity_id' => $customer->getEmail(),
-                'email' => $customer->getEmail(),
+            $email = $customer->getEmail();
+            $customersData[$email] = [
+                'entity_id' => $email,
+                'email' => $email,
                 'firstname' => $customer->getFirstname(),
                 'lastname' => $customer->getLastname(),
             ];
 
+            if ($this->isAddTelephone) {
+                $customersData[$email]['telephone'] = '';
+                $customersData[$email]['billing_telephone'] = '';
+                $billingAddress = $customer->getPrimaryBillingAddress();
+                if ($billingAddress && $billingAddress->getTelephone()) {
+                    $customersData[$email]['telephone'] = $billingAddress->getTelephone();
+                    $customersData[$email]['billing_telephone'] = $billingAddress->getTelephone();
+                }
+
+                $customersData[$email]['shipping_telephone'] = '';
+                $shippingAddress = $customer->getPrimaryShippingAddress();
+                if ($shippingAddress && $shippingAddress->getTelephone()) {
+                    $customersData[$email]['shipping_telephone'] = $shippingAddress->getTelephone();
+                }
+            }
+
             foreach ($additionalAttributes as $attributeCode => $field) {
-                $customersData[$customer->getEmail()][$attributeCode] = $customer->getResource()
+                $customersData[$email][$attributeCode] = $customer->getResource()
                     ->getAttribute($attributeCode)
                     ->getFrontend()
                     ->getValue($customer);
 
-                if ($customersData[$customer->getEmail()][$attributeCode] === false) {
-                    $customersData[$customer->getEmail()][$attributeCode] = '';
+                if ($customersData[$email][$attributeCode] === false) {
+                    $customersData[$email][$attributeCode] = '';
                 }
             }
         }
