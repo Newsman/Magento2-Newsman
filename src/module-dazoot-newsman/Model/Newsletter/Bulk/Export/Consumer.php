@@ -311,6 +311,7 @@ class Consumer
         return $this->exportContextFactory->create()
             ->setCsvData($data)
             ->setStore($store)
+            ->setStoreIds($storeIds)
             ->setAdditionalFields($this->getAdditionalAttributes($storeIds));
     }
 
@@ -340,6 +341,7 @@ class Consumer
         }
 
         if ($this->isAddTelephone) {
+            $row['telephone'] = isset($cdata['telephone']) ? $cdata['telephone'] : '';
             $row['billing_telephone'] = isset($cdata['billing_telephone']) ? $cdata['billing_telephone'] : '';
             $row['shipping_telephone'] = isset($cdata['shipping_telephone']) ? $cdata['shipping_telephone'] : '';
         }

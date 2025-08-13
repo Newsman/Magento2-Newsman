@@ -11,6 +11,7 @@ use Dazoot\Newsman\Model\Api\ClientInterfaceFactory;
 use Dazoot\Newsman\Model\Api\ContextInterfaceFactory;
 use Dazoot\Newsman\Model\Validator\EmailAddress as EmailAddressValidator;
 use Magento\Store\Api\Data\StoreInterface;
+use Dazoot\Newsman\Model\Config;
 use Magento\Store\Model\Store;
 use Dazoot\Newsman\Logger\Logger;
 
@@ -42,24 +43,32 @@ class AbstractService implements ServiceInterface
     /**
      * @var Logger
      */
-    protected $logger;
+    protected $logger
+
+    ;/**
+     * @var Config
+     */
+    protected $config;
 
     /**
      * @param ContextInterfaceFactory $contextFactory
      * @param ClientInterfaceFactory $clientFactory
      * @param EmailAddressValidator $emailAddressValidator
      * @param Logger $logger
+     * @param Config $config
      */
     public function __construct(
         ContextInterfaceFactory $contextFactory,
         ClientInterfaceFactory $clientFactory,
         EmailAddressValidator $emailAddressValidator,
-        Logger $logger
+        Logger $logger,
+        Config $config
     ) {
         $this->contextFactory = $contextFactory;
         $this->clientFactory = $clientFactory;
         $this->emailAddressValidator = $emailAddressValidator;
         $this->logger = $logger;
+        $this->config = $config;
     }
 
     /**
