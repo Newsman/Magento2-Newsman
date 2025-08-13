@@ -67,11 +67,14 @@ class ExportCsvSubscribers extends AbstractService
      */
     public function serializeCsvData($context, $source = 'Magento2')
     {
+        $header = $this->getCsvHeader($context);
+        $columnCount = count($header);
         $csvData = $context->getCsvData();
         $additionalFields = $context->getAdditionalFields();
 
         $csv = '"' . implode('","', $this->getCsvHeader($context)) . "\"\n";
         foreach ($csvData as $key => $row) {
+            $exportRow = array_combine($header, array_fill(0, $columnCount, ''));
             foreach ($row as $column => &$value) {
                 if ($column !== 'additional') {
                     if ($value === null) {
@@ -93,7 +96,13 @@ class ExportCsvSubscribers extends AbstractService
                 }
             }
 
-            $csv .= $this->getCsvLine($row, $key);
+            foreach ($exportRow as $exportKey => &$exportValue) {
+                if (isset($row[$exportKey])) {
+                    $exportValue = $row[$exportKey];
+                }
+            }
+
+            $csv .= $this->getCsvLine($exportRow, $key);
         }
 
         return $csv;
@@ -109,11 +118,16 @@ class ExportCsvSubscribers extends AbstractService
             'email',
             'firstname',
             'lastname',
-            'telephone',
-            'billing_telephone',
-            'shipping_telephone',
-            'source'
         ];
+
+        if ($this->config->isCustomerSendTelephoneByStoreIds($context->getStoreids())) {
+            $header[] = 'telephone';
+            $header[] = 'billing_telephone';
+            $header[] = 'shipping_telephone';
+        }
+
+        $header[] = 'source';
+
         foreach ($this->getAdditionalFieldsNames($context) as $field) {
             if (!in_array($field, $header)) {
                 $header[] = $field;
