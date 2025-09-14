@@ -50,7 +50,15 @@ class Authenticator
             $isAlternate = true;
         }
 
-        if ($configApiKey !== $apiKey && ($isAlternate && $alternateKey !== $apiKey)) {
+        $isAuthenticated = false;
+        if ($configApiKey === $apiKey) {
+            $isAuthenticated = true;
+        }
+        if ($isAlternate && $alternateKey === $apiKey) {
+            $isAuthenticated = true;
+        }
+
+        if (!$isAuthenticated) {
             throw new AuthenticatorException(
                 __('Invalid API key for store ' . $store->getName() . ' (' . $store->getId() . ').')
             );
