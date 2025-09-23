@@ -27,14 +27,22 @@ define([
         }
 
         customer.subscribe(function (data) {
+            var payload = {};
+
             if (!_.isEmpty(data['email']) && !isIdentified && !_nzm.isIdentified()) {
                 isIdentified = true;
 
-                _nzm.identify({
+                payload = {
                     email: data['email'],
                     first_name: data['firstname'],
                     last_name: data['lastname']
-                });
+                };
+
+                if (!_.isEmpty(data['phone'])) {
+                    payload['phone'] = data['phone'];
+                }
+
+                _nzm.identify(payload);
             }
         });
     }
