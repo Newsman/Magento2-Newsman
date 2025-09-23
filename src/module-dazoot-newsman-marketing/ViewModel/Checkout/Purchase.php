@@ -98,7 +98,7 @@ class Purchase extends Marketing
                 $productsData[] = $productData;
             }
 
-            $data[] = [
+            $orderData = [
                 'order' => [
                     'id' => $order->getIncrementId(),
                     'affiliation' => $this->escapeValue($this->storeManager->getStore()->getFrontendName()),
@@ -114,6 +114,20 @@ class Purchase extends Marketing
                     'last_name' => $order->getCustomerLastname()
                 ]
             ];
+
+            if ($this->config->getConfig()->isOrderSendTelephone()) {
+                $phone = '';
+                if ($order->getBillingAddress() && $order->getBillingAddress()->getTelephone()) {
+                    $phone = $order->getBillingAddress()->getTelephone();
+                } elseif ($order->getShippingAddress() && $order->getShippingAddress()->getTelephone()) {
+                    $phone = $order->getShippingAddress()->getTelephone();
+                }
+                if (!empty($phone)) {
+                    $orderData['buyer']['phone'] = $phone;
+                }
+            }
+
+            $data[] = $orderData;
         }
 
         return $data;

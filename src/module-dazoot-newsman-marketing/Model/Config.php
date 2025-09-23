@@ -318,4 +318,12 @@ class Config
             $store
         );
     }
+
+    /**
+     * @return \Dazoot\Newsman\Model\Config
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
 }
