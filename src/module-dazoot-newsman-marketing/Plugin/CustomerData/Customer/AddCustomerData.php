@@ -11,7 +11,7 @@ use Dazoot\Newsmanmarketing\Model\Config;
 use Magento\Customer\Helper\Session\CurrentCustomer;
 
 /**
- * Add lastname and email to customer section data
+ * Add lastname, email and phone to customer section data
  */
 class AddCustomerData
 {
@@ -57,6 +57,33 @@ class AddCustomerData
             $customer = $this->currentCustomer->getCustomer();
             $result['lastname'] = $customer->getLastname();
             $result['email'] = $customer->getEmail();
+
+            if ($this->config->getConfig()->isOrderSendTelephone() ||
+                $this->config->getConfig()->isCustomerSendTelephone()) {
+                $addresses = $customer->getAddresses();
+                $billingAddress = null;
+                $shippingAddress = null;
+                if (!empty($addresses)) {
+                    foreach ($addresses as $address) {
+                        if ($address->getId() == $customer->getDefaultBilling()) {
+                            $billingAddress = $address;
+                        }
+                        if ($address->getId() == $customer->getDefaultShipping()) {
+                            $shippingAddress = $address;
+                        }
+                    }
+                }
+
+                $phone = '';
+                if ($billingAddress && $billingAddress->getTelephone()) {
+                    $phone = $billingAddress->getTelephone();
+                } elseif ($shippingAddress && $shippingAddress->getTelephone()) {
+                    $phone = $shippingAddress->getTelephone();
+                }
+                if (!empty($phone)) {
+                    $result['phone'] = $phone;
+                }
+            }
         } catch (\Exception $e) {
             return $result;
         }
