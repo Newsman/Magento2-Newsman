@@ -57,7 +57,7 @@ class ExportCsvSubscribersContext extends StoreContext
     /**
      * @return array
      */
-    public function getStoreids()
+    public function getStoreIds()
     {
         return $this->storeIds;
     }

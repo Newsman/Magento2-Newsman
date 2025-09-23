@@ -120,7 +120,7 @@ class ExportCsvSubscribers extends AbstractService
             'lastname',
         ];
 
-        if ($this->config->isCustomerSendTelephoneByStoreIds($context->getStoreids())) {
+        if ($this->config->isCustomerSendTelephoneByStoreIds($context->getStoreIds())) {
             $header[] = 'telephone';
             $header[] = 'billing_telephone';
             $header[] = 'shipping_telephone';
