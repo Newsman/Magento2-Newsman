@@ -44,7 +44,7 @@ class Client implements ClientInterface
     protected $status;
 
     /**
-     * @var string
+     * @var int
      */
     protected $errorCode;
 
@@ -92,7 +92,8 @@ class Client implements ClientInterface
      */
     public function request($context, $method, $getParams = [], $postParams = [])
     {
-        $this->status = $this->errorMessage = $this->errorCode = null;
+        $this->status = $this->errorMessage = null;
+        $this->errorCode = 0;
         $result = [];
 
         $url = $this->config->getApiUrl();
@@ -126,7 +127,7 @@ class Client implements ClientInterface
                 try {
                     $result = $this->json->unserialize($httpClient->getBody());
                     if (($apiError = $this->parseApiError($result)) !== false) {
-                        $this->errorCode = $apiError['code'];
+                        $this->errorCode = (int) $apiError['code'];
                         $this->errorMessage = $apiError['message'];
                         $this->logger->warning($this->errorCode . ' | ' . $this->errorMessage);
                     } else {
@@ -139,12 +140,12 @@ class Client implements ClientInterface
                     return [];
                 }
             } else {
-                $this->errorCode = $httpClient->getStatus();
+                $this->errorCode = (int) $httpClient->getStatus();
                 try {
                     if (stripos($httpClient->getBody(), '{') !== false) {
                         $body = $this->json->unserialize($httpClient->getBody());
                         if (($apiError = $this->parseApiError($body)) !== false) {
-                            $this->errorCode = $apiError['code'];
+                            $this->errorCode = (int) $apiError['code'];
                             $this->errorMessage = $apiError['message'];
                         } else {
                             $this->errorMessage = 'Error: ' . $this->errorCode;
@@ -157,7 +158,7 @@ class Client implements ClientInterface
             }
         } catch (\Exception $e) {
             /** @see \Magento\Framework\HTTP\Client\Curl::doError() */
-            $this->errorCode = $httpClient->getStatus();
+            $this->errorCode = (int) $httpClient->getStatus();
             $this->errorMessage = $e->getMessage();
             $this->logger->critical($e);
         }
