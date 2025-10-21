@@ -107,7 +107,8 @@ class Client implements ClientInterface
         if (is_array($getParams) && !empty($getParams)) {
             $url .= '?' . http_build_query($getParams);
         }
-        $this->logger->debug(str_replace($context->getApiKey(), '****', $url));
+        $logHash = uniqid();
+        $this->logger->debug( '[' . $logHash . '] ' . str_replace($context->getApiKey(), '****', $url));
 
         /** @var HttpClientInterface $httpClient */
         $httpClient = $this->httpClientFactory->create();
@@ -115,12 +116,16 @@ class Client implements ClientInterface
         $httpClient->addHeader('Content-Type', 'application/json');
 
         try {
+            $startTime = microtime(true);
             if ($method == 'POST') {
                 $httpClient->post($url, $postParams);
                 $this->logger->debug($this->json->serialize($postParams));
             } else {
                 $httpClient->get($url);
             }
+
+            $duration = round( ( microtime( true ) - $startTime ) * 1000 );
+            $this->logger->debug(__('[%1] Requested in %2', $logHash, $this->formatTimeDuration($duration)));
 
             $this->status = $httpClient->getStatus();
             if ($this->status == 200) {
@@ -213,5 +218,29 @@ class Client implements ClientInterface
     public function hasError()
     {
         return $this->errorCode > 0;
+    }
+
+    /**
+     * Format time duration based on thresholds
+     *
+     * @param int $milliSeconds The number of milliseconds to format.
+     * @return string Formatted time.
+     */
+    public function formatTimeDuration($milliSeconds)
+    {
+        if ($milliSeconds < 1000) {
+            return sprintf('%d ms', $milliSeconds);
+        }
+
+        $totalSeconds = $milliSeconds / 1000;
+
+        if ($totalSeconds < 60) {
+            return sprintf('%.1f s', $totalSeconds);
+        }
+
+        $minutes = floor($totalSeconds / 60);
+        $seconds = $totalSeconds % 60;
+
+        return sprintf('%d min %.3f s', $minutes, $seconds);
     }
 }
