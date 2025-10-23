@@ -87,7 +87,7 @@ class Purchase extends Marketing
                 $productData = [
                     'id' => $this->escapeValue($item->getProduct()->getSku()),
                     'name' => $this->escapeValue($item->getName()),
-                    'price' => number_format((float) $item->getPrice(), 2),
+                    'price' => number_format((float) $item->getPrice(), 2, '.', ''),
                     'quantity' => $item->getQtyOrdered()
                 ];
                 $brandCode = $this->config->getBrandAttribute();
@@ -102,9 +102,9 @@ class Purchase extends Marketing
                 'order' => [
                     'id' => $order->getIncrementId(),
                     'affiliation' => $this->escapeValue($this->storeManager->getStore()->getFrontendName()),
-                    'revenue' => number_format((float) $order->getGrandTotal(), 2),
-                    'tax' => number_format((float) $order->getTaxAmount(), 2),
-                    'shipping' => number_format((float) $order->getShippingAmount(), 2),
+                    'revenue' => number_format((float) $order->getGrandTotal(), 2, '.', ''),
+                    'tax' => number_format((float) $order->getTaxAmount(), 2, '.', ''),
+                    'shipping' => number_format((float) $order->getShippingAmount(), 2, '.', ''),
                     'currency' => $order->getOrderCurrencyCode()
                 ],
                 'products' => $productsData,
