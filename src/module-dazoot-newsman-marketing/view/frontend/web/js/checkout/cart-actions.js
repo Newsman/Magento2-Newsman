@@ -31,6 +31,7 @@ define([
 
             if (!_.isEmpty(data['add_cart']) && (typeof _nzm !== 'undefined')) {
                 _.each(data['add_cart'], function (product) {
+                    console.log(product);
                     _nzm.run('ec:addProduct', product);
                     _nzm.run('ec:setAction', 'add');
                     _nzm.run('send', 'event', 'UX', 'click', 'add to cart');
