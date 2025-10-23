@@ -117,7 +117,7 @@ class NotifyChangesCart
                         $productData = [
                             'id' => $item->getProduct()->getSku(),
                             'name' => $item->getName(),
-                            'price' => number_format((float) $item->getPriceInclTax(), 2),
+                            'price' => number_format((float) $item->getPriceInclTax(), 2, '.', ''),
                             'quantity' => $diff
                         ];
                         $brandCode = $this->config->getBrandAttribute();
