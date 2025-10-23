@@ -70,7 +70,7 @@ class NotifyAddCartObserver implements ObserverInterface
         $productData = [
             'id' => $product->getSku(),
             'name' => $quoteItem->getName(),
-            'price' => number_format((float) $quoteItem->getPrice(), 2),
+            'price' => number_format((float) $quoteItem->getPrice(), 2, '.', ''),
             'quantity' => $qty
         ];
         $brandCode = $this->config->getBrandAttribute();
