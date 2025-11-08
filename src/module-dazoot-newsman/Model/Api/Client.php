@@ -118,7 +118,7 @@ class Client implements ClientInterface
         try {
             $startTime = microtime(true);
             if ($method == 'POST') {
-                $httpClient->post($url, $postParams);
+                $httpClient->post($url, is_array($postParams) ? $this->json->serialize($postParams) : $postParams);
                 $this->logger->debug($this->json->serialize($postParams));
             } else {
                 $httpClient->get($url);
