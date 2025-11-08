@@ -66,6 +66,7 @@ class Subscribers implements RetrieverInterface
      * @param StoreManagerInterface $storeManager
      * @param Logger $logger
      * @param CustomerCollectionFactory $customerCollectionFactory
+     * @param GetAdditionalAttributes $getAdditionalAttributes
      * @param Config $config
      */
     public function __construct(
@@ -160,9 +161,9 @@ class Subscribers implements RetrieverInterface
     /**
      * Create subscriber collection
      *
-     * @param $storeIds
-     * @param $pageSize
-     * @param $currentPage
+     * @param array $storeIds
+     * @param int $pageSize
+     * @param int $currentPage
      * @return Collection
      */
     public function createSubscriberCollection($storeIds, $pageSize, $currentPage)

@@ -11,7 +11,7 @@ use Magento\Framework\App\RequestInterface;
  * Changes:
  * - Get last proxy from HTTP_X_FORWARDED_FOR as it may be a real IP address.
  * - Added FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE on filter_var.
-  */
+ */
 class RemoteAddress
 {
     /**
@@ -37,7 +37,6 @@ class RemoteAddress
      * @var string[]|null
      */
     protected $trustedProxies;
-
 
     /**
      * Constructor
