@@ -41,6 +41,7 @@ class ExportCsvSubscribers extends AbstractService
         $client = $this->createApiClient();
         $result = $client->post(
             $apiContext,
+            [],
             [
                 'list_id' => $apiContext->getListId(),
                 'segments' => !empty($segmentId) ? [$segmentId] : $context->getNullValue(),
