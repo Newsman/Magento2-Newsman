@@ -43,9 +43,9 @@ class AbstractService implements ServiceInterface
     /**
      * @var Logger
      */
-    protected $logger
+    protected $logger;
 
-    ;/**
+    /**
      * @var Config
      */
     protected $config;

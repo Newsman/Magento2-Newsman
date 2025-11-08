@@ -186,27 +186,35 @@ class Tunnel
     }
 
     /**
+     * Implemented for plugins from 3rd modules to change the request parameters
+     *
      * @param Curl $httpClient
      * @param string $url
      * @param string $method
      * @param array $getParams
      * @param array|string $postParams
      * @return void
+     * phpcs:disable Squiz.Functions.EmptyFunction.DetectedFunction
      */
     public function addAdditionalOptions($httpClient, $url, $method, $getParams, $postParams)
     {
+        $httpClient;
     }
 
     /**
+     * Implemented for plugins from 3rd modules to change the request headers
+     *
      * @param Curl $httpClient
      * @param string $url
      * @param string $method
      * @param array $getParams
      * @param array|string $postParams
      * @return void
+     * phpcs:ignore Squiz.Functions.EmptyFunction.DetectedFunction
      */
     public function addAdditionalHeaders($httpClient, $url, $method, $getParams, $postParams)
     {
+        $httpClient;
     }
 
     /**

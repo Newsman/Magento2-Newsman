@@ -47,7 +47,7 @@ class ExportCsvSubscribersContext extends StoreContext
     /**
      * @param array $storeIds
      * @return ContextInterface
-    */
+     */
     public function setStoreIds($storeIds)
     {
         $this->storeIds = $storeIds;
@@ -65,7 +65,7 @@ class ExportCsvSubscribersContext extends StoreContext
     /**
      * @param array $data
      * @return ContextInterface
-    */
+     */
     public function setAdditionalFields($data)
     {
         $this->additionalFields = $data;
