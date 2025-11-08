@@ -39,11 +39,11 @@ abstract class MapAbstract
     public $prefix;
 
     /**
-     * @param ScopeConfigInterface $scopeConfig
-     * @param Random $mathRandom
      * @param Json $serializer
-     * @param $path
-     * @param $prefix
+     * @param Random $mathRandom
+     * @param ScopeConfigInterface $scopeConfig
+     * @param string $path
+     * @param string $prefix
      */
     public function __construct(
         Json $serializer,
