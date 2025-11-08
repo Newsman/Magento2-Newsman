@@ -2,7 +2,7 @@
     "name": "newsman/magento2x",
     "type": "magento2-component",
     "license": "Apache-2.0",
-    "version": "2.5.24",
+    "version": "2.5.25",
     "authors": [
         {
             "name": "Daniel Ifrim"
