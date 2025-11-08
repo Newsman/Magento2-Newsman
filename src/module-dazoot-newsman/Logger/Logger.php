@@ -45,6 +45,10 @@ class Logger extends \Monolog\Logger
 
     /**
      * @inheridoc
+     *
+     * @param int $level
+     * @param string|\Stringable $message
+     * @param mixed[] $context
      */
     public function log($level, $message, array $context = []): void
     {
@@ -57,6 +61,9 @@ class Logger extends \Monolog\Logger
 
     /**
      * @inheridoc
+     *
+     * @param string|\Stringable $message
+     * @param mixed[] $context
      */
     public function debug($message, array $context = []): void
     {
@@ -68,6 +75,9 @@ class Logger extends \Monolog\Logger
 
     /**
      * @inheridoc
+     *
+     * @param string|\Stringable $message
+     * @param mixed[] $context
      */
     public function info($message, array $context = []): void
     {
@@ -79,6 +89,9 @@ class Logger extends \Monolog\Logger
 
     /**
      * @inheridoc
+     *
+     * @param string|\Stringable $message
+     * @param mixed[] $context
      */
     public function notice($message, array $context = []): void
     {
@@ -90,6 +103,9 @@ class Logger extends \Monolog\Logger
 
     /**
      * @inheridoc
+     *
+     * @param string|\Stringable $message
+     * @param mixed[] $context
      */
     public function warning($message, array $context = []): void
     {
@@ -101,6 +117,9 @@ class Logger extends \Monolog\Logger
 
     /**
      * @inheridoc
+     *
+     * @param string|\Stringable $message
+     * @param mixed[] $context
      */
     public function error($message, array $context = []): void
     {
@@ -112,6 +131,9 @@ class Logger extends \Monolog\Logger
 
     /**
      * @inheridoc
+     *
+     * @param string|\Stringable $message
+     * @param mixed[] $context
      */
     public function critical($message, array $context = []): void
     {
@@ -123,6 +145,9 @@ class Logger extends \Monolog\Logger
 
     /**
      * @inheridoc
+     *
+     * @param string|\Stringable $message
+     * @param mixed[] $context
      */
     public function alert($message, array $context = []): void
     {
@@ -134,6 +159,9 @@ class Logger extends \Monolog\Logger
 
     /**
      * @inheridoc
+     *
+     * @param string|\Stringable $message
+     * @param mixed[] $context
      */
     public function emergency($message, array $context = []): void
     {
