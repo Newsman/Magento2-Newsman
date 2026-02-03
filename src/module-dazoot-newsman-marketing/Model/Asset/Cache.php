@@ -170,7 +170,7 @@ class Cache
         $write->writeFile($relativePath . '/' . $headersFilename, $this->json->serialize($cacheHeaders));
 
         $filenameScriptUrl = $this->getFilename($this->config->getScriptUrl());
-        // Invalidate block for main JS file (track.js)
+        // Invalidate block for main JS file (t.js)
         if ($filenameScriptUrl === $filename) {
             $this->cleanScriptBlockCache();
         }
