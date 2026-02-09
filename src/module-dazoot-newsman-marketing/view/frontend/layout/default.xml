@@ -46,6 +46,15 @@
                     <argument name="view_model" xsi:type="object">Dazoot\Newsmanmarketing\ViewModel\Marketing</argument>
                 </arguments>
             </block>
+            <block class="Magento\Framework\View\Element\Template"
+                   name="newsman.remarketing.page-view"
+                   before="-"
+                   template="Dazoot_Newsmanmarketing::html/page-view.phtml"
+                   ifconfig="newsmanmarketing/general/enable">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Dazoot\Newsmanmarketing\ViewModel\Marketing</argument>
+                </arguments>
+            </block>
         </referenceContainer>
     </body>
 </page>

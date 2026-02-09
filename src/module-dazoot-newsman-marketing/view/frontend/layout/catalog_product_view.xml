@@ -20,5 +20,6 @@
                 </arguments>
             </block>
         </referenceContainer>
+        <referenceBlock name="newsman.remarketing.page-view" remove="true" />
     </body>
 </page>

@@ -15,5 +15,6 @@
                 <argument name="cache_lifetime" xsi:type="boolean">false</argument>
             </arguments>
         </referenceBlock>
+        <referenceBlock name="newsman.remarketing.page-view" remove="true" />
     </body>
 </page>
