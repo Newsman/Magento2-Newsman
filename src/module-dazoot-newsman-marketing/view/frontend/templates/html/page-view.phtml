@@ -1,0 +1,20 @@
+<?php
+/**
+ * Copyright © Dazoot Software S.R.L. rights reserved.
+ * See LICENSE.txt for license details.
+ *
+ * @website https://www.newsman.ro/
+ */
+
+/** @var \Magento\Framework\View\Element\Template $block */
+/** @var \Dazoot\Newsmanmarketing\ViewModel\Marketing $viewModel */
+$viewModel = $block->getViewModel();
+if (!$viewModel->isActive()) {
+    return '';
+}
+?>
+<script>
+if (typeof _nzm !== 'undefined') {
+    _nzm.run('send', 'pageview');
+}
+</script>
