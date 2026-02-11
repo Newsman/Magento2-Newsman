@@ -28,21 +28,29 @@ class SaveConfigureList extends Action
     public const ADMIN_RESOURCE = 'Dazoot_Newsman::config_newsman';
 
     /**
+     * Config writer.
+     *
      * @var WriterInterface
      */
     protected WriterInterface $configWriter;
 
     /**
+     * Cache type list (for cleaning config cache).
+     *
      * @var TypeListInterface
      */
     protected TypeListInterface $cacheTypeList;
 
     /**
+     * Store manager instance.
+     *
      * @var StoreManagerInterface
      */
     protected StoreManagerInterface $storeManager;
 
     /**
+     * SaveConfigureList constructor.
+     *
      * @param Context $context
      * @param WriterInterface $configWriter
      * @param TypeListInterface $cacheTypeList
@@ -61,6 +69,8 @@ class SaveConfigureList extends Action
     }
 
     /**
+     * Persist selected list ID for the current scope and redirect back.
+     *
      * @return \Magento\Framework\App\ResponseInterface|Redirect|\Magento\Framework\Controller\ResultInterface
      */
     public function execute()
@@ -95,6 +105,8 @@ class SaveConfigureList extends Action
     }
 
     /**
+     * Resolve saved configuration scope (store/website/default).
+     *
      * @param string $website
      * @param string $store
      * @return array

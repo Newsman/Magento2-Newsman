@@ -22,6 +22,8 @@ class GetSegments extends AbstractService
     public const ENDPOINT = 'segment.all';
 
     /**
+     * Execute API call to retrieve all segments for the specified list.
+     *
      * @param ListContext $context
      * @return array
      * @throws LocalizedException

@@ -20,6 +20,8 @@ use Magento\Framework\Data\Form\Element\AbstractElement;
 class ConfigureWithLogin extends Field
 {
     /**
+     * Backend request instance.
+     *
      * @var RequestInterface
      */
     private $request;

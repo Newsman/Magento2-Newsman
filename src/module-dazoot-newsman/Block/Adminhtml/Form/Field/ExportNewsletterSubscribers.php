@@ -22,6 +22,8 @@ use Magento\Framework\Escaper;
 class ExportNewsletterSubscribers extends AbstractElement
 {
     /**
+     * Backend URL builder.
+     *
      * @var UrlInterface
      */
     protected $backendUrl;
@@ -45,6 +47,8 @@ class ExportNewsletterSubscribers extends AbstractElement
     }
 
     /**
+     * Render the Export Newsletter Subscribers button HTML.
+     *
      * @return string
      */
     public function getElementHtml()

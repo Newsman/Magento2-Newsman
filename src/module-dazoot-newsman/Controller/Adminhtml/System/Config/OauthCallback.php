@@ -30,31 +30,43 @@ class OauthCallback extends Action
     public const ADMIN_RESOURCE = 'Dazoot_Newsman::config_newsman';
 
     /**
+     * HTTP client.
+     *
      * @var Curl
      */
     protected Curl $curl;
 
     /**
+     * Config writer.
+     *
      * @var WriterInterface
      */
     protected WriterInterface $configWriter;
 
     /**
+     * Cache type list handler.
+     *
      * @var TypeListInterface
      */
     protected TypeListInterface $cacheTypeList;
 
     /**
+     * Store manager.
+     *
      * @var StoreManagerInterface
      */
     protected StoreManagerInterface $storeManager;
 
     /**
+     * Config encryptor.
+     *
      * @var EncryptorInterface
      */
     protected EncryptorInterface $encryptor;
 
     /**
+     * OauthCallback constructor.
+     *
      * @param Context $context
      * @param Curl $curl
      * @param WriterInterface $configWriter
@@ -79,6 +91,8 @@ class OauthCallback extends Action
     }
 
     /**
+     * Handle OAuth callback and persist credentials, then redirect.
+     *
      * @return Redirect
      */
     public function execute()
@@ -175,6 +189,8 @@ class OauthCallback extends Action
     }
 
     /**
+     * Resolve configuration scope by website/store parameters.
+     *
      * @param string $website
      * @param string $store
      * @return array
@@ -193,6 +209,8 @@ class OauthCallback extends Action
     }
 
     /**
+     * Build redirect back to Newsman configuration section.
+     *
      * @param array $params
      * @return Redirect
      */

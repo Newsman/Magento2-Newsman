@@ -16,6 +16,8 @@ class Info extends AbstractBlock implements
     RendererInterface
 {
     /**
+     * Backend request instance.
+     *
      * @var \Magento\Framework\App\RequestInterface
      */
     protected $_request;
