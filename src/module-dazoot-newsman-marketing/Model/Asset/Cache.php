@@ -35,26 +35,36 @@ class Cache
     public const FILE_LIFETIME = 86400;
 
     /**
+     * Filesystem component.
+     *
      * @var Filesystem
      */
     protected $filesystem;
 
     /**
+     * JSON serializer.
+     *
      * @var Json
      */
     protected $json;
 
     /**
+     * Module configuration.
+     *
      * @var Config
      */
     protected $config;
 
     /**
+     * Cache type list manager.
+     *
      * @var TypeListInterface
      */
     protected $cacheTypeList;
 
     /**
+     * Allowed file extensions for cached assets.
+     *
      * @var array
      */
     protected $allowedFileExtensions;
@@ -81,6 +91,8 @@ class Cache
     }
 
     /**
+     * Load cached content and headers for a given path.
+     *
      * @param string $path
      * @return false|DataObject
      * @throws FileSystemException
@@ -118,6 +130,8 @@ class Cache
     }
 
     /**
+     * Check if the given path has a non-expired cached entry.
+     *
      * @param string $path
      * @return bool
      * @throws FileSystemException
@@ -128,6 +142,8 @@ class Cache
     }
 
     /**
+     * Determine if a file is expired based on its stat data.
+     *
      * @param array $stat
      * @return bool
      */
@@ -137,6 +153,8 @@ class Cache
     }
 
     /**
+     * Save content and cache headers into media storage for the given path.
+     *
      * @param string $path
      * @param string $content
      * @param array $cacheHeaders
@@ -177,6 +195,8 @@ class Cache
     }
 
     /**
+     * Verify that all required files, based on configured patterns, are cached.
+     *
      * @return bool
      * @throws FileSystemException
      */
@@ -199,6 +219,8 @@ class Cache
     }
 
     /**
+     * Remove all cached assets and clean related block cache.
+     *
      * @return void
      * @throws FileSystemException
      */
@@ -216,6 +238,8 @@ class Cache
     }
 
     /**
+     * Clean cached blocks (script) and full page cache.
+     *
      * @return void
      */
     public function cleanScriptBlockCache()
@@ -225,6 +249,8 @@ class Cache
     }
 
     /**
+     * Normalize/adjust cache-related headers for consistent lifetime.
+     *
      * @param array $headers
      * @return array
      */
@@ -255,6 +281,8 @@ class Cache
     }
 
     /**
+     * Build relative cache directory path for the given absolute path.
+     *
      * @param string $path
      * @return string
      */
@@ -269,6 +297,8 @@ class Cache
     }
 
     /**
+     * Extract filename (with extension) from a path.
+     *
      * @param string $path
      * @return string|false
      */
@@ -280,6 +310,8 @@ class Cache
     }
 
     /**
+     * Get the relative directory part from a path.
+     *
      * @param string $path
      * @return string
      */
@@ -294,6 +326,8 @@ class Cache
     }
 
     /**
+     * Validate that the path has an allowed file extension.
+     *
      * @param string $path
      * @return bool
      */
@@ -310,6 +344,8 @@ class Cache
     }
 
     /**
+     * Get the module's relative working directory under media.
+     *
      * @return string
      */
     public function getRelativeWorkPath()
@@ -318,6 +354,8 @@ class Cache
     }
 
     /**
+     * Get the cache file lifetime in seconds.
+     *
      * @return int
      */
     public function getFileLifetime()

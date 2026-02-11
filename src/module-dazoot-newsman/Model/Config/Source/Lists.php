@@ -16,11 +16,15 @@ use Magento\Framework\Data\OptionSourceInterface;
 class Lists implements OptionSourceInterface
 {
     /**
+     * Newsman configuration model.
+     *
      * @var Config
      */
     protected $config;
 
     /**
+     * Cached options array.
+     *
      * @var array|null
      */
     protected $options;
@@ -64,6 +68,8 @@ class Lists implements OptionSourceInterface
     }
 
     /**
+     * Get label text by option value.
+     *
      * @param int $value
      * @return string
      */
