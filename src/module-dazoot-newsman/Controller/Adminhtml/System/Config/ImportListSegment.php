@@ -32,46 +32,64 @@ class ImportListSegment extends Action
     public const ADMIN_RESOURCE = 'Dazoot_Newsman::config_newsman';
 
     /**
+     * Result JSON factory.
+     *
      * @var JsonFactory
      */
     private $resultJsonFactory;
 
     /**
+     * HTML tag filter.
+     *
      * @var StripTags
      */
     private $tagFilter;
 
     /**
+     * Service to retrieve all Newsman lists.
+     *
      * @var GetListAll
      */
     protected $getListAll;
 
     /**
+     * Factory for building API user contexts.
+     *
      * @var UserContextFactory
      */
     protected $userContextFactory;
 
     /**
+     * Service to retrieve Newsman segments.
+     *
      * @var GetSegments
      */
     protected $getSegments;
 
     /**
+     * Factory for building list context objects.
+     *
      * @var ListContextFactory
      */
     protected $listContextFactory;
 
     /**
+     * Newsman module configuration.
+     *
      * @var Config
      */
     protected $config;
 
     /**
+     * Cache type list for cleaning config cache.
+     *
      * @var TypeListInterface
      */
     protected $cacheTypeList;
 
     /**
+     * ImportListSegment constructor.
+     *
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
      * @param StripTags $tagFilter

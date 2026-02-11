@@ -29,26 +29,36 @@ class TestCredentials extends Action
     public const ADMIN_RESOURCE = 'Dazoot_Newsman::config_newsman';
 
     /**
+     * Service used to validate credentials by fetching lists.
+     *
      * @var GetListAll
      */
     protected $getListAll;
 
     /**
+     * Factory for creating user context for API calls.
+     *
      * @var UserContextFactory
      */
     protected $userContextFactory;
 
     /**
+     * Newsman configuration model.
+     *
      * @var NewsmanConfig
      */
     protected $config;
 
     /**
+     * Store manager instance.
+     *
      * @var StoreManagerInterface
      */
     protected $storeManager;
 
     /**
+     * TestCredentials constructor.
+     *
      * @param Context $context
      * @param GetListAll $getListAll
      * @param UserContextFactory $userContextFactory
@@ -70,7 +80,7 @@ class TestCredentials extends Action
     }
 
     /**
-     * Execute: try to fetch lists using configured credentials and show a notice
+     * Attempt to fetch lists with stored credentials and display a notice.
      *
      * @return Redirect
      */
