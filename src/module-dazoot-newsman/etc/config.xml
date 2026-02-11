@@ -31,6 +31,7 @@
             <export>
                 <authorize_header_name />
                 <authorize_header_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <authenticate_token />
                 <customer_attributes_map />
                 <product_attributes_map />
                 <customer_send_telephone>0</customer_send_telephone>

@@ -125,7 +125,7 @@ class ImportListSegment extends Action
         $userId = $params['userId'];
 
         $apiKey = $params['apiKey'];
-        // User didn't set an apy key in input type password. Load it from configuration.
+        // User didn't set an apy key in the input type password. Load it from the configuration.
         if (stripos($params['apiKey'], '***') !== false) {
             if (isset($params['store']) && !empty($params['store'])) {
                 $apiKey = $this->config->getApiKey($params['store']);
