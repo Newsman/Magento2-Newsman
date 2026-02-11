@@ -1,0 +1,13 @@
+<?php
+/** @var $block \Dazoot\Newsman\Block\Adminhtml\System\Config\ConfigureWithLogin */
+$buttonLabel = $block->getData('button_label');
+$loginUrl = $block->getData('login_url');
+$htmlId = $block->getData('html_id');
+?>
+<div class="actions actions-validate newsman-configure-with-login">
+    <a id="<?= /* @noEscape */ $htmlId ?>_button"
+       class="action-default scalable primary"
+       href="<?= /* @noEscape */ $loginUrl ?>">
+        <span><?= $escaper->escapeHtml($buttonLabel) ?></span>
+    </a>
+</div>

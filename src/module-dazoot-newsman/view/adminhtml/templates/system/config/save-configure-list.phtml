@@ -1,0 +1,82 @@
+<?php
+/**
+ * Copyright © Dazoot Software S.R.L. rights reserved.
+ * See LICENSE.txt for license details.
+ *
+ * @website https://www.newsman.ro/
+ */
+
+/** @var $block \Dazoot\Newsman\Block\Adminhtml\System\Config\ConfigureList */
+?>
+<div>
+    <div class="page-main-actions">
+        <div class="page-actions">
+            <div class="page-actions-inner">
+                <div class="page-actions-buttons">
+                    <a href="<?= $block->getUrl('adminhtml/system_config/edit', ['section' => 'newsman'] + array_filter([
+                        'website' => $block->getRequest()->getParam('website'),
+                        'store' => $block->getRequest()->getParam('store')
+                    ])); ?>"
+                       class="action-default scalable back">
+                        <span><?= $escaper->escapeHtml(__('Back to Configuration')); ?></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="entry-edit form-inline">
+        <div class="fieldset-wrapper">
+            <div class="admin__fieldset-wrapper-content _hide">
+                <legend class="admin__legend <?= $escaper->escapeHtmlAttr($block->getHeaderCssClass()) ?>">
+                    <span><?= $escaper->escapeHtml($block->getHeaderText()) ?></span>
+                </legend><br>
+
+                <fieldset class="admin__fieldset">
+                    <legend class="admin__legend">
+                        <span><?= $escaper->escapeHtml(__('Please choose the Newsman email list to use for this scope. You can still synchronize lists and segments later from configuration.')); ?></span>
+                    </legend><br>
+                    <form action="<?= $block->getFormAction(); ?>" method="post" id="newsman-step3-form" class="admin__fieldset">
+                        <input type="hidden" name="form_key" value="<?= $escaper->escapeHtml($block->getFormKey()); ?>" />
+                        <?php if ($block->getRequest()->getParam('website')): ?>
+                            <input type="hidden" name="website" value="<?= $escaper->escapeHtmlAttr($block->getRequest()->getParam('website')); ?>" />
+                        <?php endif; ?>
+                        <?php if ($block->getRequest()->getParam('store')): ?>
+                            <input type="hidden" name="store" value="<?= $escaper->escapeHtmlAttr($block->getRequest()->getParam('store')); ?>" />
+                        <?php endif; ?>
+
+                        <div class="admin__field field">
+                            <div class="admin__field-label">
+                                <label class="label" for="newsman_step3_list_id">
+                                    <span><?= $escaper->escapeHtml(__('List ID')); ?></span>
+                                </label>
+                            </div>
+                            <div class="admin__field-control">
+                                <select name="list_id" id="newsman_step3_list_id" class="admin__control-select required-entry">
+                                    <?php foreach ($block->getListOptions() as $option): ?>
+                                        <option value="<?= $escaper->escapeHtmlAttr($option['value']); ?>"><?= $escaper->escapeHtml($option['label']); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="admin__field field">
+                            <div class="admin__field-label">
+                                <label class="label" for="newsman_step3_list_id">
+                                    <span>&nbsp;</span>
+                                </label>
+                            </div>
+                            <div class="admin__field-control">
+                                <div class="actions">
+                                    <button class="action-default scalable save primary" type="submit">
+                                        <span><?= $escaper->escapeHtml(__('Continue')); ?></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+</div>
