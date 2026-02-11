@@ -16,16 +16,22 @@ use Dazoot\Newsman\Model\Service\ContextInterface;
 class SetPurchaseStatusContext extends StoreContext
 {
     /**
+     * Increment ID of the order.
+     *
      * @var string
      */
     protected $orderId;
 
     /**
+     * Current state of the order.
+     *
      * @var string
      */
     protected $state;
 
     /**
+     * Set the order increment ID.
+     *
      * @param string $orderId
      * @return ContextInterface
      */
@@ -36,6 +42,8 @@ class SetPurchaseStatusContext extends StoreContext
     }
 
     /**
+     * Retrieve the order increment ID.
+     *
      * @return string
      */
     public function getOrderId()
@@ -44,6 +52,8 @@ class SetPurchaseStatusContext extends StoreContext
     }
 
     /**
+     * Set the order state.
+     *
      * @param string $state
      * @return $this
      */
@@ -54,6 +64,8 @@ class SetPurchaseStatusContext extends StoreContext
     }
 
     /**
+     * Retrieve the order state.
+     *
      * @return string
      */
     public function getState()

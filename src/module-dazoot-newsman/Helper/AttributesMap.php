@@ -15,11 +15,15 @@ use Magento\Store\Model\Store;
 class AttributesMap extends MapAbstract
 {
     /**
+     * Cache for attribute map values.
+     *
      * @var array
      */
     protected $valueCache = [];
 
     /**
+     * Check if the value is an encoded array field value.
+     *
      * @param string|array $value
      * @return bool
      */
@@ -41,6 +45,8 @@ class AttributesMap extends MapAbstract
     }
 
     /**
+     * Encode array field value.
+     *
      * @see \Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray
      *
      * @param array $value
@@ -66,6 +72,8 @@ class AttributesMap extends MapAbstract
     }
 
     /**
+     * Decode array field value.
+     *
      * @see \Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray
      *
      * @param array $value
@@ -97,6 +105,8 @@ class AttributesMap extends MapAbstract
     }
 
     /**
+     * Get configuration value by store ID.
+     *
      * @param int|Store $store
      * @return array
      * @throws LocalizedException
@@ -122,6 +132,8 @@ class AttributesMap extends MapAbstract
     }
 
     /**
+     * Normalize data by trimming whitespace.
+     *
      * @param string $value
      * @return string
      */
@@ -135,6 +147,8 @@ class AttributesMap extends MapAbstract
     }
 
     /**
+     * Check if the configuration value is empty for the given store.
+     *
      * @param null|string|bool|int|Store $store
      * @return bool
      */

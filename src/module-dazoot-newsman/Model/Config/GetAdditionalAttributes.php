@@ -14,11 +14,15 @@ use Magento\Framework\Exception\LocalizedException;
 class GetAdditionalAttributes
 {
     /**
+     * Retrieve the attributes mapper helper instance.
+     *
      * @var array
      */
     protected $attributes = [];
 
     /**
+     * Retrieve additional attributes mapping for the given store IDs.
+     *
      * @param array $storeIds
      * @return array
      * @throws LocalizedException
@@ -47,6 +51,8 @@ class GetAdditionalAttributes
     }
 
     /**
+     * Get configuration value for a specific store.
+     *
      * @param int $storeId
      * @return array
      * @throws LocalizedException

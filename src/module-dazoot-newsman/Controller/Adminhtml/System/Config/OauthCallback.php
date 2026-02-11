@@ -37,7 +37,7 @@ class OauthCallback extends Action
     protected Curl $curl;
 
     /**
-     * Config writer.
+     * Interface for writing system configuration.
      *
      * @var WriterInterface
      */
@@ -51,14 +51,14 @@ class OauthCallback extends Action
     protected TypeListInterface $cacheTypeList;
 
     /**
-     * Store manager.
+     * Interface for managing store instances.
      *
      * @var StoreManagerInterface
      */
     protected StoreManagerInterface $storeManager;
 
     /**
-     * Config encryptor.
+     * Config encryptor helper.
      *
      * @var EncryptorInterface
      */

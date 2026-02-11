@@ -21,6 +21,8 @@ class ExportCsvSubscribers extends AbstractService
     public const ENDPOINT = 'import.csv';
 
     /**
+     * Execute the CSV export API call.
+     *
      * @param ExportCsvSubscribersContext $context
      * @return array
      * @throws LocalizedException
@@ -63,8 +65,11 @@ class ExportCsvSubscribers extends AbstractService
     }
 
     /**
+     * Serialize CSV data from context for the API request.
+     *
      * @param ExportCsvSubscribersContext $context
-     * @return string void
+     * @param string $source
+     * @return string
      */
     public function serializeCsvData($context, $source = 'Magento2')
     {
@@ -110,6 +115,8 @@ class ExportCsvSubscribers extends AbstractService
     }
 
     /**
+     * Build the CSV header array based on context.
+     *
      * @param ExportCsvSubscribersContext $context
      * @return string[]
      */
@@ -138,6 +145,8 @@ class ExportCsvSubscribers extends AbstractService
     }
 
     /**
+     * Convert a data row into a CSV line.
+     *
      * @param array $row
      * @param int $key
      * @return string
@@ -149,6 +158,8 @@ class ExportCsvSubscribers extends AbstractService
     }
 
     /**
+     * Retrieve additional field names for the CSV from context.
+     *
      * @param ExportCsvSubscribersContext $context
      * @return array
      */

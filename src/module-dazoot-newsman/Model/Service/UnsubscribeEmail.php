@@ -21,6 +21,8 @@ class UnsubscribeEmail extends AbstractService
     public const ENDPOINT = 'subscriber.saveUnsubscribe';
 
     /**
+     * Execute the standard email unsubscription API call.
+     *
      * @param UnsubscribeEmailContext $context
      * @return array
      * @throws LocalizedException

@@ -18,27 +18,37 @@ use Magento\Store\Api\Data\StoreInterface;
 interface ServiceInterface
 {
     /**
+     * Create a new Newsman API context instance.
+     *
      * @return ContextInterface
      */
     public function createApiContext();
 
     /**
+     * Create a new Newsman API client instance.
+     *
      * @return ClientInterface
      */
     public function createApiClient();
 
     /**
+     * Set the store context for the service.
+     *
      * @param Store|StoreInterface $store
      * @return ServiceInterface
      */
     public function setStore($store);
 
     /**
+     * Retrieve the current store context.
+     *
      * @return Store|StoreInterface|null
      */
     public function getStore();
 
     /**
+     * Execute the Newsman service action.
+     *
      * @param ContextInterface $context
      * @return array
      */

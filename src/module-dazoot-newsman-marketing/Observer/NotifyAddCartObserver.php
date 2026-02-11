@@ -44,6 +44,8 @@ class NotifyAddCartObserver implements ObserverInterface
     }
 
     /**
+     * Notify Newsman after an item is successfully added to the cart.
+     *
      * @param EventObserver $observer
      * @return void
      */

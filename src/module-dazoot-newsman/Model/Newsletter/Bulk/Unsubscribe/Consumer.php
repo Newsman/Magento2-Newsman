@@ -214,6 +214,8 @@ class Consumer
     }
 
     /**
+     * Build context for email unsubscription API call.
+     *
      * @param Subscriber $subscriber
      * @param StoreInterface $store
      * @param string $ip
@@ -228,6 +230,8 @@ class Consumer
     }
 
     /**
+     * Trigger the unsubscription action for a subscriber.
+     *
      * @param Subscriber $subscriber
      * @return void
      */

@@ -229,6 +229,8 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
     }
 
     /**
+     * Check if the subscription action should use the Newsman double opt-in (init) flow.
+     *
      * @param Subscriber $subscriber
      * @param int $storeId
      * @return bool
@@ -243,6 +245,8 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
     }
 
     /**
+     * Build context for standard email subscription API call.
+     *
      * @param Subscriber $subscriber
      * @param StoreInterface $store
      * @param string $ip
@@ -267,6 +271,8 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
     }
 
     /**
+     * Build context for standard email unsubscription API call.
+     *
      * @param Subscriber $subscriber
      * @param StoreInterface $store
      * @param string $ip
@@ -281,6 +287,8 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
     }
 
     /**
+     * Build context for Newsman double opt-in (init) subscription API call.
+     *
      * @param Subscriber $subscriber
      * @param StoreInterface $store
      * @param string $ip
@@ -305,6 +313,8 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
     }
 
     /**
+     * Build context for Newsman double opt-in (init) unsubscription API call.
+     *
      * @param Subscriber $subscriber
      * @param StoreInterface $store
      * @param string $ip
@@ -319,6 +329,8 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
     }
 
     /**
+     * Retrieve customer model by email and store.
+     *
      * @param string $email
      * @param StoreInterface $store
      * @return Customer|null
@@ -336,6 +348,8 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
     }
 
     /**
+     * Extract additional Newsman properties from subscriber and customer data.
+     *
      * @param Subscriber $subscriber
      * @param StoreInterface $store
      * @param Customer|CustomerData|null $customer

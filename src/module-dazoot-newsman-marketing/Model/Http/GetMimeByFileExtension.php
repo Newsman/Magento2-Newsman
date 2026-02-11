@@ -76,6 +76,8 @@ class GetMimeByFileExtension
     }
 
     /**
+     * Retrieve the MIME type for a given file extension.
+     *
      * @param string $extension
      * @return string|false
      * @throws FileSystemException
@@ -138,6 +140,8 @@ class GetMimeByFileExtension
     }
 
     /**
+     * Get the mime type filename.
+     *
      * @return string
      */
     public function getMimeTypeFilename()
@@ -146,6 +150,8 @@ class GetMimeByFileExtension
     }
 
     /**
+     * Generate mime types from file contents.
+     *
      * @see https://www.php.net/manual/en/function.mime-content-type.php#107798
      *
      * @param string $contents
@@ -189,6 +195,8 @@ class GetMimeByFileExtension
     }
 
     /**
+     * Get the cache identifier for mime types.
+     *
      * @return string
      */
     public function getCacheId()
@@ -197,6 +205,8 @@ class GetMimeByFileExtension
     }
 
     /**
+     * Get the cache lifetime for mime types.
+     *
      * @return int
      */
     public function getCacheLifetime()
@@ -205,6 +215,8 @@ class GetMimeByFileExtension
     }
 
     /**
+     * Get the cache tags for mime types.
+     *
      * @return array
      */
     public function getCacheTags()

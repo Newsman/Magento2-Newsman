@@ -24,34 +24,49 @@ use Dazoot\Newsmanmarketing\Model\Service\SetPurchaseStatus;
  */
 class Consumer
 {
+    /**
+     * Maximum number of attempts to send a queued state.
+     */
     public const MAX_ATTEMPTS = 3;
 
     /**
+     * Module configuration.
+     *
      * @var Config
      */
     public $config;
 
     /**
+     * Order queue repository.
+     *
      * @var OrderQueueRepositoryInterface
      */
     protected $queueRepository;
 
     /**
+     * Store manager instance.
+     *
      * @var StoreManagerInterface
      */
     protected $storeManager;
 
     /**
+     * Factory for building order state API context.
+     *
      * @var SetPurchaseStatusContextFactory
      */
     protected $contextFactory;
 
     /**
+     * Service to send purchase status to Newsman.
+     *
      * @var SetPurchaseStatus
      */
     protected $setPurchaseStatus;
 
     /**
+     * Newsman logger.
+     *
      * @var Logger
      */
     protected $logger;
@@ -81,7 +96,10 @@ class Consumer
     }
 
     /**
+     * Process order state export for the specified order ID.
+     *
      * @param int $orderId
+     * @return void
      * @throws NoSuchEntityException
      */
     public function execute($orderId)
@@ -176,6 +194,8 @@ class Consumer
     }
 
     /**
+     * Mark an order queue entry as sent.
+     *
      * @param OrderQueueInterface $queue
      * @return void
      */
@@ -190,6 +210,8 @@ class Consumer
     }
 
     /**
+     * Trigger the order export service for a queue entry.
+     *
      * @param OrderQueueInterface $queue
      * @return void
      * @throws NoSuchEntityException
@@ -201,8 +223,10 @@ class Consumer
     }
 
     /**
+     * Build context for order status update API call.
+     *
      * @param OrderQueueInterface $queue
-     * @return mixed
+     * @return SetPurchaseStatusContext
      * @throws NoSuchEntityException
      */
     public function getOrderContext($queue)
@@ -215,6 +239,8 @@ class Consumer
     }
 
     /**
+     * Retrieve the configured maximum number of retry attempts.
+     *
      * @return int
      */
     public function getMaxAttempts()

@@ -22,6 +22,8 @@ class SetPurchaseStatus extends AbstractService
     public const ENDPOINT = 'remarketing.setPurchaseStatus';
 
     /**
+     * Execute the API call to update purchase status in Newsman.
+     *
      * @param SetPurchaseStatusContext $context
      * @return array
      * @throws LocalizedException

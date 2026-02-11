@@ -12,21 +12,29 @@ use Dazoot\Newsman\Model\Service\ContextInterface;
 class ExportCsvSubscribersContext extends StoreContext
 {
     /**
+     * CSV data for export.
+     *
      * @var array
      */
     protected $csvData;
 
     /**
+     * Store IDs involved in export.
+     *
      * @var array
      */
     protected $storeIds = [];
 
     /**
+     * Additional Newsman fields mapping.
+     *
      * @var array
      */
     protected $additionalFields = [];
 
     /**
+     * Set CSV data for export.
+     *
      * @param array $data
      * @return ContextInterface
      */
@@ -37,6 +45,8 @@ class ExportCsvSubscribersContext extends StoreContext
     }
 
     /**
+     * Get CSV data for export.
+     *
      * @return array
      */
     public function getCsvData()
@@ -45,6 +55,8 @@ class ExportCsvSubscribersContext extends StoreContext
     }
 
     /**
+     * Set store IDs for export.
+     *
      * @param array $storeIds
      * @return ContextInterface
      */
@@ -55,6 +67,8 @@ class ExportCsvSubscribersContext extends StoreContext
     }
 
     /**
+     * Get store IDs for export.
+     *
      * @return array
      */
     public function getStoreIds()
@@ -63,6 +77,8 @@ class ExportCsvSubscribersContext extends StoreContext
     }
 
     /**
+     * Set additional Newsman fields for export.
+     *
      * @param array $data
      * @return ContextInterface
      */
@@ -73,6 +89,8 @@ class ExportCsvSubscribersContext extends StoreContext
     }
 
     /**
+     * Get additional Newsman fields for export.
+     *
      * @return array
      */
     public function getAdditionalFields()

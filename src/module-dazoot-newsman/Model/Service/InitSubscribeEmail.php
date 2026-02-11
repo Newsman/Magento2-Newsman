@@ -21,6 +21,8 @@ class InitSubscribeEmail extends AbstractService
     public const ENDPOINT = 'subscriber.initSubscribe';
 
     /**
+     * Execute the double opt-in email subscription initialization.
+     *
      * @param InitSubscribeEmailContext $context
      * @return array
      * @throws LocalizedException
