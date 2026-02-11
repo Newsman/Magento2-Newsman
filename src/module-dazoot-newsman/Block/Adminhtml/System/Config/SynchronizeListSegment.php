@@ -20,6 +20,11 @@ class SynchronizeListSegment extends Field
     /**
      * @return $this
      */
+    /**
+     * Prepare layout and set template file for AJAX import button.
+     *
+     * @return $this
+     */
     protected function _prepareLayout()
     {
         parent::_prepareLayout();
@@ -31,6 +36,12 @@ class SynchronizeListSegment extends Field
      * @param AbstractElement $element
      * @return string
      */
+    /**
+     * Render field without scope selectors.
+     *
+     * @param AbstractElement $element
+     * @return string
+     */
     public function render(AbstractElement $element)
     {
         $element = clone $element;
@@ -39,6 +50,12 @@ class SynchronizeListSegment extends Field
     }
 
     /**
+     * @param AbstractElement $element
+     * @return string
+     */
+    /**
+     * Generate HTML for button and provide metadata for JS component.
+     *
      * @param AbstractElement $element
      * @return string
      */

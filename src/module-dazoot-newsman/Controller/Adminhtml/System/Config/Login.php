@@ -15,11 +15,11 @@ class Login extends Action
 {
     public const ADMIN_RESOURCE = 'Dazoot_Newsman::config_newsman';
 
-    public function __construct(Context $context)
-    {
-        parent::__construct($context);
-    }
-
+    /**
+     * Start OAuth flow by redirecting to Newsman authorize endpoint.
+     *
+     * @return Redirect
+     */
     public function execute()
     {
         $params = [];

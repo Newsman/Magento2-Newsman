@@ -12,6 +12,8 @@ use Dazoot\Newsman\Block\Adminhtml\Form\Field\Product\Attributes as ProductAttri
 class AttributesMap extends \Dazoot\Newsman\Block\Adminhtml\Form\Field\AttributesMap
 {
     /**
+     * Retrieve product attributes mapper.
+     *
      * @return string
      */
     public function getAttributesRendererClass()

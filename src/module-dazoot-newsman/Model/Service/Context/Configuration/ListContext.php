@@ -15,11 +15,15 @@ use Dazoot\Newsman\Model\Service\ContextInterface;
 class ListContext extends UserContext
 {
     /**
+     * Newsman list ID.
+     *
      * @var int
      */
     protected $listId;
 
     /**
+     * Set the Newsman list ID.
+     *
      * @param int $listId
      * @return ContextInterface
      */
@@ -30,6 +34,8 @@ class ListContext extends UserContext
     }
 
     /**
+     * Retrieve the Newsman list ID.
+     *
      * @return int
      */
     public function getListId()

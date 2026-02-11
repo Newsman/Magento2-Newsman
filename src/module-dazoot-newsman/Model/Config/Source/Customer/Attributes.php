@@ -27,11 +27,15 @@ class Attributes implements OptionSourceInterface
     }
 
     /**
+     * Options cache.
+     *
      * @var array
      */
     protected $options;
 
     /**
+     * Get options as an array.
+     *
      * @param boolean $isMultiselect
      * @return array
      */
@@ -58,6 +62,8 @@ class Attributes implements OptionSourceInterface
     }
 
     /**
+     * Sort option array by label.
+     *
      * @param array $option
      * @return array
      */

@@ -33,6 +33,8 @@ class Attributes extends Select
     }
 
     /**
+     * Set input name for the select element.
+     *
      * @param string $value
      * @return $this
      */
@@ -42,6 +44,8 @@ class Attributes extends Select
     }
 
     /**
+     * Render the block as HTML.
+     *
      * @return string
      */
     public function _toHtml()
@@ -59,6 +63,8 @@ class Attributes extends Select
     }
 
     /**
+     * Retrieve a list of attribute codes that are not allowed for mapping.
+     *
      * @return string[]
      */
     public function getDisallowedAttributesCodes()

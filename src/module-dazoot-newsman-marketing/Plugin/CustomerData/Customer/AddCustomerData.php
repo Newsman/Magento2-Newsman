@@ -38,6 +38,8 @@ class AddCustomerData
     }
 
     /**
+     * Add additional customer data to the customer section.
+     *
      * @param \Magento\Customer\CustomerData\Customer $subject
      * @param array $result
      * @return array

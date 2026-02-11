@@ -31,9 +31,12 @@ class Authenticator
     }
 
     /**
+     * Authenticate request by API key or alternate authorization key.
+     *
      * @param string $apiKey
      * @param StoreInterface $store
      * @return true
+     * @throws AuthenticatorException
      */
     public function authenticate($apiKey, $store)
     {

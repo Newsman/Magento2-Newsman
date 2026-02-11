@@ -86,7 +86,11 @@ class Coupons implements RetrieverInterface
     }
 
     /**
-     * @inheritdoc
+     * Process coupon generation and save based on provided data and store IDs.
+     *
+     * @param array $data
+     * @param array $storeIds
+     * @return array
      */
     public function process($data = [], $storeIds = [])
     {
@@ -149,6 +153,8 @@ class Coupons implements RetrieverInterface
     }
 
     /**
+     * Create and save a new coupon rule and code.
+     *
      * @param array $data
      * @param int $discountType
      * @param float $value
@@ -205,6 +211,8 @@ class Coupons implements RetrieverInterface
     }
 
     /**
+     * Add condition to the sales rule.
+     *
      * @param Rule $rule
      * @param array $data
      * @return void
@@ -234,6 +242,8 @@ class Coupons implements RetrieverInterface
     }
 
     /**
+     * Build standard rule name for a coupon code.
+     *
      * @param string $couponCode
      * @return string
      */
@@ -243,6 +253,8 @@ class Coupons implements RetrieverInterface
     }
 
     /**
+     * Build standard coupon description.
+     *
      * @param string $couponCode
      * @param float $value
      * @return string
@@ -253,6 +265,8 @@ class Coupons implements RetrieverInterface
     }
 
     /**
+     * Retrieve characters allowed in coupon codes.
+     *
      * @return string
      */
     public function getCouponCharacters()

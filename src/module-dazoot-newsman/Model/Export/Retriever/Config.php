@@ -145,6 +145,8 @@ class Config implements RetrieverInterface
     }
 
     /**
+     * Validate that configuration paths in the request are whitelisted.
+     *
      * @param array $config
      * @return true|array
      */
@@ -161,6 +163,8 @@ class Config implements RetrieverInterface
     }
 
     /**
+     * Resolve the store IDs that should be updated based on request parameters.
+     *
      * @param array $storeIds
      * @param bool $currentStoreOnly
      * @return array
@@ -176,6 +180,8 @@ class Config implements RetrieverInterface
     }
 
     /**
+     * Clean relevant caches after configuration update.
+     *
      * @return void
      */
     public function cleanCache()
@@ -186,6 +192,8 @@ class Config implements RetrieverInterface
     }
 
     /**
+     * Set the API key used in the current request for verification.
+     *
      * @param string $requestApyKey
      * @return void
      */

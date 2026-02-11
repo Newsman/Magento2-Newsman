@@ -105,7 +105,12 @@ class MassActionAbstract
     }
 
     /**
+     * Publish bulk operations for subscriber mass actions.
+     *
      * @param array $subscriberIds
+     * @param string $queue
+     * @param string $meta
+     * @param string $bulkDescription
      * @return void
      * @throws LocalizedException
      */
@@ -174,6 +179,8 @@ class MassActionAbstract
     }
 
     /**
+     * Build redirect response for mass actions.
+     *
      * @param \Magento\Newsletter\Controller\Adminhtml\Subscriber $subject
      * @param string $path
      * @param array $arguments

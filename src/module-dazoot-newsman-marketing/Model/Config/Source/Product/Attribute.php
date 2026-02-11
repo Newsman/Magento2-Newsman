@@ -53,6 +53,8 @@ class Attribute implements OptionSourceInterface
     }
 
     /**
+     * Get product attributes as an array of options.
+     *
      * @param bool $addEmpty
      * @return array
      */

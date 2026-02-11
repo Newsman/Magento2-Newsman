@@ -29,11 +29,15 @@ abstract class MapAbstract
     protected $scopeConfig;
 
     /**
+     * Map configuration path.
+     *
      * @var string
      */
     public $path;
 
     /**
+     * Map configuration prefix.
+     *
      * @var string
      */
     public $prefix;
@@ -144,6 +148,8 @@ abstract class MapAbstract
     }
 
     /**
+     * Normalize string value.
+     *
      * @param string $value
      * @return string
      */

@@ -71,6 +71,8 @@ class ScheduleOrderStateObserver implements ObserverInterface
     }
 
     /**
+     * Add new order state in queue and schedule for sending to Newsman API.
+     *
      * @param EventObserver $observer
      * @return void
      */
@@ -117,6 +119,8 @@ class ScheduleOrderStateObserver implements ObserverInterface
     }
 
     /**
+     * Check if the order state has changed.
+     *
      * @param Order $order
      * @return boolean
      */

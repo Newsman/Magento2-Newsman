@@ -112,6 +112,8 @@ class QueueRepository implements OrderQueueRepositoryInterface
     }
 
     /**
+     * Save order queue entry.
+     *
      * @param OrderQueueInterface $queue
      * @return OrderQueueInterface
      * @throws NoSuchEntityException If queue ID is sent but the queue not exists
@@ -126,7 +128,7 @@ class QueueRepository implements OrderQueueRepositoryInterface
                 $mergedData = array_merge($existingQueue->getData(), $queue->getData());
                 $queue->setData($mergedData);
             } catch (NoSuchEntityException $e) {
-                // pass through
+                $existingQueue = null;
             }
         }
 
@@ -135,6 +137,8 @@ class QueueRepository implements OrderQueueRepositoryInterface
     }
 
     /**
+     * Get order queue entry by ID.
+     *
      * @param int $queueId
      * @return OrderQueueInterface
      * @throws NoSuchEntityException If $queueId is not found
@@ -151,6 +155,8 @@ class QueueRepository implements OrderQueueRepositoryInterface
     }
 
     /**
+     * Get order queue entries by order ID and state.
+     *
      * @param int $orderId
      * @param string|null $state
      * @return OrderQueueInterface[]
@@ -197,6 +203,8 @@ class QueueRepository implements OrderQueueRepositoryInterface
     }
 
     /**
+     * Get order queue list by search criteria.
+     *
      * @param SearchCriteriaInterface $searchCriteria
      * @return OrderQueueSearchResultInterface
      */

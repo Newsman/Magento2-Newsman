@@ -110,6 +110,8 @@ class Scheduler
     }
 
     /**
+     * Schedule the asynchronous bulk export of newsletter subscribers.
+     *
      * @param int $listId
      * @return void
      */
@@ -204,6 +206,8 @@ class Scheduler
     }
 
     /**
+     * Retrieve the total number of subscribers identified for export.
+     *
      * @return int
      */
     public function getCountSubscribers()

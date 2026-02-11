@@ -116,6 +116,8 @@ class Processor
     }
 
     /**
+     * Extract API key from request data.
+     *
      * @param string $code
      * @param array $data
      * @return string
@@ -129,6 +131,8 @@ class Processor
     }
 
     /**
+     * Determine retriever code from request data.
+     *
      * @param array $data
      * @return false|string
      */

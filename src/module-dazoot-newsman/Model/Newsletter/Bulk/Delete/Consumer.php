@@ -20,6 +20,8 @@ class Consumer extends \Dazoot\Newsman\Model\Newsletter\Bulk\Unsubscribe\Consume
     protected $name = 'Bulk Delete Subscriber Consumer';
 
     /**
+     * Trigger the deletion action for a subscriber.
+     *
      * @param Subscriber $subscriber
      * @return void
      */
