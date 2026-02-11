@@ -117,6 +117,11 @@ class Config
     public const XML_PATH_EXPORT_AUTHORIZE_HEADER_KEY = 'newsman/export/authorize_header_key';
 
     /**
+     * Export authenticate token path
+     */
+    public const XML_PATH_EXPORT_AUTHENTICATE_TOKEN = 'newsman/export/authenticate_token';
+
+    /**
      * Export customer attributes map path
      */
     public const XML_PATH_EXPORT_CUSTOMER_ATTRIBUTES_MAP = 'newsman/export/customer_attributes_map';
