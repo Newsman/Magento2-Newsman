@@ -22,6 +22,8 @@ class GetListAll extends AbstractService
     public const ENDPOINT = 'list.all';
 
     /**
+     * Execute API call to retrieve all newsletter lists for the user.
+     *
      * @param UserContext $context
      * @return array
      * @throws LocalizedException

@@ -34,51 +34,71 @@ class ConfigureList extends Action
     public const ADMIN_RESOURCE = 'Dazoot_Newsman::config_newsman';
 
     /**
+     * Store configuration reader.
+     *
      * @var ScopeConfigInterface
      */
     protected ScopeConfigInterface $scopeConfig;
 
     /**
+     * Store manager instance.
+     *
      * @var StoreManagerInterface
      */
     protected StoreManagerInterface $storeManager;
 
     /**
+     * Service used to fetch all Newsman lists.
+     *
      * @var GetListAll
      */
     protected GetListAll $getListAll;
 
     /**
+     * Service used to fetch Newsman segments.
+     *
      * @var GetSegments
      */
     protected GetSegments $getSegments;
 
     /**
+     * Factory for creating user API contexts.
+     *
      * @var UserContextFactory
      */
     protected UserContextFactory $userContextFactory;
 
     /**
+     * Factory for creating list API contexts.
+     *
      * @var ListContextFactory
      */
     protected ListContextFactory $listContextFactory;
 
     /**
+     * Newsman configuration model.
+     *
      * @var NewsmanConfig
      */
     protected NewsmanConfig $config;
 
     /**
+     * Cache type list (for cleaning config cache).
+     *
      * @var TypeListInterface
      */
     protected TypeListInterface $cacheTypeList;
 
     /**
+     * Tag filter for safe admin messages.
+     *
      * @var StripTags
      */
     protected StripTags $tagFilter;
 
     /**
+     * ConfigureList constructor.
+     *
      * @param Context $context
      * @param ScopeConfigInterface $scopeConfig
      * @param StoreManagerInterface $storeManager
@@ -115,6 +135,8 @@ class ConfigureList extends Action
     }
 
     /**
+     * Build the Configure List page and ensure lists/segments are synchronized.
+     *
      * @return \Magento\Framework\Controller\Result\Redirect|\Magento\Framework\Controller\ResultInterface
      * @throws LocalizedException
      */
@@ -174,6 +196,8 @@ class ConfigureList extends Action
     }
 
     /**
+     * Resolve scope (store/website/default) from request parameters.
+     *
      * @param string $website
      * @param string $store
      * @return array
@@ -193,6 +217,8 @@ class ConfigureList extends Action
     }
 
     /**
+     * Retrieve stored Newsman credentials for the resolved scope.
+     *
      * @param string $scope
      * @param int|null $scopeId
      * @param string $website
