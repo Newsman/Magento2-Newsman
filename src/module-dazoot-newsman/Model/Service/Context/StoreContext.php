@@ -16,11 +16,15 @@ use Magento\Store\Api\Data\StoreInterface;
 class StoreContext extends AbstractContext
 {
     /**
+     * Store instance.
+     *
      * @var StoreInterface
      */
     protected $store;
 
     /**
+     * Set store instance.
+     *
      * @param StoreInterface $store
      * @return ContextInterface
      */
@@ -31,6 +35,8 @@ class StoreContext extends AbstractContext
     }
 
     /**
+     * Retrieve store instance.
+     *
      * @return StoreInterface
      */
     public function getStore()

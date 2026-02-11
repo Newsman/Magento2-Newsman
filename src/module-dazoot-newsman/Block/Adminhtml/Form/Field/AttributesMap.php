@@ -16,6 +16,8 @@ use Magento\Framework\View\Element\Html\Select;
 class AttributesMap extends AbstractFieldArray
 {
     /**
+     * Entity attributes column renderer.
+     *
      * @var Select
      */
     protected $attributesRenderer;
@@ -39,6 +41,8 @@ class AttributesMap extends AbstractFieldArray
     }
 
     /**
+     * Get the class name for attributes renderer.
+     *
      * @return mixed
      * @throws LocalizedException
      */
@@ -48,6 +52,8 @@ class AttributesMap extends AbstractFieldArray
     }
 
     /**
+     * Prepare column and button for the field array.
+     *
      * @return void
      * @throws LocalizedException
      */
@@ -63,6 +69,8 @@ class AttributesMap extends AbstractFieldArray
     }
 
     /**
+     * Prepare data for a single row in the field array.
+     *
      * @param DataObject $row
      * @return void
      * @throws LocalizedException
@@ -81,6 +89,8 @@ class AttributesMap extends AbstractFieldArray
     }
 
     /**
+     * Render the field HTML.
+     *
      * @param AbstractElement $element
      * @return string
      */
@@ -95,6 +105,8 @@ class AttributesMap extends AbstractFieldArray
     }
 
     /**
+     * Render the value HTML for the field.
+     *
      * @param AbstractElement $element
      * @return string
      */

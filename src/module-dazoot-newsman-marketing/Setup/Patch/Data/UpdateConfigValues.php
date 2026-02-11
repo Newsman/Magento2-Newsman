@@ -41,7 +41,8 @@ class UpdateConfigValues implements DataPatchInterface
             'newsmanmarketing/tracking/script_url' => 'https://t.newsmanapp.com/jt/t.js',
             'newsmanmarketing/http/resources_url' => 'https://t.newsmanapp.com/',
             'newsmanmarketing/http/tracking_url' => 'https://rtrack.newsmanapp.com/',
-            'newsmanmarketing/http/required_file_patterns' => "jt/t.js\njt/nzm_custom_{{api_key}}.js\njt/ecommerce.js\njt/modal_{{api_key}}.js",
+            'newsmanmarketing/http/required_file_patterns' =>
+                "jt/t.js\njt/nzm_custom_{{api_key}}.js\njt/ecommerce.js\njt/modal_{{api_key}}.js",
         ];
 
         $tableName = $this->moduleDataSetup->getTable('core_config_data');

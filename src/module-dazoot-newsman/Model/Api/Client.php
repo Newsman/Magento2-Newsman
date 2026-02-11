@@ -73,6 +73,9 @@ class Client implements ClientInterface
 
     /**
      * @inheritdoc
+     * @param ContextInterface $context
+     * @param array $params
+     * @return array
      */
     public function get($context, $params = [])
     {
@@ -81,6 +84,10 @@ class Client implements ClientInterface
 
     /**
      * @inheritdoc
+     * @param ContextInterface $context
+     * @param array $getParams
+     * @param array $postParams
+     * @return array
      */
     public function post($context, $getParams = [], $postParams = [])
     {
@@ -89,6 +96,11 @@ class Client implements ClientInterface
 
     /**
      * @inheritdoc
+     * @param ContextInterface $context
+     * @param string $method
+     * @param array $getParams
+     * @param array $postParams
+     * @return array
      */
     public function request($context, $method, $getParams = [], $postParams = [])
     {
@@ -173,6 +185,8 @@ class Client implements ClientInterface
     }
 
     /**
+     * Parse API error from the result.
+     *
      * @param array $result
      * @return array|false
      */

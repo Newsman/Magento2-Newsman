@@ -267,6 +267,8 @@ class Consumer
     }
 
     /**
+     * Validate the asynchronous operation data.
+     *
      * @param array $data
      * @return void
      * @throws LocalizedException
@@ -300,6 +302,8 @@ class Consumer
     }
 
     /**
+     * Get CSV export context for Newsman API.
+     *
      * @param array $data
      * @param StoreInterface $store
      * @param array $storeIds
@@ -316,6 +320,8 @@ class Consumer
     }
 
     /**
+     * Build row data for a single subscriber including additional attributes.
+     *
      * @param Subscriber $subscriber
      * @param string $firstname
      * @param string $lastname
@@ -364,7 +370,7 @@ class Consumer
     }
 
     /**
-     * Create subscriber collection
+     * Create subscriber collection for export chunk.
      *
      * @param array $storeIds
      * @param int $chunkSize
@@ -384,7 +390,7 @@ class Consumer
     }
 
     /**
-     * Process subscriber collection for 3rd party plugins
+     * Hook for 3rd party modules to modify the subscriber collection.
      *
      * @param Collection $collection
      * @param array $storeIds
@@ -398,7 +404,7 @@ class Consumer
     }
 
     /**
-     * Create customer collection
+     * Create customer collection for mapping data to subscribers.
      *
      * @param array $storeIds
      * @param array $emails
@@ -423,7 +429,7 @@ class Consumer
     }
 
     /**
-     * Process customer collection for 3rd party plugins
+     * Hook for 3rd party modules to modify the customer collection.
      *
      * @param CustomerCollection $collection
      * @param array $storeIds
@@ -436,7 +442,10 @@ class Consumer
     }
 
     /**
+     * Extract relevant customer data from the collection.
+     *
      * @param CustomerCollection $collection
+     * @param array $storeIds
      * @return array
      * @throws LocalizedException
      */
@@ -487,6 +496,8 @@ class Consumer
     }
 
     /**
+     * Retrieve additional attributes mapping for the given store IDs.
+     *
      * @param array $storeIds
      * @return array
      * @throws LocalizedException

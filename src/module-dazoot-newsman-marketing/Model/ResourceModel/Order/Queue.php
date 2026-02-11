@@ -59,7 +59,9 @@ class Queue extends AbstractDb implements OrderQueueResourceInterface
     }
 
     /**
-     * @inheritDoc
+     * Retrieve the connection instance for the resource.
+     *
+     * @return \Magento\Framework\DB\Adapter\AdapterInterface
      */
     public function getConnection()
     {
@@ -67,6 +69,8 @@ class Queue extends AbstractDb implements OrderQueueResourceInterface
     }
 
     /**
+     * Load an object.
+     *
      * @param AbstractModel $object
      * @param mixed $value
      * @param string $field field to load by (defaults to model id)
@@ -80,6 +84,8 @@ class Queue extends AbstractDb implements OrderQueueResourceInterface
     }
 
     /**
+     * Save an object.
+     *
      * @param AbstractModel $object
      * @return $this
      * @throws Exception
@@ -91,6 +97,8 @@ class Queue extends AbstractDb implements OrderQueueResourceInterface
     }
 
     /**
+     * Delete an object.
+     *
      * @param AbstractModel $object
      * @return $this
      * @throws Exception

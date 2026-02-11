@@ -26,6 +26,12 @@ class ConfigureWithLogin extends Field
      */
     private $request;
 
+    /**
+     * Constructor.
+     *
+     * @param Context $context
+     * @param array $data
+     */
     public function __construct(
         Context $context,
         array $data = []
@@ -34,6 +40,11 @@ class ConfigureWithLogin extends Field
         $this->request = $context->getRequest();
     }
 
+    /**
+     * Prepare layout and set template.
+     *
+     * @return $this
+     */
     protected function _prepareLayout()
     {
         parent::_prepareLayout();
@@ -41,6 +52,12 @@ class ConfigureWithLogin extends Field
         return $this;
     }
 
+    /**
+     * Render form field element without scope controls.
+     *
+     * @param AbstractElement $element
+     * @return string
+     */
     public function render(AbstractElement $element)
     {
         $element = clone $element;
@@ -48,6 +65,12 @@ class ConfigureWithLogin extends Field
         return parent::render($element);
     }
 
+    /**
+     * Build button HTML and provide URL with current scope params.
+     *
+     * @param AbstractElement $element
+     * @return string
+     */
     protected function _getElementHtml(AbstractElement $element)
     {
         $originalData = $element->getOriginalData();

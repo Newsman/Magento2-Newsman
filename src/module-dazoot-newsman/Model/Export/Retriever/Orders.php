@@ -227,6 +227,8 @@ class Orders implements RetrieverInterface
     }
 
     /**
+     * Map order data into an export row.
+     *
      * @param OrderInterface $order
      * @return array
      */

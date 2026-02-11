@@ -19,6 +19,8 @@ use Dazoot\Newsmanmarketing\Api\Data\OrderQueueSearchResultInterface;
 interface OrderQueueRepositoryInterface
 {
     /**
+     * Save order queue entry.
+     *
      * @param OrderQueueInterface $queue
      * @return OrderQueueInterface
      * @throws NoSuchEntityException
@@ -27,6 +29,8 @@ interface OrderQueueRepositoryInterface
     public function save(OrderQueueInterface $queue);
 
     /**
+     * Retrieve order queue entry by ID.
+     *
      * @param int $queueId
      * @return OrderQueueInterface
      * @throws NoSuchEntityException
@@ -35,12 +39,16 @@ interface OrderQueueRepositoryInterface
     public function getById($queueId);
 
     /**
+     * Retrieve order queue entries matching search criteria.
+     *
      * @param SearchCriteriaInterface $searchCriteria
      * @return OrderQueueSearchResultInterface
      */
     public function getList(SearchCriteriaInterface $searchCriteria);
 
     /**
+     * Retrieve order queue entries by order ID and optional state.
+     *
      * @param int $orderId
      * @param string|null $state
      * @return OrderQueueInterface[]
@@ -49,6 +57,8 @@ interface OrderQueueRepositoryInterface
     public function getByOrderId($orderId, $state = null);
 
     /**
+     * Delete order queue entry by ID.
+     *
      * @param int $queueId
      * @return bool
      * @throws NoSuchEntityException

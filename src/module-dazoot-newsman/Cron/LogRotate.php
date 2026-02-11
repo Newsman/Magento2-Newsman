@@ -49,6 +49,8 @@ class LogRotate
     }
 
     /**
+     * Execute the log rotation cron job.
+     *
      * @return void
      * @throws FileSystemException
      */

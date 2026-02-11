@@ -57,6 +57,8 @@ class Purchase extends Marketing
     }
 
     /**
+     * Retrieve marketing data for the given order IDs.
+     *
      * @see https://kb.newsman.ro/remarketing-javascript-api-pentru-dezvoltatori/
      *
      * @param array $orderIds

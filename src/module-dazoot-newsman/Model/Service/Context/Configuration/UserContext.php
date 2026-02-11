@@ -16,16 +16,22 @@ use Dazoot\Newsman\Model\Service\ContextInterface;
 class UserContext extends AbstractContext
 {
     /**
+     * Newsman user ID.
+     *
      * @var string|int
      */
     protected $userId;
 
     /**
+     * Newsman API key.
+     *
      * @var string
      */
     protected $apiKey;
 
     /**
+     * Set the Newsman user ID.
+     *
      * @param string|int $userId
      * @return ContextInterface
      */
@@ -36,6 +42,8 @@ class UserContext extends AbstractContext
     }
 
     /**
+     * Retrieve the Newsman user ID.
+     *
      * @return int|string
      */
     public function getUserId()
@@ -44,6 +52,8 @@ class UserContext extends AbstractContext
     }
 
     /**
+     * Set the Newsman API key.
+     *
      * @param string $apiKey
      * @return ContextInterface
      */
@@ -54,6 +64,8 @@ class UserContext extends AbstractContext
     }
 
     /**
+     * Retrieve the Newsman API key.
+     *
      * @return string
      */
     public function getApiKey()

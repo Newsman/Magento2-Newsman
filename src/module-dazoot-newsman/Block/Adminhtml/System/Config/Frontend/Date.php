@@ -17,6 +17,8 @@ use Magento\Framework\Stdlib\DateTime;
 class Date extends Field
 {
     /**
+     * Render the date field element.
+     *
      * @param AbstractElement $element
      * @return string
      */

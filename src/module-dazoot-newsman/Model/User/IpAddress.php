@@ -41,6 +41,7 @@ class IpAddress implements IpAddressInterface
      * @param RequestInterface $request
      * @param Config $config
      * @param HostIpAddress $hostIpAddress
+     * @param RemoteAddress $remoteAddress
      */
     public function __construct(
         RequestInterface $request,

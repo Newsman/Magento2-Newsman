@@ -47,6 +47,8 @@ class CleanAssets
     }
 
     /**
+     * Execute the cron job to clean Newsman Marketing assets.
+     *
      * @return void
      */
     public function execute()

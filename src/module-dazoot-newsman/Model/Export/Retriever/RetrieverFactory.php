@@ -28,6 +28,8 @@ class RetrieverFactory
     }
 
     /**
+     * Create a retriever instance of the specified class.
+     *
      * @param string $className
      * @param array $data
      * @return RetrieverInterface

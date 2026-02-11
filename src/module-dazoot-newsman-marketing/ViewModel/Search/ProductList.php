@@ -18,6 +18,8 @@ use Magento\Framework\View\LayoutInterface;
 class ProductList extends Marketing
 {
     /**
+     * Retrieve marketing data for the current search result list.
+     *
      * @param LayoutInterface $layout
      * @return array
      */

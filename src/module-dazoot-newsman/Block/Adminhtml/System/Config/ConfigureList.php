@@ -21,6 +21,14 @@ class ConfigureList extends Template
     /** @var FormKey */
     protected $formKey;
 
+    /**
+     * Constructor.
+     *
+     * @param Context $context
+     * @param NewsmanConfig $config
+     * @param FormKey $formKey
+     * @param array $data
+     */
     public function __construct(
         Context $context,
         NewsmanConfig $config,
@@ -33,6 +41,11 @@ class ConfigureList extends Template
         $this->setTemplate('Dazoot_Newsman::system/config/save-configure-list.phtml');
     }
 
+    /**
+     * Get form action URL preserving current scope.
+     *
+     * @return string
+     */
     public function getFormAction(): string
     {
         $params = [];
@@ -46,11 +59,21 @@ class ConfigureList extends Template
         return $this->getUrl('newsman/system_config/saveConfigureList', $params);
     }
 
+    /**
+     * Get Magento form key value for CSRF protection.
+     *
+     * @return string
+     */
     public function getFormKey(): string
     {
         return $this->formKey->getFormKey();
     }
 
+    /**
+     * Build list options with only newsletter-type lists.
+     *
+     * @return array
+     */
     public function getListOptions(): array
     {
         $options = [["value" => '', "label" => (string)__("Please choose a list")]];

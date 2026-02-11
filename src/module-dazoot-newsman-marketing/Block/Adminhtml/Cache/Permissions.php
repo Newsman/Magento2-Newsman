@@ -28,6 +28,8 @@ class Permissions implements ArgumentInterface
     }
 
     /**
+     * Check if user has access to flush assets.
+     *
      * @return bool
      */
     public function hasAccessToFlushAssets()

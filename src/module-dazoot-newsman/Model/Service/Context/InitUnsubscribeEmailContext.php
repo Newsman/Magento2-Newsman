@@ -15,11 +15,15 @@ use Dazoot\Newsman\Model\Service\ContextInterface;
 class InitUnsubscribeEmailContext extends UnsubscribeEmailContext
 {
     /**
+     * Additional options for initialization.
+     *
      * @var array|null
      */
     protected $options;
 
     /**
+     * Set initialization options.
+     *
      * @param string $options
      * @return ContextInterface
      */
@@ -30,6 +34,8 @@ class InitUnsubscribeEmailContext extends UnsubscribeEmailContext
     }
 
     /**
+     * Retrieve initialization options.
+     *
      * @return array|string
      */
     public function getOptions()

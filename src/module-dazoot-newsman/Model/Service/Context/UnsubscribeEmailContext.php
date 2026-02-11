@@ -15,16 +15,22 @@ use Dazoot\Newsman\Model\Service\ContextInterface;
 class UnsubscribeEmailContext extends StoreContext
 {
     /**
+     * Email address.
+     *
      * @var string
      */
     protected $email;
 
     /**
+     * IP address.
+     *
      * @var string
      */
     protected $ip;
 
     /**
+     * Set email address.
+     *
      * @param string $email
      * @return ContextInterface
      */
@@ -35,6 +41,8 @@ class UnsubscribeEmailContext extends StoreContext
     }
 
     /**
+     * Retrieve email address.
+     *
      * @return string
      */
     public function getEmail()
@@ -43,6 +51,8 @@ class UnsubscribeEmailContext extends StoreContext
     }
 
     /**
+     * Set IP address.
+     *
      * @param string $ip
      * @return ContextInterface
      */
@@ -53,6 +63,8 @@ class UnsubscribeEmailContext extends StoreContext
     }
 
     /**
+     * Retrieve IP address.
+     *
      * @return string
      */
     public function getIp()

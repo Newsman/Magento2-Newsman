@@ -28,7 +28,7 @@ class SaveConfigureList extends Action
     public const ADMIN_RESOURCE = 'Dazoot_Newsman::config_newsman';
 
     /**
-     * Config writer.
+     * Interface for writing configuration data.
      *
      * @var WriterInterface
      */
@@ -83,7 +83,10 @@ class SaveConfigureList extends Action
             $this->messageManager->addErrorMessage(__('List ID is required.'));
             /** @var Redirect $resultRedirect */
             $resultRedirect = $this->resultRedirectFactory->create();
-            return $resultRedirect->setPath('newsman/system_config/configureList', array_filter(['website' => $website, 'store' => $store]));
+            return $resultRedirect->setPath(
+                'newsman/system_config/configureList',
+                array_filter(['website' => $website, 'store' => $store])
+            );
         }
 
         [$scope, $scopeId] = $this->resolveScope($website, $store);
@@ -96,12 +99,18 @@ class SaveConfigureList extends Action
             $this->messageManager->addErrorMessage(__('Could not save list: %1', $e->getMessage()));
             /** @var Redirect $resultRedirect */
             $resultRedirect = $this->resultRedirectFactory->create();
-            return $resultRedirect->setPath('newsman/system_config/configureList', array_filter(['website' => $website, 'store' => $store]));
+            return $resultRedirect->setPath(
+                'newsman/system_config/configureList',
+                array_filter(['website' => $website, 'store' => $store])
+            );
         }
 
         /** @var Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
-        return $resultRedirect->setPath('adminhtml/system_config/edit', ['section' => 'newsman'] + array_filter(['website' => $website, 'store' => $store]));
+        return $resultRedirect->setPath(
+            'adminhtml/system_config/edit',
+            ['section' => 'newsman'] + array_filter(['website' => $website, 'store' => $store])
+        );
     }
 
     /**

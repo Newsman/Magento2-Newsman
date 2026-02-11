@@ -15,21 +15,29 @@ use Dazoot\Newsman\Model\Service\ContextInterface;
 class SubscribeEmailContext extends UnsubscribeEmailContext
 {
     /**
+     * Customer first name.
+     *
      * @var string
      */
     protected $firstname;
 
     /**
+     * Customer last name.
+     *
      * @var string
      */
     protected $lastname;
 
     /**
+     * Additional Newsman subscriber properties.
+     *
      * @var array
      */
     protected $properties = [];
 
     /**
+     * Set customer first name.
+     *
      * @param string $firstname
      * @return ContextInterface
      */
@@ -40,6 +48,8 @@ class SubscribeEmailContext extends UnsubscribeEmailContext
     }
 
     /**
+     * Get customer first name or null value placeholder.
+     *
      * @return string
      */
     public function getFirstsname()
@@ -51,6 +61,8 @@ class SubscribeEmailContext extends UnsubscribeEmailContext
     }
 
     /**
+     * Set customer last name.
+     *
      * @param string $lastname
      * @return ContextInterface
      */
@@ -61,6 +73,8 @@ class SubscribeEmailContext extends UnsubscribeEmailContext
     }
 
     /**
+     * Get customer last name or null value placeholder.
+     *
      * @return string
      */
     public function getLastsname()
@@ -72,6 +86,8 @@ class SubscribeEmailContext extends UnsubscribeEmailContext
     }
 
     /**
+     * Set Newsman subscriber properties.
+     *
      * @param array $properties
      * @return ContextInterface
      */
@@ -82,6 +98,8 @@ class SubscribeEmailContext extends UnsubscribeEmailContext
     }
 
     /**
+     * Get Newsman subscriber properties.
+     *
      * @return array
      */
     public function getProperties()

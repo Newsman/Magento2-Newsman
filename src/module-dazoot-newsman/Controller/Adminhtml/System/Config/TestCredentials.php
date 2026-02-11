@@ -105,7 +105,8 @@ class TestCredentials extends Action
                 $effectiveStore = $this->storeManager->getWebsite($websiteParam)->getDefaultStore()->getId();
             }
         } catch (\Exception $e) {
-            // leave $effectiveStore as null (default scope)
+            // Keep default scope when resolving scope fails
+            $effectiveStore = null;
         }
 
         $userId = (int)$this->config->getUserId($effectiveStore);

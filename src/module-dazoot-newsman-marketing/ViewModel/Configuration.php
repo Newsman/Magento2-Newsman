@@ -30,6 +30,8 @@ class Configuration implements ArgumentInterface
     }
 
     /**
+     * Check if Newsman Marketing is active for the current store.
+     *
      * @return bool
      */
     public function isActive()
@@ -38,6 +40,8 @@ class Configuration implements ArgumentInterface
     }
 
     /**
+     * Check if Newsman Marketing is active for any store.
+     *
      * @return bool
      */
     public function isAnyActive()

@@ -116,6 +116,8 @@ class HostIpAddress implements IpAddressInterface
     }
 
     /**
+     * Look up the IP address by making a HEAD request to the given URL.
+     *
      * @param string $url
      * @return string
      */
@@ -141,6 +143,8 @@ class HostIpAddress implements IpAddressInterface
     }
 
     /**
+     * Retrieve the URL used for IP lookup (usually the store logo URL).
+     *
      * @return string
      */
     public function getUrl()

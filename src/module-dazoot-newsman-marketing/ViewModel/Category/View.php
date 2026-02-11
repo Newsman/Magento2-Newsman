@@ -19,6 +19,8 @@ use Magento\Framework\View\LayoutInterface;
 class View extends Marketing
 {
     /**
+     * Retrieve marketing data for the current category view.
+     *
      * @param Category $category
      * @param LayoutInterface $layout
      * @return array

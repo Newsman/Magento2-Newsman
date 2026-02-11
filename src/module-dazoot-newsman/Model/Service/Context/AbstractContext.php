@@ -16,6 +16,8 @@ use Magento\Store\Api\Data\StoreInterface;
 class AbstractContext implements ContextInterface
 {
     /**
+     * Retrieve the Newsman API null value placeholder.
+     *
      * @return string
      */
     public function getNullValue()

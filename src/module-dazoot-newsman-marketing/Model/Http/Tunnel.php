@@ -86,6 +86,8 @@ class Tunnel
     }
 
     /**
+     * Perform an HTTP request through the Newsman tunnel.
+     *
      * @param string $tunnelUrl
      * @param string $method
      * @param string $requestUri
@@ -218,6 +220,8 @@ class Tunnel
     }
 
     /**
+     * Filter request headers by removing disallowed entries.
+     *
      * @param array $headers
      * @return array
      */
@@ -242,6 +246,8 @@ class Tunnel
     }
 
     /**
+     * Get a list of headers that are disallowed for outgoing requests.
+     *
      * @return string[]
      */
     public function getDisallowedSentHeaders()
@@ -258,6 +264,8 @@ class Tunnel
     }
 
     /**
+     * Filter outgoing cookies based on disallowed list.
+     *
      * @see Cookie
      *
      * @param string $cookies
@@ -290,7 +298,8 @@ class Tunnel
     }
 
     /**
-     * @see https://experienceleague.adobe.com/en/docs/commerce-admin/start/compliance/privacy/compliance-cookie-law
+     * Get a list of cookies that are disallowed for outgoing requests.
+     *
      * @return string[]
      */
     public function getDisallowedSentCookies()
@@ -335,6 +344,8 @@ class Tunnel
     }
 
     /**
+     * Filter received headers by removing disallowed entries and ensuring content-type.
+     *
      * @param array $headers
      * @param string $url
      * @return array
@@ -374,7 +385,10 @@ class Tunnel
     }
 
     /**
+     * Parse received Set-Cookie headers into an associative array.
+     *
      * Fixes \Magento\Framework\HTTP\Client\Curl::getCookiesFull for HttpOnly
+     *
      * @see \Magento\Framework\HTTP\Client\Curl
      *
      * @param array $headers
@@ -415,6 +429,8 @@ class Tunnel
     }
 
     /**
+     * Get a list of headers that are disallowed for incoming responses.
+     *
      * @return string[]
      */
     public function getDissallowedReceivedHeaders()
@@ -430,6 +446,8 @@ class Tunnel
     }
 
     /**
+     * Get the configured HTTP request timeout.
+     *
      * @return int
      */
     public function getTimeout()

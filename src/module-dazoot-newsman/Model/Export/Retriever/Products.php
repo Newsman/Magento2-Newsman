@@ -172,6 +172,8 @@ class Products implements RetrieverInterface
     }
 
     /**
+     * Map product data into an export row.
+     *
      * @param Product|ProductInterface $product
      * @param array $websiteIds
      * @param array $storeIds
@@ -222,6 +224,8 @@ class Products implements RetrieverInterface
     }
 
     /**
+     * Retrieve current quantity for a product.
+     *
      * @param Product|ProductInterface $product
      * @param array $websiteIds
      * @return float
@@ -245,9 +249,9 @@ class Products implements RetrieverInterface
     }
 
     /**
-     * Create product collection
+     * Create product collection for export.
      *
-     * @param $websiteIds
+     * @param array $websiteIds
      * @param array $storeIds
      * @param int $currentPage
      * @param int $pageSize
@@ -275,7 +279,7 @@ class Products implements RetrieverInterface
     }
 
     /**
-     * Process product collection for 3rd party plugins
+     * Hook for 3rd party modules to modify the product collection.
      *
      * @param Collection $collection
      * @param array $websiteIds
@@ -288,6 +292,8 @@ class Products implements RetrieverInterface
     }
 
     /**
+     * Retrieve additional attributes mapping for the given store IDs.
+     *
      * @param array $storeIds
      * @return array
      * @throws LocalizedException

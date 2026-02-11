@@ -21,6 +21,8 @@ class SubscribeEmail extends AbstractService
     public const ENDPOINT = 'subscriber.saveSubscribe';
 
     /**
+     * Execute the standard email subscription API call.
+     *
      * @param SubscribeEmailContext $context
      * @return array
      * @throws LocalizedException

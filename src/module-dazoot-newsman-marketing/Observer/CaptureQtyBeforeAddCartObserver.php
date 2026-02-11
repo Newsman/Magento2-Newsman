@@ -46,6 +46,8 @@ class CaptureQtyBeforeAddCartObserver implements ObserverInterface
     }
 
     /**
+     * Capture item quantity before it is added to the cart.
+     *
      * @param EventObserver $observer
      * @return void
      */

@@ -15,11 +15,15 @@ use Dazoot\Newsman\Model\Service\ContextInterface;
 class InitSubscribeEmailContext extends SubscribeEmailContext
 {
     /**
+     * Additional options for initialization.
+     *
      * @var array|null
      */
     protected $options;
 
     /**
+     * Set initialization options.
+     *
      * @param string $options
      * @return ContextInterface
      */
@@ -30,6 +34,8 @@ class InitSubscribeEmailContext extends SubscribeEmailContext
     }
 
     /**
+     * Retrieve initialization options.
+     *
      * @return array|null
      */
     public function getOptions()

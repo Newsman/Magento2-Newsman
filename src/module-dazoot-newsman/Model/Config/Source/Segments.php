@@ -64,6 +64,8 @@ class Segments implements OptionSourceInterface
     }
 
     /**
+     * Get segment label by its value (ID).
+     *
      * @param int $value
      * @return string
      */

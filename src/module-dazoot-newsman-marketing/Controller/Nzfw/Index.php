@@ -114,6 +114,8 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
     }
 
     /**
+     * Build the marketing resource response.
+     *
      * @return ResultInterface|void
      * @throws LocalizedException
      * @throws FileSystemException
@@ -207,6 +209,8 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
     }
 
     /**
+     * Retrieve query parameters from the current request.
+     *
      * @return array
      */
     public function getQueryParams()
@@ -221,6 +225,8 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
     }
 
     /**
+     * Retrieve POST parameters from the current request.
+     *
      * @return array
      */
     public function getPostParams()
@@ -230,9 +236,7 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
             $postParams = $this->getRequest()->getPost();
             if (!empty($postParams) && $postParams instanceof \Laminas\Stdlib\Parameters && $postParams->count() > 0) {
                 $postParams = $postParams->toArray();
-            } elseif (!empty($postParams) && is_array($postParams)) {
-                // pass through
-            } else {
+            } elseif (empty($postParams) || !is_array($postParams)) {
                 $content = $this->getRequest()->getContent();
                 if (!empty($content)) {
                     $postParams = $content;
@@ -246,6 +250,8 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
     }
 
     /**
+     * Retrieve all request headers.
+     *
      * @return array
      */
     public function getHeaders()
@@ -260,6 +266,8 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
     }
 
     /**
+     * Check if the provided path is relative and valid.
+     *
      * @param string $path
      * @return bool
      */
@@ -275,9 +283,10 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
     }
 
     /**
+     * Check if the request method is allowed for the given path.
+     *
      * @param string $path
      * @return bool
-     * @throws LocalizedException
      */
     public function validateRequestMethod($path)
     {
@@ -294,6 +303,8 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
     }
 
     /**
+     * Retrieve a list of supported HTTP methods for the tunnel.
+     *
      * @return array
      */
     public function getAllowedMethods()
@@ -306,6 +317,8 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
     }
 
     /**
+     * Batch process and add cookies from Newsman response.
+     *
      * @param array $cookies
      * @return void
      */
@@ -325,6 +338,8 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
     }
 
     /**
+     * Add a received cookie to the response.
+     *
      * @param string $name
      * @param array $cookieData
      * @return void
@@ -382,6 +397,8 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
     }
 
     /**
+     * Send a 404 Not Found response.
+     *
      * @return void
      */
     public function sendNotFound()
@@ -392,6 +409,8 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
     }
 
     /**
+     * Set the Newsman path.
+     *
      * @param string $path
      * @return $this
      */
@@ -402,6 +421,8 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
     }
 
     /**
+     * Get the Newsman path.
+     *
      * @return string
      */
     public function getNzmPath()
@@ -410,6 +431,8 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
     }
 
     /**
+     * Set the Newsman request type.
+     *
      * @param string $type
      * @return $this
      */
@@ -420,6 +443,8 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
     }
 
     /**
+     * Get the Newsman request type.
+     *
      * @return string
      */
     public function getNzmType()

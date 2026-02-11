@@ -17,6 +17,8 @@ use Magento\Framework\App\ObjectManager;
 class Assets extends Template
 {
     /**
+     * Retrieve URL for cleaning assets cache.
+     *
      * @return string
      */
     public function getCleanAssetsUrl()

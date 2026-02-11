@@ -30,6 +30,8 @@ class GetAdditionalAttributes extends \Dazoot\Newsman\Model\Config\GetAdditional
     }
 
     /**
+     * Retrieve additional attributes mapping for customers.
+     *
      * @param int $storeId
      * @return array
      * @throws LocalizedException

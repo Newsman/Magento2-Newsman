@@ -13,6 +13,8 @@ namespace Dazoot\Newsman\Model\User;
 interface IpAddressInterface
 {
     /**
+     * Get user IP address.
+     *
      * @return string
      */
     public function getIp();

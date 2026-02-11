@@ -40,7 +40,8 @@ class View extends Template implements IdentityInterface
     }
 
     /**
-     * @inheritdoc
+     * Prepare category layout and set current category data.
+     *
      * @return $this
      */
     protected function _prepareLayout()
@@ -51,6 +52,8 @@ class View extends Template implements IdentityInterface
     }
 
     /**
+     * Retrieve current category model from registry.
+     *
      * @return Category
      */
     public function getCurrentCategory()
@@ -62,6 +65,8 @@ class View extends Template implements IdentityInterface
     }
 
     /**
+     * Alias for getCurrentCategory.
+     *
      * @return Category
      */
     public function getCategory()
@@ -70,6 +75,8 @@ class View extends Template implements IdentityInterface
     }
 
     /**
+     * Get block cache identities based on current category.
+     *
      * @return array
      */
     public function getIdentities()

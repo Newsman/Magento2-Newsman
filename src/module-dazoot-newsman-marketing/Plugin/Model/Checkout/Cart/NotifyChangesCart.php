@@ -41,6 +41,8 @@ class NotifyChangesCart
     }
 
     /**
+     * Notify Newsman of item removal from cart.
+     *
      * @param Cart $subject
      * @param int $itemId
      * @return array
@@ -77,6 +79,8 @@ class NotifyChangesCart
     }
 
     /**
+     * Notify Newsman of multiple item updates in cart.
+     *
      * @param Cart $subject
      * @param array $data
      * @return array

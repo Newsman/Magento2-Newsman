@@ -12,6 +12,8 @@ use Dazoot\Newsman\Block\Adminhtml\Form\Field\Customer\Attributes as CustomerAtt
 class AttributesMap extends \Dazoot\Newsman\Block\Adminhtml\Form\Field\AttributesMap
 {
     /**
+     * Retrieve customer attributes mapper.
+     *
      * @return string
      */
     public function getAttributesRendererClass()

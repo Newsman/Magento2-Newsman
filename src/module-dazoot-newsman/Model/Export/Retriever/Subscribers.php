@@ -159,11 +159,11 @@ class Subscribers implements RetrieverInterface
     }
 
     /**
-     * Create subscriber collection
+     * Create subscriber collection for export.
      *
      * @param array $storeIds
-     * @param int $pageSize
-     * @param int $currentPage
+     * @param int|false $pageSize
+     * @param int|false $currentPage
      * @return Collection
      */
     public function createSubscriberCollection($storeIds, $pageSize, $currentPage)
@@ -179,12 +179,12 @@ class Subscribers implements RetrieverInterface
     }
 
     /**
-     * Process subscriber collection for 3rd party plugins
+     * Hook for 3rd party modules to modify the subscriber collection.
      *
      * @param Collection $collection
      * @param array $storeIds
-     * @param int $pageSize
-     * @param int $currentPage
+     * @param int|false $pageSize
+     * @param int|false $currentPage
      * @return Collection
      */
     public function processSubscriberCollection($collection, $storeIds, $pageSize, $currentPage)
@@ -193,7 +193,10 @@ class Subscribers implements RetrieverInterface
     }
 
     /**
+     * Extract relevant customer data from the collection.
+     *
      * @param CustomerCollection $collection
+     * @param array $storeIds
      * @return array
      * @throws LocalizedException
      */
@@ -243,7 +246,7 @@ class Subscribers implements RetrieverInterface
     }
 
     /**
-     * Create customer collection
+     * Create customer collection for mapping data to subscribers.
      *
      * @param array $storeIds
      * @param array $emails
@@ -268,7 +271,7 @@ class Subscribers implements RetrieverInterface
     }
 
     /**
-     * Process customer collection for 3rd party plugins
+     * Hook for 3rd party modules to modify the customer collection.
      *
      * @param CustomerCollection $collection
      * @param array $storeIds
@@ -281,6 +284,8 @@ class Subscribers implements RetrieverInterface
     }
 
     /**
+     * Map subscriber and customer data into an export row.
+     *
      * @param Subscriber $subscriber
      * @param array $customersData
      * @param array $storeIds
@@ -329,6 +334,8 @@ class Subscribers implements RetrieverInterface
     }
 
     /**
+     * Retrieve additional attributes mapping for the given store IDs.
+     *
      * @param array $storeIds
      * @return array
      * @throws LocalizedException

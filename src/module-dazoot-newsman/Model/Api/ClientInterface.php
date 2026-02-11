@@ -13,6 +13,8 @@ namespace Dazoot\Newsman\Model\Api;
 interface ClientInterface
 {
     /**
+     * Perform a GET request to the Newsman API.
+     *
      * @param ContextInterface $context
      * @param array $params
      * @return array
@@ -20,6 +22,8 @@ interface ClientInterface
     public function get($context, $params = []);
 
     /**
+     * Perform a POST request to the Newsman API.
+     *
      * @param ContextInterface $context
      * @param array $getParams
      * @param array $postParams
@@ -28,6 +32,8 @@ interface ClientInterface
     public function post($context, $getParams = [], $postParams = []);
 
     /**
+     * Perform a custom request to the Newsman API.
+     *
      * @param ContextInterface $context
      * @param string $method
      * @param array $getParams
@@ -58,6 +64,8 @@ interface ClientInterface
     public function getErrorMessage();
 
     /**
+     * Check if the last request resulted in an error.
+     *
      * @return bool
      */
     public function hasError();

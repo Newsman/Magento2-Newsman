@@ -30,6 +30,8 @@ class Attributes implements OptionSourceInterface
     protected $attributeRepository;
 
     /**
+     * Options cache.
+     *
      * @var array
      */
     protected $options;
@@ -50,6 +52,8 @@ class Attributes implements OptionSourceInterface
     }
 
     /**
+     * Get options as an array.
+     *
      * @param bool $addEmpty
      * @return array
      */

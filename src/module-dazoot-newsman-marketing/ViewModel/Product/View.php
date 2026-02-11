@@ -17,6 +17,8 @@ use Magento\Catalog\Model\Category;
 class View extends Marketing
 {
     /**
+     * Retrieve marketing data for the current product view.
+     *
      * @param Product $product
      * @param Category|null $category
      * @return array
