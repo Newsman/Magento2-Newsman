@@ -21,6 +21,8 @@ class InitUnsubscribeEmail extends AbstractService
     public const ENDPOINT = 'subscriber.initUnsubscribe';
 
     /**
+     * Execute the email unsubscription initialization.
+     *
      * @param InitUnsubscribeEmailContext $context
      * @return array
      * @throws LocalizedException

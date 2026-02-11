@@ -29,6 +29,8 @@ class SuppressSendEmail
     }
 
     /**
+     * Suppress confirmation request email if Newsman is enabled and configured to send emails.
+     *
      * @param Subscriber $subject
      * @param \Closure $proceed
      * @return Subscriber
@@ -48,6 +50,8 @@ class SuppressSendEmail
     }
 
     /**
+     * Suppress confirmation success email if Newsman is enabled and configured to send emails.
+     *
      * @param Subscriber $subject
      * @param \Closure $proceed
      * @return Subscriber
@@ -67,6 +71,8 @@ class SuppressSendEmail
     }
 
     /**
+     * Suppress unsubscription email if Newsman is enabled and configured to send emails.
+     *
      * @param Subscriber $subject
      * @param \Closure $proceed
      * @return Subscriber

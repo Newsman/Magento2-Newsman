@@ -36,6 +36,8 @@ class InitializeOrderAfterDateConfig implements DataPatchInterface
     }
 
     /**
+     * Apply data patch.
+     *
      * @return void
      */
     public function apply()

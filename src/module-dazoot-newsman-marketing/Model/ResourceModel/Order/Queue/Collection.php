@@ -28,6 +28,8 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     protected $_eventObject = 'dazoot_newsmanmarketing_order_queue_collection';
 
     /**
+     * Define resource model.
+     *
      * @return void
      */
     protected function _construct()

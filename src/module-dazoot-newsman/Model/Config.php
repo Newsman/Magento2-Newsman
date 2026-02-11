@@ -470,6 +470,8 @@ class Config
     }
 
     /**
+     * Check if customer telephone should be sent for the given store IDs.
+     *
      * @param array $storeIds
      * @return bool
      */
@@ -504,6 +506,8 @@ class Config
     }
 
     /**
+     * Check if order telephone should be sent for the given store IDs.
+     *
      * @param array $storeIds
      * @return bool
      */
@@ -663,6 +667,8 @@ class Config
     }
 
     /**
+     * Get stored lists configuration path by user ID.
+     *
      * @param int|string $userId
      * @return string
      */
@@ -672,6 +678,8 @@ class Config
     }
 
     /**
+     * Save synchronized lists data for a user ID.
+     *
      * @param int|string $userId
      * @param array $data
      * @return void
@@ -686,6 +694,8 @@ class Config
     }
 
     /**
+     * Get stored segments configuration path by user ID.
+     *
      * @param int|string $userId
      * @return string
      */
@@ -695,6 +705,8 @@ class Config
     }
 
     /**
+     * Save synchronized segments data for a user ID.
+     *
      * @param int|string $userId
      * @param array $data
      * @return void
@@ -709,6 +721,8 @@ class Config
     }
 
     /**
+     * Retrieve all stored lists from configuration.
+     *
      * @return array
      */
     public function getStoredLists()
@@ -737,6 +751,8 @@ class Config
     }
 
     /**
+     * Retrieve all stored segments from configuration.
+     *
      * @return array
      */
     public function getStoredSegments()
@@ -767,6 +783,8 @@ class Config
     }
 
     /**
+     * Get unique Newsman user IDs from all active stores.
+     *
      * @return array
      */
     public function getAllUserIds()
@@ -782,6 +800,8 @@ class Config
     }
 
     /**
+     * Get store IDs that are using the specified Newsman list ID.
+     *
      * @param int $listId
      * @return array
      */
@@ -800,6 +820,8 @@ class Config
     }
 
     /**
+     * Get unique Newsman user IDs for the specified store IDs.
+     *
      * @param array $storeIds
      * @return array
      */
@@ -813,6 +835,8 @@ class Config
     }
 
     /**
+     * Get all unique Newsman list IDs configured across all stores.
+     *
      * @return array
      */
     public function getAllListIds()
@@ -835,6 +859,8 @@ class Config
     }
 
     /**
+     * Get store IDs that are using the specified Newsman API key.
+     *
      * @param string $apiKey
      * @return array
      */

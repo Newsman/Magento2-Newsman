@@ -118,6 +118,8 @@ class Config
     }
 
     /**
+     * Check if any store has Newsman Marketing active.
+     *
      * @return bool
      */
     public function isAnyActive()
@@ -284,6 +286,8 @@ class Config
     }
 
     /**
+     * Extract the script request URI from the script URL.
+     *
      * @param null|string|bool|int|Store $store
      * @return string
      */
@@ -307,6 +311,8 @@ class Config
     }
 
     /**
+     * Check if tunnel logging is enabled.
+     *
      * @param null|string|bool|int|Store $store
      * @return bool
      */
@@ -320,6 +326,8 @@ class Config
     }
 
     /**
+     * Retrieve the Newsman module configuration model.
+     *
      * @return \Dazoot\Newsman\Model\Config
      */
     public function getConfig()

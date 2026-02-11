@@ -32,7 +32,7 @@ class ImportListSegment extends Action
     public const ADMIN_RESOURCE = 'Dazoot_Newsman::config_newsman';
 
     /**
-     * Result JSON factory.
+     * Factory for building JSON results.
      *
      * @var JsonFactory
      */
@@ -46,7 +46,7 @@ class ImportListSegment extends Action
     private $tagFilter;
 
     /**
-     * Service to retrieve all Newsman lists.
+     * Service to retrieve all Newsman newsletter lists.
      *
      * @var GetListAll
      */
@@ -74,7 +74,7 @@ class ImportListSegment extends Action
     protected $listContextFactory;
 
     /**
-     * Newsman module configuration.
+     * Newsman module configuration helper.
      *
      * @var Config
      */

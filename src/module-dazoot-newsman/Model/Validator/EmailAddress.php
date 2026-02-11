@@ -15,8 +15,10 @@ use Laminas\Validator\Exception\ExceptionInterface;
 class EmailAddress
 {
     /**
+     * Check if email address is valid.
+     *
      * @param string $email
-     * @return false
+     * @return bool
      */
     public function isValid($email)
     {

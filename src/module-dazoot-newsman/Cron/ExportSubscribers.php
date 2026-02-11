@@ -48,6 +48,8 @@ class ExportSubscribers
     }
 
     /**
+     * Execute the subscribers export cron job.
+     *
      * @return void
      * @throws LocalizedException
      */

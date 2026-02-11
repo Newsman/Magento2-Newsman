@@ -61,6 +61,8 @@ class AttributeValue
     }
 
     /**
+     * Retrieve the product URL for a specific product and store.
+     *
      * @param int $productId
      * @param int $storeId
      * @return string
@@ -77,6 +79,8 @@ class AttributeValue
     }
 
     /**
+     * Retrieve the raw or labeled value of a product attribute.
+     *
      * @param int $productId
      * @param string $attributeCode
      * @param int|bool $storeId
@@ -118,6 +122,8 @@ class AttributeValue
     }
 
     /**
+     * Retrieve attribute model by attribute code.
+     *
      * @param string $code
      * @return AbstractAttribute|null
      * @throws LocalizedException

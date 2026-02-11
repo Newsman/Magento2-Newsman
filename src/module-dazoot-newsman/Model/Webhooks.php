@@ -106,6 +106,8 @@ class Webhooks
     }
 
     /**
+     * Process webhook data for the given store.
+     *
      * @param array $data
      * @param int|null $storeId
      * @return array
@@ -147,6 +149,8 @@ class Webhooks
     }
 
     /**
+     * Process unsubscribe event from Newsman.
+     *
      * @param array $event
      * @param int $websiteId
      * @return array
@@ -189,6 +193,8 @@ class Webhooks
     }
 
     /**
+     * Process subscribe event from Newsman.
+     *
      * @param array $event
      * @param int|null $storeId
      * @return array
@@ -264,6 +270,8 @@ class Webhooks
     }
 
     /**
+     * Pre-process subscription event to extract common data.
+     *
      * @param array $event
      * @return array
      */
@@ -285,7 +293,8 @@ class Webhooks
     }
 
     /**
-     * Sends out email to customer after change subscription status
+     * Sends out email to customer after change subscription status.
+     *
      * @see \Magento\Newsletter\Model\SubscriptionManager::sendEmailAfterChangeStatus()
      *
      * @param Subscriber $subscriber
@@ -317,6 +326,8 @@ class Webhooks
     }
 
     /**
+     * Get customer by email and website ID.
+     *
      * @param string $email
      * @param int $websiteId
      * @return CustomerInterface|null
@@ -336,6 +347,8 @@ class Webhooks
     }
 
     /**
+     * Process import notifier event.
+     *
      * @param array $event
      * @param int|null $storeId
      * @return array

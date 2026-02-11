@@ -130,7 +130,7 @@ class Customers implements RetrieverInterface
     /**
      * Create customer collection
      *
-     * @param $websiteIds
+     * @param array $websiteIds
      * @param array $storeIds
      * @param int $currentPage
      * @param int $pageSize
@@ -169,6 +169,8 @@ class Customers implements RetrieverInterface
     }
 
     /**
+     * Map customer data into an export row.
+     *
      * @param CustomerInterface|Customer $customer
      * @param array $storeIds
      * @return array
@@ -198,6 +200,8 @@ class Customers implements RetrieverInterface
     }
 
     /**
+     * Retrieve additional attributes mapping for the given store IDs.
+     *
      * @param array $storeIds
      * @return array
      * @throws LocalizedException
@@ -208,6 +212,8 @@ class Customers implements RetrieverInterface
     }
 
     /**
+     * Process and add telephone data to the customer export row.
+     *
      * @param Customer $customer
      * @param array $storeIds
      * @param array $row

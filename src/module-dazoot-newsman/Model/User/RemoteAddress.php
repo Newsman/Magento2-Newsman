@@ -165,6 +165,8 @@ class RemoteAddress
     }
 
     /**
+     * Retrieve alternative HTTP headers for IP lookup.
+     *
      * @return array
      */
     public function getAlternativeHeaders()

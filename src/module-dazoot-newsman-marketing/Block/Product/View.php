@@ -17,6 +17,8 @@ use Magento\Catalog\Model\Category;
 class View extends Description implements IdentityInterface
 {
     /**
+     * Get block cache identities based on current product.
+     *
      * @return array
      */
     public function getIdentities()
@@ -25,6 +27,8 @@ class View extends Description implements IdentityInterface
     }
 
     /**
+     * Retrieve current category model from registry.
+     *
      * @return Category|null
      */
     public function getCategory()

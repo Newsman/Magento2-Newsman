@@ -15,11 +15,15 @@ use Magento\Framework\Api\SearchResultsInterface;
 interface OrderQueueSearchResultInterface extends SearchResultsInterface
 {
     /**
+     * Retrieve items list.
+     *
      * @return OrderQueueInterface[]
      */
     public function getItems();
 
     /**
+     * Set items list.
+     *
      * @param OrderQueueInterface[] $items
      * @return $this
      */

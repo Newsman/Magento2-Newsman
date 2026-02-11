@@ -65,6 +65,8 @@ class Tracking implements ArgumentInterface
     }
 
     /**
+     * Check if tracking is active.
+     *
      * @return bool
      */
     public function isActive()
@@ -73,6 +75,8 @@ class Tracking implements ArgumentInterface
     }
 
     /**
+     * Get the Newsman UA ID.
+     *
      * @return string
      */
     public function getUaId()
@@ -81,6 +85,8 @@ class Tracking implements ArgumentInterface
     }
 
     /**
+     * Check if tunnel should be used for requests.
+     *
      * @return bool
      */
     public function useTunnel()
@@ -89,6 +95,8 @@ class Tracking implements ArgumentInterface
     }
 
     /**
+     * Check if user IP should be anonymized.
+     *
      * @return bool
      */
     public function getAnynymizeIp()
@@ -97,6 +105,8 @@ class Tracking implements ArgumentInterface
     }
 
     /**
+     * Get the base URL for Newsman resources.
+     *
      * @return string
      * @throws FileSystemException
      * @throws NoSuchEntityException
@@ -112,6 +122,8 @@ class Tracking implements ArgumentInterface
     }
 
     /**
+     * Check if tracking JavaScript is currently cached.
+     *
      * @return bool
      * @throws FileSystemException
      */
@@ -127,6 +139,8 @@ class Tracking implements ArgumentInterface
     }
 
     /**
+     * Get the base URL for Newsman tracking.
+     *
      * @return string
      */
     public function getTrackingUrl()
@@ -135,6 +149,8 @@ class Tracking implements ArgumentInterface
     }
 
     /**
+     * Get the Newsman script URL.
+     *
      * @return string
      */
     public function getScriptUrl()
@@ -143,6 +159,8 @@ class Tracking implements ArgumentInterface
     }
 
     /**
+     * Get the final script URL, considering tunnel and cache.
+     *
      * @return string
      */
     public function getScriptFinalUrl()
@@ -155,6 +173,8 @@ class Tracking implements ArgumentInterface
     }
 
     /**
+     * Get the Newsman script request URI.
+     *
      * @return string
      */
     public function getScriptRequestUri()
@@ -176,6 +196,8 @@ class Tracking implements ArgumentInterface
     }
 
     /**
+     * Get the current store currency code.
+     *
      * @return string
      * @throws NoSuchEntityException
      */
@@ -185,6 +207,8 @@ class Tracking implements ArgumentInterface
     }
 
     /**
+     * Get the raw Newsman script JS content.
+     *
      * @return string
      */
     public function getScriptJs()

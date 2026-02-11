@@ -42,7 +42,7 @@ class Logger extends \Monolog\Logger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      *
      * @param int $level
      * @param string|\Stringable $message
@@ -58,7 +58,7 @@ class Logger extends \Monolog\Logger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      *
      * @param string|\Stringable $message
      * @param mixed[] $context
@@ -72,7 +72,7 @@ class Logger extends \Monolog\Logger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      *
      * @param string|\Stringable $message
      * @param mixed[] $context
@@ -86,7 +86,7 @@ class Logger extends \Monolog\Logger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      *
      * @param string|\Stringable $message
      * @param mixed[] $context
@@ -100,7 +100,7 @@ class Logger extends \Monolog\Logger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      *
      * @param string|\Stringable $message
      * @param mixed[] $context
@@ -114,7 +114,7 @@ class Logger extends \Monolog\Logger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      *
      * @param string|\Stringable $message
      * @param mixed[] $context
@@ -128,7 +128,7 @@ class Logger extends \Monolog\Logger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      *
      * @param string|\Stringable $message
      * @param mixed[] $context
@@ -142,7 +142,7 @@ class Logger extends \Monolog\Logger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      *
      * @param string|\Stringable $message
      * @param mixed[] $context
@@ -156,7 +156,7 @@ class Logger extends \Monolog\Logger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      *
      * @param string|\Stringable $message
      * @param mixed[] $context

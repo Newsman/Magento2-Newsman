@@ -66,6 +66,8 @@ class Marketing implements ArgumentInterface
     }
 
     /**
+     * Check if Newsman Marketing is active.
+     *
      * @return bool
      */
     public function isActive()
@@ -74,6 +76,8 @@ class Marketing implements ArgumentInterface
     }
 
     /**
+     * Escape value for JavaScript output.
+     *
      * @param string|int $value
      * @return string|int
      */
@@ -83,6 +87,8 @@ class Marketing implements ArgumentInterface
     }
 
     /**
+     * Retrieve the serializer instance.
+     *
      * @return SerializerInterface
      */
     public function getSerializer()
