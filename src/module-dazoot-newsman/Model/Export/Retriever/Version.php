@@ -12,7 +12,7 @@ use Magento\Framework\App\ProductMetadataInterface;
 /**
  * Get Magento version
  */
-class Version implements RetrieverInterface
+class Version extends AbstractRetriever implements RetrieverInterface
 {
     /**
      * @var ProductMetadataInterface
