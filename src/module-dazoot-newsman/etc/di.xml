@@ -55,6 +55,10 @@
                     <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\Products</item>
                     <item name="code" xsi:type="string">products</item>
                 </item>
+                <item name="products-feed" xsi:type="array">
+                    <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\ProductsFeed</item>
+                    <item name="code" xsi:type="string">products-feed</item>
+                </item>
                 <item name="customers" xsi:type="array">
                     <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\Customers</item>
                     <item name="code" xsi:type="string">customers</item>

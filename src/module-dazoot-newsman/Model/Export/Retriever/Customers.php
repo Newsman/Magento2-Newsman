@@ -20,7 +20,7 @@ use Magento\Store\Model\StoreManagerInterface;
 /**
  * Get customers
  */
-class Customers implements RetrieverInterface
+class Customers extends AbstractRetriever
 {
     public const DEFAULT_PAGE_SIZE = 1000;
 
@@ -82,27 +82,29 @@ class Customers implements RetrieverInterface
     {
         $this->isAddTelephone = $this->config->isCustomerSendTelephoneByStoreIds($storeIds);
 
-        $pageSize = self::DEFAULT_PAGE_SIZE;
-        if (!empty($data['limit']) && (int) $data['limit'] > 0) {
-            $pageSize = (int) $data['limit'];
-        }
-        $start = (!empty($data['start']) && (int) $data['start'] >= 0) ? (int) $data['start'] : 0;
-        $currentPage = (int) floor($start / $pageSize) + 1;
+        $params = $this->processListParameters($data, self::DEFAULT_PAGE_SIZE);
 
-        $this->logger->info(__('Export customers %1, %2, store IDs', $currentPage, $pageSize, implode(",", $storeIds)));
+        $this->logger->info(
+            __(
+                'Export customers %1, %2, store IDs %3',
+                $params['currentPage'],
+                $params['limit'],
+                implode(",", $storeIds)
+            )
+        );
 
         $websiteIds = [];
         foreach ($storeIds as $storeId) {
             $websiteIds[] = $this->storeManager->getStore($storeId)->getWebsiteId();
         }
         $websiteIds = array_unique($websiteIds);
-        $collection = $this->createCollection($websiteIds, $storeIds, $currentPage, $pageSize);
+        $collection = $this->createCollection($websiteIds, $storeIds, $params);
 
         $count = $collection->getSize();
         $result = [];
 
-        if (($count >= $currentPage * $pageSize)
-            || (($count < $currentPage * $pageSize) && ($count > ($currentPage - 1) * $pageSize))
+        if (($count >= $params['currentPage'] * $params['limit'])
+            || (($count < $params['currentPage'] * $params['limit']) && ($count > ($params['currentPage'] - 1) * $params['limit']))
         ) {
             /** @var CustomerInterface $customer */
             foreach ($collection as $customer) {
@@ -117,8 +119,8 @@ class Customers implements RetrieverInterface
         $this->logger->info(
             __(
                 'Exported customers %1, %2, store IDs %3: %4',
-                $currentPage,
-                $pageSize,
+                $params['currentPage'],
+                $params['limit'],
                 implode(",", $storeIds),
                 count($result)
             )
@@ -132,27 +134,86 @@ class Customers implements RetrieverInterface
      *
      * @param array $websiteIds
      * @param array $storeIds
-     * @param int $currentPage
-     * @param int $pageSize
+     * @param array $params
      * @return Collection
      * @throws LocalizedException
      */
-    public function createCollection($websiteIds, $storeIds, $currentPage, $pageSize)
+    public function createCollection($websiteIds, $storeIds, $params)
     {
         $additionalAttributes = $this->getAdditionalAttributes($storeIds);
 
         /** @var Collection $collection */
         $collection = $this->collectionFactory->create();
         $collection->addAttributeToSelect(['entity_id', 'email', 'firstname', 'lastname'])
-            ->addAttributeToFilter('website_id', ['in' => $websiteIds])
-            ->setCurPage($currentPage)
-            ->setPageSize($pageSize);
+            ->addAttributeToFilter('website_id', ['in' => $websiteIds]);
+
+        $this->applyFiltersToCollection($collection, $params);
 
         if (!empty($additionalAttributes)) {
             $collection->addAttributeToSelect(array_keys($additionalAttributes));
         }
 
         return $this->processCollection($collection, $websiteIds, $storeIds);
+    }
+
+    /**
+     * Get allowed request parameters
+     *
+     * @return array
+     */
+    public function getWhereParametersMapping()
+    {
+        return [
+            'created_at' => [
+                'field' => 'created_at',
+                'multiple' => false,
+            ],
+            'modified_at' => [
+                'field' => 'updated_at',
+                'multiple' => false,
+            ],
+            'customer_id' => [
+                'field' => 'entity_id',
+                'multiple' => false,
+            ],
+            'customer_ids' => [
+                'field' => 'entity_id',
+                'multiple' => true,
+            ],
+            'email' => [
+                'field' => 'email',
+                'multiple' => false,
+            ],
+            'firstname' => [
+                'field' => 'firstname',
+                'multiple' => false,
+            ],
+            'lastname' => [
+                'field' => 'lastname',
+                'multiple' => false,
+            ],
+            'customer_group_id' => [
+                'field' => 'group_id',
+                'multiple' => false,
+            ],
+        ];
+    }
+
+    /**
+     * Get allowed sort fields
+     *
+     * @return array
+     */
+    public function getAllowedSortFields()
+    {
+        return [
+            'email' => 'email',
+            'created_at' => 'created_at',
+            'modified_at' => 'updated_at',
+            'customer_id' => 'entity_id',
+            'firstname' => 'firstname',
+            'lastname' => 'lastname',
+        ];
     }
 
     /**
@@ -178,9 +239,12 @@ class Customers implements RetrieverInterface
     public function processCustomer($customer, $storeIds)
     {
         $row = [
+            'customer_id' => $customer->getId(),
             'email' => $customer->getEmail(),
             'firstname' => $customer->getFirstname(),
-            'lastname' => $customer->getLastname()
+            'lastname' => $customer->getLastname(),
+            'date_created' => $customer->getCreatedAt(),
+            'source' => 'Magento2 customers'
         ];
 
         $row = $this->processTelephone($customer, $storeIds, $row);
@@ -226,17 +290,9 @@ class Customers implements RetrieverInterface
         }
 
         $billingAddress = $customer->getPrimaryBillingAddress();
-        $row['telephone'] = '';
-        $row['billing_telephone'] = '';
+        $row['phone'] = '';
         if ($billingAddress) {
-            $row['telephone'] = $billingAddress->getTelephone();
-            $row['billing_telephone'] = $billingAddress->getTelephone();
-        }
-
-        $shippingAddress = $customer->getPrimaryShippingAddress();
-        $row['shipping_telephone'] = '';
-        if ($shippingAddress) {
-            $row['shipping_telephone'] = $shippingAddress->getTelephone();
+            $row['phone'] = $billingAddress->getTelephone();
         }
 
         return $row;

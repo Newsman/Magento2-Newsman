@@ -16,7 +16,7 @@ use Magento\Store\Model\StoreManagerInterface;
 /**
  * Get count subscribers
  */
-class CountSubscribers implements RetrieverInterface
+class CountSubscribers extends AbstractRetriever implements RetrieverInterface
 {
     /**
      * @var CollectionFactory

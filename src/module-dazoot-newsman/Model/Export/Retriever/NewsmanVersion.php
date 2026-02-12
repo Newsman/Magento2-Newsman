@@ -12,7 +12,7 @@ use Magento\Framework\Composer\ComposerInformation;
 /**
  * Get Newsman extension version
  */
-class NewsmanVersion implements RetrieverInterface
+class NewsmanVersion extends AbstractRetriever implements RetrieverInterface
 {
     /**
      * @var ComposerInformation
