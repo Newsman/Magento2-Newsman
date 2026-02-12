@@ -455,6 +455,21 @@ class Config
     }
 
     /**
+     * Get export authenticate token
+     *
+     * @param null|string|bool|int|Store $store
+     * @return int
+     */
+    public function getExportAuthenticateToken($store = null)
+    {
+        return trim((string) $this->scopeConfig->getValue(
+            self::XML_PATH_EXPORT_AUTHENTICATE_TOKEN,
+            ScopeInterface::SCOPE_STORE,
+            $store
+        ));
+    }
+
+    /**
      * Is customer send telephone
      *
      * @param null|string|bool|int|Store $store

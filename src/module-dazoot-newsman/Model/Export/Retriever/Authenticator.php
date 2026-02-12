@@ -45,6 +45,7 @@ class Authenticator
         }
 
         $configApiKey = $this->config->getApiKey($store);
+        $configAuthToken = $this->config->getExportAuthenticateToken($store);
 
         $alternateName = $this->config->getExportAuthorizeHeaderName($store);
         $alternateKey = $this->config->getExportAuthorizeHeaderKey($store);
@@ -53,11 +54,19 @@ class Authenticator
             $isAlternate = true;
         }
 
+        $isAlternateWithToken = false;
+        if (!empty($configAuthToken)) {
+            $isAlternateWithToken = true;
+        }
+
         $isAuthenticated = false;
         if ($configApiKey === $apiKey) {
             $isAuthenticated = true;
         }
-        if ($isAlternate && $alternateKey === $apiKey) {
+        if ($isAlternateWithToken && ($configAuthToken === $apiKey)) {
+            $isAuthenticated = true;
+        }
+        if ($isAlternate && ($alternateKey === $apiKey)) {
             $isAuthenticated = true;
         }
 
