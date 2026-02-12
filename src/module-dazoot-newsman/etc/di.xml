@@ -43,6 +43,10 @@
                     <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\Version</item>
                     <item name="code" xsi:type="string">version</item>
                 </item>
+                <item name="newsman-version" xsi:type="array">
+                    <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\NewsmanVersion</item>
+                    <item name="code" xsi:type="string">newsman-version</item>
+                </item>
                 <item name="orders" xsi:type="array">
                     <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\Orders</item>
                     <item name="code" xsi:type="string">orders</item>
