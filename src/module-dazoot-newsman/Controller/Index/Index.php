@@ -156,7 +156,7 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
     }
 
     /**
-     * Get API key from HTTP header
+     * Get API key from the HTTP header
      *
      * @return string
      */
@@ -181,7 +181,7 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
         if (stripos($auth, 'Bearer') !== false) {
             return trim(str_replace('Bearer', '', $auth));
         }
-        return '';
+        return (string) $auth;
     }
 
     /**
