@@ -21,7 +21,7 @@ use Magento\SalesRule\Model\Rule\Condition\AddressFactory as ConditionAddressFac
 /**
  * Add coupons
  */
-class Coupons implements RetrieverInterface
+class Coupons extends AbstractRetriever implements RetrieverInterface
 {
     /**
      * @var CouponFactory

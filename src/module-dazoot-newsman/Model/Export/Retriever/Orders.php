@@ -13,6 +13,7 @@ use Dazoot\Newsman\Model\Config;
 use Dazoot\Newsman\Model\Product\AttributeValue;
 use Magento\Catalog\Helper\ImageFactory;
 use Magento\Catalog\Model\ProductFactory;
+use Magento\Framework\Api\SortOrderBuilderFactory;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 use Magento\Framework\Api\FilterBuilder;
@@ -28,7 +29,7 @@ use Magento\Catalog\Helper\ProductFactory as ProductHelperFactory;
 /**
  * Get orders or an order
  */
-class Orders implements RetrieverInterface
+class Orders extends AbstractRetriever
 {
     public const DEFAULT_PAGE_SIZE = 1000;
 
@@ -41,6 +42,11 @@ class Orders implements RetrieverInterface
      * @var FilterBuilder
      */
     protected $filterBuilder;
+
+    /**
+     * @var SortOrderBuilderFactory
+     */
+    protected $sortOrderBuilderFactory;
 
     /**
      * @var OrderRepositoryInterface
@@ -100,6 +106,7 @@ class Orders implements RetrieverInterface
     /**
      * @param SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory
      * @param FilterBuilder $filterBuilder
+     * @param SortOrderBuilderFactory $sortOrderBuilderFactory
      * @param OrderRepositoryInterface $orderRepository
      * @param AttributeValue $attributeValue
      * @param ImageFactory $imageHelperFactory
@@ -114,6 +121,7 @@ class Orders implements RetrieverInterface
     public function __construct(
         SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
         FilterBuilder $filterBuilder,
+        SortOrderBuilderFactory $sortOrderBuilderFactory,
         OrderRepositoryInterface $orderRepository,
         AttributeValue $attributeValue,
         ImageFactory $imageHelperFactory,
@@ -127,6 +135,7 @@ class Orders implements RetrieverInterface
     ) {
         $this->searchCriteriaBuilderFactory = $searchCriteriaBuilderFactory;
         $this->filterBuilder = $filterBuilder;
+        $this->sortOrderBuilderFactory = $sortOrderBuilderFactory;
         $this->orderRepository = $orderRepository;
         $this->attributeValue = $attributeValue;
         $this->imageHelperFactory = $imageHelperFactory;
@@ -146,7 +155,7 @@ class Orders implements RetrieverInterface
     {
         $this->isAddTelephone = $this->config->isOrderSendTelephoneByStoreIds($storeIds);
 
-        if (isset($data['order_id'])) {
+        if (isset($data['order_id']) && !is_array($data['order_id'])) {
             if (empty($data['order_id'])) {
                 return [];
             }
@@ -157,52 +166,56 @@ class Orders implements RetrieverInterface
             return $result;
         }
 
-        $pageSize = self::DEFAULT_PAGE_SIZE;
-        if (!empty($data['limit']) && (int) $data['limit'] > 0) {
-            $pageSize = (int) $data['limit'];
-        }
-        $start = (!empty($data['start']) && (int) $data['start'] >= 0) ? (int) $data['start'] : 0;
-        $currentPage = (int) floor($start / $pageSize) + 1;
+        $params = $this->processListParameters($data, self::DEFAULT_PAGE_SIZE);
 
-        $this->logger->info(__('Export orders %1, %2, storeIds %3', $currentPage, $pageSize, implode(",", $storeIds)));
-
-        $storeFilter = $this->filterBuilder
-            ->setField('store_id')
-            ->setConditionType('in')
-            ->setValue($storeIds)
-            ->create();
-
-        $createdAtFilter = false;
-        $afterDate = $this->config->getOrderAfterDate();
-        if (!empty($afterDate) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $afterDate)) {
-            $createdAtFilter = $this->filterBuilder
-                ->setField('created_at')
-                ->setConditionType('gteq')
-                ->setValue($afterDate . ' 00:00:00')
-                ->create();
-        }
+        $this->logger->info(
+            __(
+                'Export orders %1, %2, storeIds %3',
+                $params['currentPage'],
+                $params['limit'],
+                implode(",", $storeIds)
+            )
+        );
 
         /** @var SearchCriteriaBuilder $searchCriteriaBuilder */
         $searchCriteriaBuilder = $this->searchCriteriaBuilderFactory->create();
 
-        $searchCriteriaBuilder->setPageSize($pageSize)
-            ->setCurrentPage($currentPage);
+        $this->applyFiltersToSearchCriteria(
+            $searchCriteriaBuilder,
+            $this->filterBuilder,
+            $this->sortOrderBuilderFactory,
+            $params
+        );
 
-        /** @var SearchCriteriaInterface $searchCriteria */
-        $searchCriteriaBuilder
-            ->addFilters([$storeFilter]);
-        if ($createdAtFilter) {
-            $searchCriteriaBuilder->addFilters([$createdAtFilter]);
+        $searchCriteriaBuilder->addFilters([
+            $this->filterBuilder
+                ->setField('store_id')
+                ->setConditionType('in')
+                ->setValue($storeIds)
+                ->create()
+        ]);
+
+        $afterDate = $this->config->getOrderAfterDate();
+        if (!empty($afterDate) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $afterDate)) {
+            $searchCriteriaBuilder->addFilters([
+                $this->filterBuilder
+                    ->setField('created_at')
+                    ->setConditionType('gteq')
+                    ->setValue($afterDate . ' 00:00:00')
+                    ->create()
+            ]);
         }
+
         $searchCriteria = $searchCriteriaBuilder->create();
 
         $result = [];
-        $count = $this->orderRepository->getList($searchCriteria)->getTotalCount();
+        $orderList = $this->orderRepository->getList($searchCriteria);
+        $count = $orderList->getTotalCount();
 
-        if (($count >= $currentPage * $pageSize)
-            || (($count < $currentPage * $pageSize) && ($count > ($currentPage - 1) * $pageSize))
+        if (($count >= $params['currentPage'] * $params['limit'])
+            || (($count < $params['currentPage'] * $params['limit']) && ($count > ($params['currentPage'] - 1) * $params['limit']))
         ) {
-            $orders = $this->orderRepository->getList($searchCriteria)->getItems();
+            $orders = $orderList->getItems();
             /** @var OrderInterface $order */
             foreach ($orders as $order) {
                 try {
@@ -216,14 +229,55 @@ class Orders implements RetrieverInterface
         $this->logger->info(
             __(
                 'Exported orders %1, %2, store IDs %3: %4',
-                $currentPage,
-                $pageSize,
+                $params['currentPage'],
+                $params['limit'],
                 implode(",", $storeIds),
                 count($result)
             )
         );
 
         return $result;
+    }
+
+    /**
+     * Get allowed request parameters
+     *
+     * @return array
+     */
+    public function getWhereParametersMapping()
+    {
+        return [
+            'created_at' => [
+                'field' => 'created_at',
+                'multiple' => false,
+            ],
+            'modified_at' => [
+                'field' => 'updated_at',
+                'multiple' => false,
+            ],
+            'order_id' => [
+                'field' => 'entity_id',
+                'multiple' => false,
+            ],
+            'order_ids' => [
+                'field' => 'entity_id',
+                'multiple' => true,
+            ],
+        ];
+    }
+
+    /**
+     * Get allowed sort fields
+     *
+     * @return array
+     */
+    public function getAllowedSortFields()
+    {
+        return [
+            'created_at' => 'created_at',
+            'modified_at' => 'updated_at',
+            'order_id' => 'entity_id',
+        ];
     }
 
     /**
@@ -280,44 +334,31 @@ class Orders implements RetrieverInterface
                 'id' => $productId,
                 'name' => $item->getName(),
                 'quantity' => (int) $item->getQtyOrdered(),
-                'price' => (float) $item->getBasePriceInclTax(),
-                'price_old' => 0.0,
-                'image_url' => $imageUrl,
-                'url' => $url
+                'unit_price' => (float) $item->getBasePriceInclTax(),
             ];
         }
 
-        $date = new DateTime($order->getCreatedAt());
-        $timestamp = $date->getTimestamp();
-
-        $billingPhone = $shippingPhone = '';
+        $billingPhone = '';
         if ($this->isAddTelephone) {
             $billingPhone = $order->getBillingAddress()->getTelephone();
-            if (!$order->getIsVirtual()) {
-                $shippingPhone = $order->getShippingAddress()->getTelephone();
-            }
         }
 
         $result = [
-            'order_no' => $order->getId(),
-            'date' => $timestamp,
-            'status' => $order->getStatus(),
-            'lastname' => $order->getCustomerFirstname(),
-            'firstname' => $order->getCustomerLastname(),
-            'email' => $order->getCustomerEmail(),
-            'phone' => $billingPhone,
-            'telephone' => $billingPhone,
-            'billing_telephone' => $billingPhone,
-            'shipping_telephone' => $shippingPhone,
-            'state' => '',
-            'city' => '',
-            'address' => '',
+            'id' => $order->getId(),
+            'billing_name' => trim($order->getCustomerFirstname() . ' ' . $order->getCustomerLastname()),
+            'billing_company_name' => $order->getBillingAddress()->getCompany(),
+            'billing_phone' => $billingPhone,
+            'customer_email' => $order->getCustomerEmail(),
+            'shipping_amount' => (float)$order->getBaseShippingInclTax(),
+            'tax_amount' => (float)$order->getBaseTaxAmount(),
+            'total_amount' => (float)$order->getBaseGrandTotal(),
+            'currency' => $order->getBaseCurrencyCode(),
+            'subtotal_amount' => (float)$order->getBaseSubtotalInclTax(),
             'discount' => abs($order->getBaseDiscountAmount()),
-            'discount_code' => '',
-            'shipping' => '',
-            'fees' => 0,
-            'rebates' => 0,
-            'total' => $order->getBaseGrandTotal(),
+            'discount_code' => $order->getCouponCode(),
+            'status' => $order->getStatus(),
+            'date_created' => $order->getCreatedAt(),
+            'date_modified' => $order->getUpdatedAt(),
             'products' => $products
         ];
 

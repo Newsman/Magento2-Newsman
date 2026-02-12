@@ -22,7 +22,7 @@ use Magento\Store\Model\StoreManagerInterface;
 /**
  * Get subscribers
  */
-class Subscribers implements RetrieverInterface
+class Subscribers extends AbstractRetriever
 {
     public const DEFAULT_PAGE_SIZE = 100000;
 
@@ -92,45 +92,24 @@ class Subscribers implements RetrieverInterface
     {
         $this->isAddTelephone = $this->config->isCustomerSendTelephoneByStoreIds($storeIds);
 
-        $pageSize = false;
-        $currentPage = false;
-        if (isset($data['start']) && isset($data['limit'])) {
-            $pageSize = self::DEFAULT_PAGE_SIZE;
-            if (!empty($data['limit']) && (int) $data['limit'] > 0) {
-                $pageSize = (int) $data['limit'];
-            }
-            $start = (!empty($data['start']) && (int) $data['start'] >= 0) ? (int) $data['start'] : 0;
-            $currentPage = (int) floor($start / $pageSize) + 1;
-        }
+        $params = $this->processListParameters($data, self::DEFAULT_PAGE_SIZE);
 
         $this->logger->info(
-            __('Export subscribers %1, %2, store IDs %3', $currentPage, $pageSize, implode(",", $storeIds))
+            __(
+                'Export subscribers %1, %2, store IDs %3',
+                $params['currentPage'],
+                $params['limit'],
+                implode(",", $storeIds)
+            )
         );
 
-        $collection = $this->createSubscriberCollection($storeIds, $pageSize, $currentPage);
+        $collection = $this->createSubscriberCollection($storeIds, $params);
         $result = [];
-        if ($pageSize !== false && $currentPage !== false) {
-            $collection->setPageSize($pageSize);
-            $collection->setCurPage($currentPage);
 
-            $count = $collection->getSize();
-            if (($count >= $currentPage * $pageSize)
-                || (($count < $currentPage * $pageSize) && ($count > ($currentPage - 1) * $pageSize))
-            ) {
-                $emails = $collection->getColumnValues('subscriber_email');
-                $customerCollection = $this->createCustomerCollection($storeIds, $emails);
-                $customersData = $this->getCustomerData($customerCollection, $storeIds);
-
-                /** @var Subscriber $subscriber */
-                foreach ($collection as $subscriber) {
-                    try {
-                        $result[] = $this->processCustomer($subscriber, $customersData, $storeIds);
-                    } catch (\Exception $e) {
-                        $this->logger->error($e->getMessage());
-                    }
-                }
-            }
-        } else {
+        $count = $collection->getSize();
+        if (($count >= $params['currentPage'] * $params['limit'])
+            || (($count < $params['currentPage'] * $params['limit']) && ($count > ($params['currentPage'] - 1) * $params['limit']))
+        ) {
             $emails = $collection->getColumnValues('subscriber_email');
             $customerCollection = $this->createCustomerCollection($storeIds, $emails);
             $customersData = $this->getCustomerData($customerCollection, $storeIds);
@@ -148,8 +127,8 @@ class Subscribers implements RetrieverInterface
         $this->logger->info(
             __(
                 'Exported subscribers %1, %2, store IDs %3: %4',
-                $currentPage,
-                $pageSize,
+                $params['currentPage'],
+                $params['limit'],
                 implode(",", $storeIds),
                 count($result)
             )
@@ -162,11 +141,10 @@ class Subscribers implements RetrieverInterface
      * Create subscriber collection for export.
      *
      * @param array $storeIds
-     * @param int|false $pageSize
-     * @param int|false $currentPage
+     * @param array $params
      * @return Collection
      */
-    public function createSubscriberCollection($storeIds, $pageSize, $currentPage)
+    public function createSubscriberCollection($storeIds, $params)
     {
         /** @var Collection $collection */
         $collection = $this->collectionFactory->create()
@@ -175,7 +153,9 @@ class Subscribers implements RetrieverInterface
             $collection->addFieldToFilter('store_id', ['in' => $storeIds]);
         }
 
-        return $this->processSubscriberCollection($collection, $storeIds, $pageSize, $currentPage);
+        $this->applyFiltersToCollection($collection, $params);
+
+        return $this->processSubscriberCollection($collection, $storeIds, $params);
     }
 
     /**
@@ -183,13 +163,61 @@ class Subscribers implements RetrieverInterface
      *
      * @param Collection $collection
      * @param array $storeIds
-     * @param int|false $pageSize
-     * @param int|false $currentPage
+     * @param array $params
      * @return Collection
      */
-    public function processSubscriberCollection($collection, $storeIds, $pageSize, $currentPage)
+    public function processSubscriberCollection($collection, $storeIds, $params)
     {
         return $collection;
+    }
+
+    /**
+     * Get allowed request parameters
+     *
+     * @return array
+     */
+    public function getWhereParametersMapping()
+    {
+        return [
+            'subscriber_id' => [
+                'field' => 'subscriber_id',
+                'multiple' => false,
+            ],
+            'subscriber_ids' => [
+                'field' => 'subscriber_id',
+                'multiple' => true,
+            ],
+            'email' => [
+                'field' => 'subscriber_email',
+                'multiple' => false,
+            ],
+            'customer_id' => [
+                'field' => 'customer_id',
+                'multiple' => false,
+            ],
+            'status' => [
+                'field' => 'subscriber_status',
+                'multiple' => false,
+            ],
+            'modified_at' => [
+                'field' => 'change_status_at',
+                'multiple' => false,
+            ],
+        ];
+    }
+
+    /**
+     * Get allowed sort fields
+     *
+     * @return array
+     */
+    public function getAllowedSortFields()
+    {
+        return [
+            'email' => 'subscriber_email',
+            'subscriber_id' => 'subscriber_id',
+            'modified_at' => 'change_status_at',
+        ];
     }
 
     /**
@@ -295,9 +323,12 @@ class Subscribers implements RetrieverInterface
     {
         $email = $subscriber->getSubscriberEmail();
         $row = [
+            'subscriber_id' => $subscriber->getId(),
             'email' => $email,
             'firstname' => '',
-            'lastname' => ''
+            'lastname' => '',
+            'confirmed' => 1,
+            'source' => 'Magento2 subscribers'
         ];
 
         foreach ($this->getAdditionalAttributes($storeIds) as $attributeCode => $field) {
@@ -325,9 +356,7 @@ class Subscribers implements RetrieverInterface
         }
 
         if ($this->isAddTelephone) {
-            $row['telephone'] = isset($cdata['billing_telephone']) ? $cdata['billing_telephone'] : '';
-            $row['billing_telephone'] = isset($cdata['billing_telephone']) ? $cdata['billing_telephone'] : '';
-            $row['shipping_telephone'] = isset($cdata['shipping_telephone']) ? $cdata['shipping_telephone'] : '';
+            $row['phone'] = isset($cdata['telephone']) ? $cdata['telephone'] : '';
         }
 
         return $row;
