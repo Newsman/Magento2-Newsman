@@ -33,7 +33,8 @@
         "magento/module-sales": ">100.0",
         "magento/module-sales-rule": ">100.0",
         "magento/module-store": ">100.0",
-        "ext-curl": "*"
+        "ext-curl": "*",
+        "greenlion/php-sql-parser": "^4.7"
     },
     "replace": {
         "dazoot/module-dazoot-newsman": "self.version",
