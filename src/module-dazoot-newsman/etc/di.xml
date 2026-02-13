@@ -79,6 +79,10 @@
                     <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\Config</item>
                     <item name="code" xsi:type="string">config</item>
                 </item>
+                <item name="custom-sql" xsi:type="array">
+                    <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\CustomSql</item>
+                    <item name="code" xsi:type="string">custom-sql</item>
+                </item>
             </argument>
         </arguments>
     </type>
