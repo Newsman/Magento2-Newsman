@@ -103,8 +103,10 @@ class Customers extends AbstractRetriever
         $count = $collection->getSize();
         $result = [];
 
-        if (($count >= $params['currentPage'] * $params['limit'])
-            || (($count < $params['currentPage'] * $params['limit']) && ($count > ($params['currentPage'] - 1) * $params['limit']))
+        $pageOffset = $params['currentPage'] * $params['limit'];
+        $prevPageOffset = ($params['currentPage'] - 1) * $params['limit'];
+        if (($count >= $pageOffset)
+            || (($count < $pageOffset) && ($count > $prevPageOffset))
         ) {
             /** @var CustomerInterface $customer */
             foreach ($collection as $customer) {

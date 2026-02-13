@@ -212,8 +212,10 @@ class Orders extends AbstractRetriever
         $orderList = $this->orderRepository->getList($searchCriteria);
         $count = $orderList->getTotalCount();
 
-        if (($count >= $params['currentPage'] * $params['limit'])
-            || (($count < $params['currentPage'] * $params['limit']) && ($count > ($params['currentPage'] - 1) * $params['limit']))
+        $pageOffset = $params['currentPage'] * $params['limit'];
+        $prevPageOffset = ($params['currentPage'] - 1) * $params['limit'];
+        if (($count >= $pageOffset)
+            || (($count < $pageOffset) && ($count > $prevPageOffset))
         ) {
             $orders = $orderList->getItems();
             /** @var OrderInterface $order */
