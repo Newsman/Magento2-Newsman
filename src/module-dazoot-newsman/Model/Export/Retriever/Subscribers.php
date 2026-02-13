@@ -107,8 +107,10 @@ class Subscribers extends AbstractRetriever
         $result = [];
 
         $count = $collection->getSize();
-        if (($count >= $params['currentPage'] * $params['limit'])
-            || (($count < $params['currentPage'] * $params['limit']) && ($count > ($params['currentPage'] - 1) * $params['limit']))
+        $pageOffset = $params['currentPage'] * $params['limit'];
+        $prevPageOffset = ($params['currentPage'] - 1) * $params['limit'];
+        if (($count >= $pageOffset)
+            || (($count < $pageOffset) && ($count > $prevPageOffset))
         ) {
             $emails = $collection->getColumnValues('subscriber_email');
             $customerCollection = $this->createCustomerCollection($storeIds, $emails);
