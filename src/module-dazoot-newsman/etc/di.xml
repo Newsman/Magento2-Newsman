@@ -83,6 +83,14 @@
                     <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\CustomSql</item>
                     <item name="code" xsi:type="string">custom-sql</item>
                 </item>
+                <item name="subscriber-subscribe" xsi:type="array">
+                    <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\SubscriberSubscribe</item>
+                    <item name="code" xsi:type="string">subscriber-subscribe</item>
+                </item>
+                <item name="subscriber-unsubscribe" xsi:type="array">
+                    <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\SubscriberUnsubscribe</item>
+                    <item name="code" xsi:type="string">subscriber-unsubscribe</item>
+                </item>
             </argument>
         </arguments>
     </type>
