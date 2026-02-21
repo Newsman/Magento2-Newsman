@@ -19,6 +19,7 @@ use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Composer\ComposerInformation;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\ScopeInterface;
@@ -72,6 +73,11 @@ class ConfigSaveObserver implements ObserverInterface
     protected $logger;
 
     /**
+     * @var ManagerInterface
+     */
+    protected $messageManager;
+
+    /**
      * @param NewsmanConfig $newsmanConfig
      * @param SaveListIntegrationSetup $saveIntegrationService
      * @param StoreManagerInterface $storeManager
@@ -80,6 +86,7 @@ class ConfigSaveObserver implements ObserverInterface
      * @param ProductMetadataInterface $productMetadata
      * @param ComposerInformation $composerInformation
      * @param Logger $logger
+     * @param ManagerInterface $messageManager
      */
     public function __construct(
         NewsmanConfig $newsmanConfig,
@@ -89,7 +96,8 @@ class ConfigSaveObserver implements ObserverInterface
         TypeListInterface $cacheTypeList,
         ProductMetadataInterface $productMetadata,
         ComposerInformation $composerInformation,
-        Logger $logger
+        Logger $logger,
+        ManagerInterface $messageManager
     ) {
         $this->newsmanConfig = $newsmanConfig;
         $this->saveIntegrationService = $saveIntegrationService;
@@ -99,6 +107,7 @@ class ConfigSaveObserver implements ObserverInterface
         $this->productMetadata = $productMetadata;
         $this->composerInformation = $composerInformation;
         $this->logger = $logger;
+        $this->messageManager = $messageManager;
     }
 
     /**
@@ -150,6 +159,9 @@ class ConfigSaveObserver implements ObserverInterface
             $this->callSaveListIntegrationSetup($listId, $userId, $apiKey, $storeModel, $authenticateToken);
         } catch (\Exception $e) {
             $this->logger->error('ConfigSaveObserver: saveListIntegrationSetup failed: ' . $e->getMessage());
+            $this->messageManager->addErrorMessage(
+                __('Newsman integration setup failed: %1', $e->getMessage())
+            );
         }
     }
 
