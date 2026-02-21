@@ -11,12 +11,17 @@ use Dazoot\Newsmanmarketing\Api\Data\OrderQueueInterface;
 use Dazoot\Newsmanmarketing\Api\OrderQueueRepositoryInterface;
 use Dazoot\Newsmanmarketing\Model\Config;
 use Dazoot\Newsman\Logger\Logger;
-use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Store\Model\StoreManagerInterface;
+use Dazoot\Newsmanmarketing\Model\Order\Mapper as OrderMapper;
+use Dazoot\Newsmanmarketing\Model\Service\Context\SaveOrderContext;
+use Dazoot\Newsmanmarketing\Model\Service\Context\SaveOrderContextFactory;
 use Dazoot\Newsmanmarketing\Model\Service\Context\SetPurchaseStatusContext;
 use Dazoot\Newsmanmarketing\Model\Service\Context\SetPurchaseStatusContextFactory;
+use Dazoot\Newsmanmarketing\Model\Service\SaveOrder;
 use Dazoot\Newsmanmarketing\Model\Service\SetPurchaseStatus;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Export order state to Newsman API consumer
@@ -65,6 +70,34 @@ class Consumer
     protected $setPurchaseStatus;
 
     /**
+     * Service to save order data to Newsman.
+     *
+     * @var SaveOrder
+     */
+    protected $saveOrder;
+
+    /**
+     * Factory for building save order API context.
+     *
+     * @var SaveOrderContextFactory
+     */
+    protected $saveOrderContextFactory;
+
+    /**
+     * Maps Magento order to Newsman API payload.
+     *
+     * @var OrderMapper
+     */
+    protected $orderMapper;
+
+    /**
+     * Magento order repository.
+     *
+     * @var OrderRepositoryInterface
+     */
+    protected $orderRepository;
+
+    /**
      * Newsman logger.
      *
      * @var Logger
@@ -77,6 +110,10 @@ class Consumer
      * @param StoreManagerInterface $storeManager
      * @param SetPurchaseStatusContextFactory $contextFactory
      * @param SetPurchaseStatus $setPurchaseStatus
+     * @param SaveOrder $saveOrder
+     * @param SaveOrderContextFactory $saveOrderContextFactory
+     * @param OrderMapper $orderMapper
+     * @param OrderRepositoryInterface $orderRepository
      * @param Logger $logger
      */
     public function __construct(
@@ -85,6 +122,10 @@ class Consumer
         StoreManagerInterface $storeManager,
         SetPurchaseStatusContextFactory $contextFactory,
         SetPurchaseStatus $setPurchaseStatus,
+        SaveOrder $saveOrder,
+        SaveOrderContextFactory $saveOrderContextFactory,
+        OrderMapper $orderMapper,
+        OrderRepositoryInterface $orderRepository,
         Logger $logger
     ) {
         $this->config = $config;
@@ -92,6 +133,10 @@ class Consumer
         $this->storeManager = $storeManager;
         $this->contextFactory = $contextFactory;
         $this->setPurchaseStatus = $setPurchaseStatus;
+        $this->saveOrder = $saveOrder;
+        $this->saveOrderContextFactory = $saveOrderContextFactory;
+        $this->orderMapper = $orderMapper;
+        $this->orderRepository = $orderRepository;
         $this->logger = $logger;
     }
 
@@ -212,6 +257,11 @@ class Consumer
     /**
      * Trigger the order export service for a queue entry.
      *
+     * Calls remarketing.saveOrder to sync full order data, then
+     * remarketing.setPurchaseStatus to update the order state.
+     * saveOrder errors are logged but do not prevent setPurchaseStatus
+     * from running. setPurchaseStatus errors propagate to trigger retry logic.
+     *
      * @param OrderQueueInterface $queue
      * @return void
      * @throws NoSuchEntityException
@@ -219,6 +269,18 @@ class Consumer
      */
     public function exportOrder($queue)
     {
+        try {
+            $order = $this->orderRepository->get($queue->getOrderId());
+            /** @var SaveOrderContext $saveOrderContext */
+            $saveOrderContext = $this->saveOrderContextFactory->create()
+                ->setStore($this->storeManager->getStore($queue->getStoreId()))
+                ->setOrderDetails($this->orderMapper->getOrderDetails($order))
+                ->setOrderProducts($this->orderMapper->getOrderProducts($order));
+            $this->saveOrder->execute($saveOrderContext);
+        } catch (\Exception $e) {
+            $this->logger->error($e);
+        }
+
         $this->setPurchaseStatus->execute($this->getOrderContext($queue));
     }
 
