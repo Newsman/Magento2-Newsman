@@ -16,9 +16,9 @@ use Dazoot\Newsman\Model\Service\Context\Configuration\SaveListIntegrationSetupC
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Framework\Composer\ComposerInformation;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Framework\Filesystem\Driver\File as FileDriver;
 use Magento\Framework\UrlInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\ScopeInterface;
@@ -62,9 +62,9 @@ class ConfigSaveObserver implements ObserverInterface
     protected $productMetadata;
 
     /**
-     * @var FileDriver
+     * @var ComposerInformation
      */
-    protected $fileDriver;
+    protected $composerInformation;
 
     /**
      * @var Logger
@@ -78,7 +78,7 @@ class ConfigSaveObserver implements ObserverInterface
      * @param WriterInterface $configWriter
      * @param TypeListInterface $cacheTypeList
      * @param ProductMetadataInterface $productMetadata
-     * @param FileDriver $fileDriver
+     * @param ComposerInformation $composerInformation
      * @param Logger $logger
      */
     public function __construct(
@@ -88,7 +88,7 @@ class ConfigSaveObserver implements ObserverInterface
         WriterInterface $configWriter,
         TypeListInterface $cacheTypeList,
         ProductMetadataInterface $productMetadata,
-        FileDriver $fileDriver,
+        ComposerInformation $composerInformation,
         Logger $logger
     ) {
         $this->newsmanConfig = $newsmanConfig;
@@ -97,7 +97,7 @@ class ConfigSaveObserver implements ObserverInterface
         $this->configWriter = $configWriter;
         $this->cacheTypeList = $cacheTypeList;
         $this->productMetadata = $productMetadata;
-        $this->fileDriver = $fileDriver;
+        $this->composerInformation = $composerInformation;
         $this->logger = $logger;
     }
 
@@ -170,21 +170,10 @@ class ConfigSaveObserver implements ObserverInterface
         $baseUrl = $store->getBaseUrl(UrlInterface::URL_TYPE_WEB, true);
         $apiUrl = rtrim($baseUrl, '/') . '/newsman/index/index';
 
-        $pluginVersion = '0.0.0';
-        try {
-            $composerFile = $this->fileDriver->getParentDirectory(__DIR__);
-            for ($i = 0; $i < 3; $i++) {
-                $composerFile = $this->fileDriver->getParentDirectory($composerFile);
-            }
-            $composerFile .= '/composer.json';
-            if ($this->fileDriver->isExists($composerFile)) {
-                $composerData = json_decode($this->fileDriver->fileGetContents($composerFile), true);
-                if (isset($composerData['version'])) {
-                    $pluginVersion = $composerData['version'];
-                }
-            }
-        } catch (\Exception $e) {
-            $this->logger->debug('Could not read plugin version: ' . $e->getMessage());
+        $pluginVersion = 'unknown';
+        $packages = $this->composerInformation->getInstalledMagentoPackages();
+        if (isset($packages[NewsmanConfig::COMPOSER_PACKAGE_NAME])) {
+            $pluginVersion = $packages[NewsmanConfig::COMPOSER_PACKAGE_NAME]['version'];
         }
 
         $payload = [

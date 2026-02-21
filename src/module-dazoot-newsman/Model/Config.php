@@ -157,6 +157,11 @@ class Config
     public const XML_PATH_STORED_SEGMENTS_PLACEHOLDER = 'newsman/stored/segments_%s';
 
     /**
+     * Composer package name for this extension
+     */
+    public const COMPOSER_PACKAGE_NAME = 'newsman/magento2x';
+
+    /**
      * Store config
      *
      * @var ScopeConfigInterface
