@@ -17,6 +17,9 @@ use Magento\Config\Controller\Adminhtml\System\ConfigSectionChecker;
 use Magento\Store\Model\StoreManagerInterface;
 use Dazoot\Newsman\Model\Config\Source\Lists as ListsSource;
 
+/**
+ * @deprecated
+ */
 class ExportSubscribers extends AbstractConfig
 {
     /**

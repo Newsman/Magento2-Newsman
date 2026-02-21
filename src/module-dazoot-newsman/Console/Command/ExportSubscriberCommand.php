@@ -18,6 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Command to export newsletter subscribers
  * @see \Dazoot\Newsman\Cron\ExportSubscribers
+ * @deprecated
  */
 class ExportSubscriberCommand extends Command
 {

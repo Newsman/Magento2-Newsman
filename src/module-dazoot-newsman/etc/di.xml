@@ -11,7 +11,7 @@
     <preference for="Dazoot\Newsman\Model\Api\ContextInterface" type="Dazoot\Newsman\Model\Api\Context" />
     <preference for="Dazoot\Newsman\Model\Api\ClientInterface" type="Dazoot\Newsman\Model\Api\Client" />
     <preference for="Dazoot\Newsman\Model\User\IpAddressInterface" type="Dazoot\Newsman\Model\User\IpAddress" />
-    <type name="Magento\Framework\Console\CommandListInterface">
+    <!-- deprecated <type name="Magento\Framework\Console\CommandListInterface">
         <arguments>
             <argument name="commands" xsi:type="array">
                 <item name="dazootNewsmanExportSubscribers" xsi:type="object">Dazoot\Newsman\Console\Command\ExportSubscriberCommand</item>
@@ -22,7 +22,7 @@
         <arguments>
             <argument name="exportSubscriberConsumer" xsi:type="object">Dazoot\Newsman\Model\Newsletter\Bulk\Export\Consumer\Proxy</argument>
         </arguments>
-    </type>
+    </type>-->
     <type name="Dazoot\Newsman\Logger\Logger">
         <arguments>
             <argument name="config" xsi:type="object">Dazoot\Newsman\Model\Config\Proxy</argument>

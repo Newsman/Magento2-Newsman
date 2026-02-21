@@ -10,5 +10,5 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/publisher.xsd">
     <publisher topic="dazoot_newsman.newsletter.bulk.unsubscribe"/>
     <publisher topic="dazoot_newsman.newsletter.bulk.delete"/>
-    <publisher topic="dazoot_newsman.newsletter.bulk.export.list"/>
+    <!-- deprecated <publisher topic="dazoot_newsman.newsletter.bulk.export.list"/>-->
 </config>

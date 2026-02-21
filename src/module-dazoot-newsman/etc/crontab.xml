@@ -9,9 +9,9 @@
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
     <group id="default">
-        <job name="dazoot_newsman_export_subscribers" instance="Dazoot\Newsman\Cron\ExportSubscribers" method="execute">
+        <!-- deprecated <job name="dazoot_newsman_export_subscribers" instance="Dazoot\Newsman\Cron\ExportSubscribers" method="execute">
             <schedule>45 1 * * *</schedule>
-        </job>
+        </job>-->
         <job name="dazoot_newsman_log_rotate" instance="Dazoot\Newsman\Cron\LogRotate" method="execute">
             <schedule>30 5 * * 0</schedule>
         </job>
