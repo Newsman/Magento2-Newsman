@@ -17,8 +17,8 @@ use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Framework\Composer\ComposerInformation;
 use Magento\Framework\Controller\Result\Redirect;
-use Magento\Framework\Filesystem\Driver\File as FileDriver;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\ScopeInterface;
 
@@ -75,11 +75,11 @@ class SaveConfigureList extends Action
     protected ProductMetadataInterface $productMetadata;
 
     /**
-     * Filesystem driver for file operations.
+     * Composer information for reading installed package versions.
      *
-     * @var FileDriver
+     * @var ComposerInformation
      */
-    protected FileDriver $fileDriver;
+    protected ComposerInformation $composerInformation;
 
     /**
      * Logger instance.
@@ -98,7 +98,7 @@ class SaveConfigureList extends Action
      * @param NewsmanConfig $newsmanConfig
      * @param SaveListIntegrationSetup $saveIntegrationService
      * @param ProductMetadataInterface $productMetadata
-     * @param FileDriver $fileDriver
+     * @param ComposerInformation $composerInformation
      * @param Logger $logger
      */
     public function __construct(
@@ -109,7 +109,7 @@ class SaveConfigureList extends Action
         NewsmanConfig $newsmanConfig,
         SaveListIntegrationSetup $saveIntegrationService,
         ProductMetadataInterface $productMetadata,
-        FileDriver $fileDriver,
+        ComposerInformation $composerInformation,
         Logger $logger
     ) {
         parent::__construct($context);
@@ -119,7 +119,7 @@ class SaveConfigureList extends Action
         $this->newsmanConfig = $newsmanConfig;
         $this->saveIntegrationService = $saveIntegrationService;
         $this->productMetadata = $productMetadata;
-        $this->fileDriver = $fileDriver;
+        $this->composerInformation = $composerInformation;
         $this->logger = $logger;
     }
 
@@ -225,21 +225,10 @@ class SaveConfigureList extends Action
             $baseUrl = $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_WEB, true);
             $apiUrl = rtrim($baseUrl, '/') . '/newsman/index/index';
 
-            $pluginVersion = '0.0.0';
-            try {
-                $composerFile = $this->fileDriver->getParentDirectory(__DIR__);
-                for ($i = 0; $i < 4; $i++) {
-                    $composerFile = $this->fileDriver->getParentDirectory($composerFile);
-                }
-                $composerFile .= '/composer.json';
-                if ($this->fileDriver->isExists($composerFile)) {
-                    $composerData = json_decode($this->fileDriver->fileGetContents($composerFile), true);
-                    if (isset($composerData['version'])) {
-                        $pluginVersion = $composerData['version'];
-                    }
-                }
-            } catch (\Exception $e) {
-                $this->logger->debug('Could not read plugin version: ' . $e->getMessage());
+            $pluginVersion = 'unknown';
+            $packages = $this->composerInformation->getInstalledMagentoPackages();
+            if (isset($packages[NewsmanConfig::COMPOSER_PACKAGE_NAME])) {
+                $pluginVersion = $packages[NewsmanConfig::COMPOSER_PACKAGE_NAME]['version'];
             }
 
             $payload = [
