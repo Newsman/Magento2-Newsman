@@ -7,6 +7,7 @@
  */
 namespace Dazoot\Newsman\Model\Export\Retriever;
 
+use Dazoot\Newsman\Model\Config as NewsmanConfig;
 use Magento\Framework\Composer\ComposerInformation;
 
 /**
@@ -33,8 +34,8 @@ class NewsmanVersion extends AbstractRetriever implements RetrieverInterface
     public function process($data = [], $storeIds = [])
     {
         $packages = $this->composerInformation->getInstalledMagentoPackages();
-        if (isset($packages['newsman/magento2x'])) {
-            return ['version' => $packages['newsman/magento2x']['version']];
+        if (isset($packages[NewsmanConfig::COMPOSER_PACKAGE_NAME])) {
+            return ['version' => $packages[NewsmanConfig::COMPOSER_PACKAGE_NAME]['version']];
         }
 
         return ['version' => 'unknown'];
