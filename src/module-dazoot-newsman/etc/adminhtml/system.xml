@@ -97,11 +97,11 @@
                     <source_model>Dazoot\Newsman\Model\Config\Source\Segments</source_model>
                     <comment><![CDATA[All Newsman segments. Selecting a segment is not mandatory. The segment ID must match corresponding list ID.]]></comment>
                 </field>
-                <field id="export_newsletter_subscribers" type="Dazoot\Newsman\Block\Adminhtml\Form\Field\ExportNewsletterSubscribers" sortOrder="70" showInDefault="1"
+                <!-- deprecated <field id="export_newsletter_subscribers" type="Dazoot\Newsman\Block\Adminhtml\Form\Field\ExportNewsletterSubscribers" sortOrder="70" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <label>Export</label>
                     <comment><![CDATA[The export of newsletter subscribers uses saved API list ID and segment ID configuration.<br />It exports the subscribers from all stores associated with current list ID.<br />Please save first the settings before exporting.]]></comment>
-                </field>
+                </field>-->
             </group>
             <group id="export" translate="label" type="text" sortOrder="40" showInDefault="1"
                    showInWebsite="1" showInStore="1">
