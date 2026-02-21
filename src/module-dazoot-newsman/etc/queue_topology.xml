@@ -11,6 +11,6 @@
     <exchange name="magento-db" type="topic" connection="db">
         <binding id="dazoot_newsman_newsletter_bulk_unsubscribe" topic="dazoot_newsman.newsletter.bulk.unsubscribe" destinationType="queue" destination="dazoot_newsman.newsletter.bulk.unsubscribe"/>
         <binding id="dazoot_newsman_newsletter_bulk_delete" topic="dazoot_newsman.newsletter.bulk.delete" destinationType="queue" destination="dazoot_newsman.newsletter.bulk.delete"/>
-        <binding id="dazoot_newsman_newsletter_bulk_export_list" topic="dazoot_newsman.newsletter.bulk.export.list" destinationType="queue" destination="dazoot_newsman.newsletter.bulk.export.list"/>
+        <!-- deprecated <binding id="dazoot_newsman_newsletter_bulk_export_list" topic="dazoot_newsman.newsletter.bulk.export.list" destinationType="queue" destination="dazoot_newsman.newsletter.bulk.export.list"/>-->
     </exchange>
 </config>
