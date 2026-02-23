@@ -9,7 +9,11 @@ namespace Dazoot\Newsman\Controller\Adminhtml\System\Config;
 
 use Dazoot\Newsman\Model\Config as NewsmanConfig;
 use Dazoot\Newsman\Model\Service\Configuration\Integration\SaveListIntegrationSetup;
+use Dazoot\Newsman\Model\Service\Configuration\SetFeedOnList;
+use Dazoot\Newsman\Model\Service\Configuration\UpdateFeed;
 use Dazoot\Newsman\Model\Service\Context\Configuration\SaveListIntegrationSetupContext;
+use Dazoot\Newsman\Model\Service\Context\Configuration\SetFeedOnListContext;
+use Dazoot\Newsman\Model\Service\Context\Configuration\UpdateFeedContext;
 use Dazoot\Newsman\Logger\Logger;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
@@ -89,6 +93,20 @@ class SaveConfigureList extends Action
     protected Logger $logger;
 
     /**
+     * Service for installing a product feed on a Newsman list.
+     *
+     * @var SetFeedOnList
+     */
+    protected SetFeedOnList $setFeedOnListService;
+
+    /**
+     * Service for updating a product feed in Newsman.
+     *
+     * @var UpdateFeed
+     */
+    protected UpdateFeed $updateFeedService;
+
+    /**
      * SaveConfigureList constructor.
      *
      * @param Context $context
@@ -100,6 +118,8 @@ class SaveConfigureList extends Action
      * @param ProductMetadataInterface $productMetadata
      * @param ComposerInformation $composerInformation
      * @param Logger $logger
+     * @param SetFeedOnList $setFeedOnListService
+     * @param UpdateFeed $updateFeedService
      */
     public function __construct(
         Context $context,
@@ -110,7 +130,9 @@ class SaveConfigureList extends Action
         SaveListIntegrationSetup $saveIntegrationService,
         ProductMetadataInterface $productMetadata,
         ComposerInformation $composerInformation,
-        Logger $logger
+        Logger $logger,
+        SetFeedOnList $setFeedOnListService,
+        UpdateFeed $updateFeedService
     ) {
         parent::__construct($context);
         $this->configWriter = $configWriter;
@@ -121,6 +143,8 @@ class SaveConfigureList extends Action
         $this->productMetadata = $productMetadata;
         $this->composerInformation = $composerInformation;
         $this->logger = $logger;
+        $this->setFeedOnListService = $setFeedOnListService;
+        $this->updateFeedService = $updateFeedService;
     }
 
     /**
@@ -192,6 +216,8 @@ class SaveConfigureList extends Action
             );
         }
 
+        $this->callSetFeedOnList($listId, $storeModel, $scope, $scopeId);
+
         $this->messageManager->addSuccessMessage(__('Newsman list saved successfully.'));
 
         /** @var Redirect $resultRedirect */
@@ -253,6 +279,86 @@ class SaveConfigureList extends Action
         } catch (\Exception $e) {
             $this->logger->error('saveListIntegrationSetup failed: ' . $e->getMessage());
             return false;
+        }
+    }
+
+    /**
+     * Call the setFeedOnList API and add a user notice about the result.
+     *
+     * @param int $listId
+     * @param \Magento\Store\Api\Data\StoreInterface|null $storeModel
+     * @param string $scope
+     * @param int $scopeId
+     * @return void
+     */
+    protected function callSetFeedOnList($listId, $storeModel, $scope, $scopeId)
+    {
+        try {
+            $userId = $this->newsmanConfig->getUserId($storeModel);
+            $apiKey = $this->newsmanConfig->getApiKey($storeModel);
+
+            if (empty($userId) || empty($apiKey)) {
+                return;
+            }
+
+            $store = $storeModel ?: $this->storeManager->getStore();
+            $baseUrl = $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_WEB, true);
+            $feedUrl = rtrim($baseUrl, '/') . '/newsman/index/index?newsman=products.json&nzmhash=' . $apiKey;
+
+            $context = new SetFeedOnListContext();
+            $context->setUserId($userId)
+                ->setApiKey($apiKey)
+                ->setListId($listId)
+                ->setUrl($feedUrl)
+                ->setWebsite(rtrim($baseUrl, '/'))
+                ->setType('NewsMAN')
+                ->setReturnId(1);
+
+            $result = $this->setFeedOnListService->execute($context);
+
+            if (is_array($result) && !empty($result['feed_id'])) {
+                $authName = $this->generateRandomToken(16);
+                $authValue = $this->generateRandomToken(32);
+
+                $updateContext = new UpdateFeedContext();
+                $updateContext->setUserId($userId)
+                    ->setApiKey($apiKey)
+                    ->setListId($listId)
+                    ->setFeedId($result['feed_id'])
+                    ->setProperties([
+                        'auth_header_name'  => $authName,
+                        'auth_header_value' => $authValue,
+                    ]);
+
+                $updateResult = $this->updateFeedService->execute($updateContext);
+
+                if ($updateResult !== false) {
+                    $this->configWriter->save(
+                        NewsmanConfig::XML_PATH_EXPORT_AUTHORIZE_HEADER_NAME,
+                        $authName,
+                        $scope,
+                        $scopeId
+                    );
+                    $this->configWriter->save(
+                        NewsmanConfig::XML_PATH_EXPORT_AUTHORIZE_HEADER_KEY,
+                        $authValue,
+                        $scope,
+                        $scopeId
+                    );
+                    $this->cacheTypeList->cleanType(\Magento\Framework\App\Cache\Type\Config::TYPE_IDENTIFIER);
+                }
+
+                $this->messageManager->addSuccessMessage(__('Products feed installed in Newsman.'));
+            } else {
+                $this->messageManager->addWarningMessage(
+                    __('Products feed could not be installed. It may already exist in Newsman.')
+                );
+            }
+        } catch (\Exception $e) {
+            $this->logger->warning('callSetFeedOnList: ' . $e->getMessage());
+            $this->messageManager->addWarningMessage(
+                __('Products feed could not be installed. It may already exist in Newsman.')
+            );
         }
     }
 
