@@ -28,7 +28,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 /**
  * Observer for Newsman admin system config save.
  *
- * Calls saveListIntegrationSetup when the list ID is changed via system configuration.
+ * Calls saveListIntegrationSetup when the list ID, user ID, or API key is changed via system configuration.
  */
 class ConfigSaveObserver implements ObserverInterface
 {
@@ -120,7 +120,12 @@ class ConfigSaveObserver implements ObserverInterface
     {
         $changedPaths = (array) $observer->getEvent()->getData('changed_paths');
 
-        if (!in_array(NewsmanConfig::XML_PATH_CREDENTIALS_LIST_ID, $changedPaths, true)) {
+        $relevantPaths = [
+            NewsmanConfig::XML_PATH_CREDENTIALS_LIST_ID,
+            NewsmanConfig::XML_PATH_CREDENTIALS_USER_ID,
+            NewsmanConfig::XML_PATH_CREDENTIALS_API_KEY,
+        ];
+        if (empty(array_intersect($relevantPaths, $changedPaths))) {
             return;
         }
 
