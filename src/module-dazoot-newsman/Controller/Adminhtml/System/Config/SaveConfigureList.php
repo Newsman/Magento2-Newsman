@@ -290,6 +290,7 @@ class SaveConfigureList extends Action
      * @param string $scope
      * @param int $scopeId
      * @return void
+     * @deprecated
      */
     protected function callSetFeedOnList($listId, $storeModel, $scope, $scopeId)
     {
