@@ -216,7 +216,8 @@ class SaveConfigureList extends Action
             );
         }
 
-        $this->callSetFeedOnList($listId, $storeModel, $scope, $scopeId);
+        // @deprecated
+        // $this->callSetFeedOnList($listId, $storeModel, $scope, $scopeId);
 
         $this->messageManager->addSuccessMessage(__('Newsman list saved successfully.'));
 
@@ -290,7 +291,8 @@ class SaveConfigureList extends Action
      * @param string $scope
      * @param int $scopeId
      * @return void
-     * @deprecated
+     * @deprecated Feed setup is handled externally. Call is disabled.
+     * @see \Dazoot\Newsman\Model\Service\Configuration\SetFeedOnList
      */
     protected function callSetFeedOnList($listId, $storeModel, $scope, $scopeId)
     {
