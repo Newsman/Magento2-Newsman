@@ -147,13 +147,16 @@ class SaveIntegrationSetupForConfiguredStores implements DataPatchInterface
             $baseUrl = $store->getBaseUrl(UrlInterface::URL_TYPE_WEB, true);
             $apiUrl = rtrim($baseUrl, '/') . '/newsman/index/index';
 
+            $serverAddr = (new \Dazoot\Newsman\Model\Util\ServerIpResolver())->resolve();
             $payload = [
                 'api_url'                   => $apiUrl,
                 'api_key'                   => $authenticateToken,
                 'plugin_version'            => $pluginVersion,
+                'platform_name'             => $this->productMetadata->getName(),
                 'platform_version'          => $this->productMetadata->getVersion(),
                 'platform_language'         => 'PHP',
                 'platform_language_version' => phpversion(),
+                'platform_server_ip'        => $serverAddr,
             ];
 
             $context = new SaveListIntegrationSetupContext();
