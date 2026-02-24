@@ -95,6 +95,19 @@ class HostIpAddress implements IpAddressInterface
             return $this->ip;
         }
 
+        $resolver = new \Dazoot\Newsman\Model\Util\ServerIpResolver();
+        $ip = $resolver->resolve();
+        if (!empty($ip)) {
+            $this->configWriter->save(
+                Config::XML_PATH_SERVER_IP,
+                $ip,
+                \Magento\Framework\App\ScopeInterface::SCOPE_DEFAULT
+            );
+            $this->cacheTypeList->cleanType(\Magento\Framework\App\Cache\Type\Config::TYPE_IDENTIFIER);
+            $this->ip = $ip;
+            return $this->ip;
+        }
+
         $ip = $this->lookupIp($this->getUrl());
         if (empty($ip)) {
             $ip = self::NOT_FOUND;

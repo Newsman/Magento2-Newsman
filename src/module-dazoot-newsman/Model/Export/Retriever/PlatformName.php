@@ -10,9 +10,9 @@ namespace Dazoot\Newsman\Model\Export\Retriever;
 use Magento\Framework\App\ProductMetadataInterface;
 
 /**
- * Get Magento version
+ * Get store platform name
  */
-class Version extends AbstractRetriever implements RetrieverInterface
+class PlatformName extends AbstractRetriever implements RetrieverInterface
 {
     /**
      * @var ProductMetadataInterface
@@ -32,6 +32,6 @@ class Version extends AbstractRetriever implements RetrieverInterface
      */
     public function process($data = [], $storeIds = [])
     {
-        return ['version' => 'Magento ' . $this->productMetadata->getVersion() . ''];
+        return ['name' => $this->productMetadata->getName()];
     }
 }

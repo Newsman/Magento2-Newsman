@@ -11,9 +11,9 @@ use Dazoot\Newsman\Model\Config as NewsmanConfig;
 use Magento\Framework\Composer\ComposerInformation;
 
 /**
- * Get Newsman extension version
+ * Get Newsman integration version
  */
-class NewsmanVersion extends AbstractRetriever implements RetrieverInterface
+class IntegrationVersion extends AbstractRetriever implements RetrieverInterface
 {
     /**
      * @var ComposerInformation
