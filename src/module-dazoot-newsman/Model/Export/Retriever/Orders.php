@@ -351,6 +351,7 @@ class Orders extends AbstractRetriever
             'billing_company_name' => $order->getBillingAddress()->getCompany(),
             'billing_phone' => $billingPhone,
             'customer_email' => $order->getCustomerEmail(),
+            'customer_id' => $order->getCustomerId() !== null ? (string)$order->getCustomerId() : '',
             'shipping_amount' => (float)$order->getBaseShippingInclTax(),
             'tax_amount' => (float)$order->getBaseTaxAmount(),
             'total_amount' => (float)$order->getBaseGrandTotal(),
