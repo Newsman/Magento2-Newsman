@@ -39,13 +39,45 @@
     <type name="Dazoot\Newsman\Model\Export\Retriever\Pool">
         <arguments>
             <argument name="retrieverList" xsi:type="array">
-                <item name="version" xsi:type="array">
-                    <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\Version</item>
-                    <item name="code" xsi:type="string">version</item>
+                <item name="platform-name" xsi:type="array">
+                    <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\PlatformName</item>
+                    <item name="code" xsi:type="string">platform-name</item>
                 </item>
-                <item name="newsman-version" xsi:type="array">
-                    <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\NewsmanVersion</item>
-                    <item name="code" xsi:type="string">newsman-version</item>
+                <item name="platform-version" xsi:type="array">
+                    <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\PlatformVersion</item>
+                    <item name="code" xsi:type="string">platform-version</item>
+                </item>
+                <item name="platform-language" xsi:type="array">
+                    <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\PlatformLanguage</item>
+                    <item name="code" xsi:type="string">platform-language</item>
+                </item>
+                <item name="platform-language-version" xsi:type="array">
+                    <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\PlatformLanguageVersion</item>
+                    <item name="code" xsi:type="string">platform-language-version</item>
+                </item>
+                <item name="integration-name" xsi:type="array">
+                    <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\IntegrationName</item>
+                    <item name="code" xsi:type="string">integration-name</item>
+                </item>
+                <item name="integration-version" xsi:type="array">
+                    <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\IntegrationVersion</item>
+                    <item name="code" xsi:type="string">integration-version</item>
+                </item>
+                <item name="server-ip" xsi:type="array">
+                    <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\ServerIp</item>
+                    <item name="code" xsi:type="string">server-ip</item>
+                </item>
+                <item name="server-cloudflare" xsi:type="array">
+                    <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\ServerCloudflare</item>
+                    <item name="code" xsi:type="string">server-cloudflare</item>
+                </item>
+                <item name="sql-name" xsi:type="array">
+                    <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\SqlName</item>
+                    <item name="code" xsi:type="string">sql-name</item>
+                </item>
+                <item name="sql-version" xsi:type="array">
+                    <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\SqlVersion</item>
+                    <item name="code" xsi:type="string">sql-version</item>
                 </item>
                 <item name="orders" xsi:type="array">
                     <item name="class" xsi:type="string">\Dazoot\Newsman\Model\Export\Retriever\Orders</item>
