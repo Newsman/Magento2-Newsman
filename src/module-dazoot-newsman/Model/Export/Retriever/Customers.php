@@ -10,10 +10,12 @@ namespace Dazoot\Newsman\Model\Export\Retriever;
 use Dazoot\Newsman\Logger\Logger;
 use Dazoot\Newsman\Model\Config;
 use Dazoot\Newsman\Model\Config\Customer\GetAdditionalAttributes;
+use Magento\Customer\Api\GroupRepositoryInterface;
 use Magento\Customer\Model\Customer;
 use Magento\Customer\Model\ResourceModel\Customer\Collection;
 use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory as CollectionFactory;
 use Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Store\Model\StoreManagerInterface;
 
@@ -50,6 +52,23 @@ class Customers extends AbstractRetriever
     protected $config;
 
     /**
+     * @var GroupRepositoryInterface
+     */
+    protected $groupRepository;
+
+    /**
+     * @var SearchCriteriaBuilder
+     */
+    protected $searchCriteriaBuilder;
+
+    /**
+     * Customer groups indexed by ID: [ id => name ]
+     *
+     * @var array
+     */
+    protected $customerGroupsById = [];
+
+    /**
      * @var bool
      */
     protected $isAddTelephone = false;
@@ -60,19 +79,25 @@ class Customers extends AbstractRetriever
      * @param Logger $logger
      * @param GetAdditionalAttributes $getAdditionalAttributes
      * @param Config $config
+     * @param GroupRepositoryInterface $groupRepository
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
      */
     public function __construct(
         CollectionFactory $collectionFactory,
         StoreManagerInterface $storeManager,
         Logger $logger,
         GetAdditionalAttributes $getAdditionalAttributes,
-        Config $config
+        Config $config,
+        GroupRepositoryInterface $groupRepository,
+        SearchCriteriaBuilder $searchCriteriaBuilder
     ) {
         $this->collectionFactory = $collectionFactory;
         $this->storeManager = $storeManager;
         $this->logger = $logger;
         $this->getAdditionalAttributes = $getAdditionalAttributes;
         $this->config = $config;
+        $this->groupRepository = $groupRepository;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
     }
 
     /**
@@ -80,6 +105,7 @@ class Customers extends AbstractRetriever
      */
     public function process($data = [], $storeIds = [])
     {
+        $this->loadCustomerGroups();
         $this->isAddTelephone = $this->config->isCustomerSendTelephoneByStoreIds($storeIds);
 
         $params = $this->processListParameters($data, self::DEFAULT_PAGE_SIZE);
@@ -232,6 +258,21 @@ class Customers extends AbstractRetriever
     }
 
     /**
+     * Load all customer groups into $customerGroupsById indexed by group ID.
+     *
+     * @return void
+     */
+    protected function loadCustomerGroups()
+    {
+        $this->customerGroupsById = [];
+        $searchCriteria = $this->searchCriteriaBuilder->create();
+        $groups = $this->groupRepository->getList($searchCriteria)->getItems();
+        foreach ($groups as $group) {
+            $this->customerGroupsById[(int)$group->getId()] = $group->getCode();
+        }
+    }
+
+    /**
      * Map customer data into an export row.
      *
      * @param CustomerInterface|Customer $customer
@@ -240,13 +281,20 @@ class Customers extends AbstractRetriever
      */
     public function processCustomer($customer, $storeIds)
     {
+        $groupId = (int)$customer->getGroupId();
+        $customerGroups = [];
+        if (isset($this->customerGroupsById[$groupId])) {
+            $customerGroups = [['id' => $groupId, 'name' => $this->customerGroupsById[$groupId]]];
+        }
+
         $row = [
             'customer_id' => $customer->getId(),
             'email' => $customer->getEmail(),
             'firstname' => $customer->getFirstname(),
             'lastname' => $customer->getLastname(),
             'date_created' => $customer->getCreatedAt(),
-            'source' => 'Magento2 customers'
+            'source' => 'Magento2 customers',
+            'customer_groups' => $customerGroups,
         ];
 
         $row = $this->processTelephone($customer, $storeIds, $row);
