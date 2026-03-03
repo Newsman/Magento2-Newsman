@@ -18,7 +18,8 @@ use Magento\Store\Model\StoreManagerInterface;
 use Dazoot\Newsman\Model\Config\Source\Lists as ListsSource;
 
 /**
- * @deprecated
+ * @deprecated Use the CLI console command instead.
+ * @see \Dazoot\Newsman\Console\Command\ExportSubscriberCommand
  */
 class ExportSubscribers extends AbstractConfig
 {

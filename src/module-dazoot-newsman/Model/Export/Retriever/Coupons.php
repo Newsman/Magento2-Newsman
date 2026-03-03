@@ -17,6 +17,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Customer\Api\GroupManagementInterface;
 use Magento\SalesRule\Model\Rule\Condition\Address as ConditionAddress;
 use Magento\SalesRule\Model\Rule\Condition\AddressFactory as ConditionAddressFactory;
+use Dazoot\Newsman\Model\Export\Retriever\V1\ApiV1Exception;
 
 /**
  * Add coupons
@@ -91,26 +92,58 @@ class Coupons extends AbstractRetriever implements RetrieverInterface
      * @param array $data
      * @param array $storeIds
      * @return array
+     * @throws ApiV1Exception On invalid parameters in API v1 context.
      */
     public function process($data = [], $storeIds = [])
     {
         $this->logger->info(__('Add coupons: %1', json_encode($data)));
 
-        $discountType = (int) ($data['type'] >= 0 ? $data['type'] : -1);
-        $value = (float) (!empty($data['value']) ? $data['value'] : -1);
-        $batchSize = (int) (!empty($data['batch_size']) ? $data['batch_size'] : 1);
-        $prefix = (string) (!empty($data['prefix']) ? $data['prefix'] : '');
-        $expireDate = isset($data['expire_date']) ? $data['expire_date'] : null;
-        //$currency = (string) (!empty($data['currency']) ? $data['currency'] : 'RON');
+        $isV1 = isset($data['_v1_filter_fields']);
 
-        if ($discountType == -1) {
+        if (!isset($data['type'])) {
+            if ($isV1) {
+                throw new ApiV1Exception(8001, 'Missing "type" parameter', 400);
+            }
             $this->logger->error(__('Missing type param'));
             return ['status' => 0, 'msg' => 'Missing type param'];
         }
-        if ($value <= 0) {
+        $discountType = (int) $data['type'];
+        if (!in_array($discountType, [0, 1], true)) {
+            if ($isV1) {
+                throw new ApiV1Exception(8002, 'Invalid "type" parameter: must be 0 (fixed) or 1 (percent)', 400);
+            }
+            $this->logger->error(__('Invalid type param'));
+            return ['status' => 0, 'msg' => 'Invalid type param'];
+        }
+        if (!isset($data['value'])) {
+            if ($isV1) {
+                throw new ApiV1Exception(8003, 'Missing "value" parameter', 400);
+            }
             $this->logger->error(__('Missing value param'));
             return ['status' => 0, 'msg' => 'Missing value param'];
         }
+        $value = (float) $data['value'];
+        if ($value <= 0) {
+            if ($isV1) {
+                throw new ApiV1Exception(8004, 'Invalid "value" parameter: must be greater than 0', 400);
+            }
+            $this->logger->error(__('Invalid value param'));
+            return ['status' => 0, 'msg' => 'Invalid value param'];
+        }
+        $batchSize = (int) (!empty($data['batch_size']) ? $data['batch_size'] : 1);
+        if ($batchSize < 1) {
+            if ($isV1) {
+                throw new ApiV1Exception(8005, 'Invalid "batch_size" parameter: must be >= 1', 400);
+            }
+        }
+        $expireDate = isset($data['expire_date']) ? $data['expire_date'] : null;
+        if ($expireDate !== null && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $expireDate)) {
+            if ($isV1) {
+                throw new ApiV1Exception(8006, 'Invalid "expire_date" format: expected YYYY-MM-DD', 400);
+            }
+        }
+        $prefix = (string) (!empty($data['prefix']) ? $data['prefix'] : '');
+        //$currency = (string) (!empty($data['currency']) ? $data['currency'] : 'RON');
 
         $websiteIds = [];
         foreach ($storeIds as $storeId) {
@@ -147,6 +180,9 @@ class Coupons extends AbstractRetriever implements RetrieverInterface
 
         if (empty($couponsList)) {
             $this->logger->error(__('Something went wrong creating coupons'));
+            if ($isV1) {
+                throw new ApiV1Exception(8007, 'Failed to create coupons', 500);
+            }
             return ['status' => 0, 'codes' => 'Something went wrong creating coupons'];
         }
         return ['status' => 1, 'codes' => $couponsList];
