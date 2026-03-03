@@ -7,6 +7,8 @@
  */
 namespace Dazoot\Newsman\Model\Export\Retriever;
 
+use Dazoot\Newsman\Model\Export\Retriever\V1\ApiV1Exception;
+
 /**
  * Abstract Retriever
  */
@@ -50,8 +52,12 @@ abstract class AbstractRetriever implements RetrieverInterface
         ];
 
         $allowedSort = $this->getAllowedSortFields();
-        if (isset($data['sort']) && isset($allowedSort[$data['sort']])) {
-            $params['sort'] = $allowedSort[$data['sort']];
+        if (isset($data['sort'])) {
+            if (isset($allowedSort[$data['sort']])) {
+                $params['sort'] = $allowedSort[$data['sort']];
+            } elseif (!empty($data['_v1_filter_fields'])) {
+                throw new ApiV1Exception(1008, 'Invalid sort field: ' . $data['sort'], 400);
+            }
         }
 
         if (isset($data['order']) && strcasecmp($data['order'], 'desc') === 0) {
@@ -81,6 +87,15 @@ abstract class AbstractRetriever implements RetrieverInterface
      */
     public function processListWhereParameters($data = [])
     {
+        if (!empty($data['_v1_filter_fields'])) {
+            $allowedMapping = $this->getWhereParametersMapping();
+            foreach ($data['_v1_filter_fields'] as $field) {
+                if (!isset($allowedMapping[$field])) {
+                    throw new ApiV1Exception(1006, 'Invalid filter field: ' . $field, 400);
+                }
+            }
+        }
+
         $filters = [];
         $operators = array_keys($this->getExpressionsDefinition());
         $expressions = $this->getExpressionsDefinition();
@@ -96,6 +111,9 @@ abstract class AbstractRetriever implements RetrieverInterface
             if (is_array($value) && !empty(array_intersect(array_keys($value), $operators))) {
                 foreach ($value as $operator => $val) {
                     if (!isset($expressions[$operator])) {
+                        if (!empty($data['_v1_filter_fields'])) {
+                            throw new ApiV1Exception(1007, 'Invalid filter operator: ' . $operator, 400);
+                        }
                         continue;
                     }
                     $filters[] = [
