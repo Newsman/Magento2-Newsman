@@ -55,7 +55,7 @@ abstract class AbstractRetriever implements RetrieverInterface
         if (isset($data['sort'])) {
             if (isset($allowedSort[$data['sort']])) {
                 $params['sort'] = $allowedSort[$data['sort']];
-            } elseif (!empty($data['_v1_filter_fields'])) {
+            } elseif (isset($data['_v1_filter_fields'])) {
                 throw new ApiV1Exception(1008, 'Invalid sort field: ' . $data['sort'], 400);
             }
         }
@@ -108,10 +108,10 @@ abstract class AbstractRetriever implements RetrieverInterface
             $fieldName = $definition['field'];
             $value = $data[$requestName];
 
-            if (is_array($value) && !empty(array_intersect(array_keys($value), $operators))) {
+            if (is_array($value) && !empty($value) && is_string(array_keys($value)[0])) {
                 foreach ($value as $operator => $val) {
                     if (!isset($expressions[$operator])) {
-                        if (!empty($data['_v1_filter_fields'])) {
+                        if (isset($data['_v1_filter_fields'])) {
                             throw new ApiV1Exception(1007, 'Invalid filter operator: ' . $operator, 400);
                         }
                         continue;
