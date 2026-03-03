@@ -205,6 +205,10 @@ class Subscribers extends AbstractRetriever
                 'field' => 'change_status_at',
                 'multiple' => false,
             ],
+            'created_at' => [
+                'field' => 'change_status_at',
+                'multiple' => false,
+            ],
         ];
     }
 
@@ -219,6 +223,7 @@ class Subscribers extends AbstractRetriever
             'email' => 'subscriber_email',
             'subscriber_id' => 'subscriber_id',
             'modified_at' => 'change_status_at',
+            'created_at' => 'change_status_at',
         ];
     }
 
