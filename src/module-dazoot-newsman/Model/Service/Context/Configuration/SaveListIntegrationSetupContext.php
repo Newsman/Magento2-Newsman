@@ -19,7 +19,7 @@ class SaveListIntegrationSetupContext extends ListContext
      *
      * @var string
      */
-    protected $integration = 'magento2';
+    protected $integration = 'magento';
 
     /**
      * Payload data for the integration setup.
