@@ -152,7 +152,7 @@ class SaveIntegrationSetupForConfiguredStores implements DataPatchInterface
                 'api_url'                   => $apiUrl,
                 'api_key'                   => $authenticateToken,
                 'plugin_version'            => $pluginVersion,
-                'platform_name'             => $this->productMetadata->getName(),
+                // 'platform_name'             => $this->productMetadata->getName(),
                 'platform_version'          => $this->productMetadata->getVersion(),
                 'platform_language'         => 'PHP',
                 'platform_language_version' => phpversion(),
