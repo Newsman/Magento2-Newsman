@@ -44,11 +44,12 @@ class InitializeOrderAfterDateConfig implements DataPatchInterface
     {
         $this->moduleDataSetup->getConnection()->startSetup();
 
-        /** @var ConfigWriter $configWriter */
-        $configWriter = $this->configWriterFactory->create();
-        $date = new \DateTime();
-        $date->modify('-2 years');
-        $configWriter->saveConfigValue(Config::XML_PATH_ORDER_AFTER_DATE, $date->format('Y-m-d'));
+        // @deprecated Export Orders After Date config
+        // /** @var ConfigWriter $configWriter */
+        // $configWriter = $this->configWriterFactory->create();
+        // $date = new \DateTime();
+        // $date->modify('-2 years');
+        // $configWriter->saveConfigValue(Config::XML_PATH_ORDER_AFTER_DATE, $date->format('Y-m-d'));
 
         $this->moduleDataSetup->getConnection()->endSetup();
     }

@@ -195,16 +195,17 @@ class Orders extends AbstractRetriever
                 ->create()
         ]);
 
-        $afterDate = $this->config->getOrderAfterDate();
-        if (!empty($afterDate) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $afterDate)) {
-            $searchCriteriaBuilder->addFilters([
-                $this->filterBuilder
-                    ->setField('created_at')
-                    ->setConditionType('gteq')
-                    ->setValue($afterDate . ' 00:00:00')
-                    ->create()
-            ]);
-        }
+        // @deprecated Export Orders After Date config
+        // $afterDate = $this->config->getOrderAfterDate();
+        // if (!empty($afterDate) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $afterDate)) {
+        //     $searchCriteriaBuilder->addFilters([
+        //         $this->filterBuilder
+        //             ->setField('created_at')
+        //             ->setConditionType('gteq')
+        //             ->setValue($afterDate . ' 00:00:00')
+        //             ->create()
+        //     ]);
+        // }
 
         $searchCriteria = $searchCriteriaBuilder->create();
 
