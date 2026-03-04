@@ -274,7 +274,7 @@ class SaveConfigureList extends Action
             $context->setUserId($userId)
                 ->setApiKey($apiKey)
                 ->setListId($listId)
-                ->setIntegration('magento2')
+                ->setIntegration($context->getIntegration())
                 ->setPayload($payload);
 
             $this->saveIntegrationService->execute($context);

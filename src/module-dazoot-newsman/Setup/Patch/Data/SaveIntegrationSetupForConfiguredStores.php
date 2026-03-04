@@ -163,7 +163,7 @@ class SaveIntegrationSetupForConfiguredStores implements DataPatchInterface
             $context->setUserId($userId)
                 ->setApiKey($apiKey)
                 ->setListId($listId)
-                ->setIntegration('magento2')
+                ->setIntegration($context->getIntegration())
                 ->setPayload($payload);
 
             try {
