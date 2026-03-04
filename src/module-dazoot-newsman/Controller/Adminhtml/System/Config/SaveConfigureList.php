@@ -216,6 +216,16 @@ class SaveConfigureList extends Action
             );
         }
 
+        $this->_eventManager->dispatch(
+            'dazoot_newsman_save_configure_list_after',
+            [
+                'list_id'  => $listId,
+                'store'    => $storeModel,
+                'scope'    => $scope,
+                'scope_id' => $scopeId,
+            ]
+        );
+
         // @deprecated
         // $this->callSetFeedOnList($listId, $storeModel, $scope, $scopeId);
 
