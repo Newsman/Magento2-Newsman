@@ -45,12 +45,14 @@
                         <field id="send_user_ip">0</field>
                     </depends>
                 </field>
+                <!-- @deprecated Export Orders After Date configuration is no longer used.
                 <field id="order_after_date" translate="label" type="date" sortOrder="40" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <label>Export Orders After Date</label>
                     <frontend_model>Dazoot\Newsman\Block\Adminhtml\System\Config\Frontend\Date</frontend_model>
                     <comment><![CDATA[Export orders created after date set. Leave empty field to export all orders.]]></comment>
                 </field>
+                -->
             </group>
             <group id="credentials" translate="label" type="text" sortOrder="30" showInDefault="1"
                    showInWebsite="1" showInStore="1">
