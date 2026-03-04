@@ -252,8 +252,10 @@ class Config
     }
 
     /**
-     * Get server IP address
+     * Get order after date config value
      *
+     * @deprecated Export Orders After Date configuration is no longer used. No replacement.
+     * @see Config::getOrderAfterDate()
      * @param null|string|bool|int|Store $store
      * @return string
      */
