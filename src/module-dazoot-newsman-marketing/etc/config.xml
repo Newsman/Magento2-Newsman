@@ -11,7 +11,7 @@
     <default>
         <newsmanmarketing>
             <general>
-                <enable>0</enable>
+                <enable>1</enable>
                 <ua_id />
                 <use_tunnel>1</use_tunnel>
                 <anonymize_ip>0</anonymize_ip>
