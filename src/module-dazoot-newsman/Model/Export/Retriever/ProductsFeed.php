@@ -13,6 +13,7 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ProductFactory;
+use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Framework\Exception\LocalizedException;
@@ -26,16 +27,6 @@ use Magento\CatalogInventory\Api\StockRegistryInterface;
 class ProductsFeed extends AbstractRetriever
 {
     public const DEFAULT_PAGE_SIZE = 1000;
-
-    /**
-     * Category separator
-     */
-    public const CATEGORY_SEPARATOR = '>';
-
-    /**
-     * Categories separator
-     */
-    public const CATEGORIES_SEPARATOR = '|';
 
     /**
      * @var ProductRepositoryInterface
@@ -78,6 +69,18 @@ class ProductsFeed extends AbstractRetriever
     protected $stockRegistry;
 
     /**
+     * @var CategoryCollectionFactory
+     */
+    protected $categoryCollectionFactory;
+
+    /**
+     * All-categories cache per store ID: [storeId => [categoryId => ['name' => ..., 'path' => ...]]]
+     *
+     * @var array
+     */
+    protected $categoriesCache = [];
+
+    /**
      * @param ProductRepositoryInterface $productRepository
      * @param CollectionFactory $collectionFactory
      * @param StoreManagerInterface $storeManager
@@ -86,6 +89,7 @@ class ProductsFeed extends AbstractRetriever
      * @param Logger $logger
      * @param GetAdditionalAttributes $getAdditionalAttributes
      * @param StockRegistryInterface $stockRegistry
+     * @param CategoryCollectionFactory $categoryCollectionFactory
      */
     public function __construct(
         ProductRepositoryInterface $productRepository,
@@ -95,7 +99,8 @@ class ProductsFeed extends AbstractRetriever
         ProductHelperFactory $productHelperFactory,
         Logger $logger,
         GetAdditionalAttributes $getAdditionalAttributes,
-        StockRegistryInterface $stockRegistry
+        StockRegistryInterface $stockRegistry,
+        CategoryCollectionFactory $categoryCollectionFactory
     ) {
         $this->productRepository = $productRepository;
         $this->collectionFactory = $collectionFactory;
@@ -105,6 +110,7 @@ class ProductsFeed extends AbstractRetriever
         $this->logger = $logger;
         $this->getAdditionalAttributes = $getAdditionalAttributes;
         $this->stockRegistry = $stockRegistry;
+        $this->categoryCollectionFactory = $categoryCollectionFactory;
     }
 
     /**
@@ -117,6 +123,11 @@ class ProductsFeed extends AbstractRetriever
             $websiteIds[] = $this->storeManager->getStore($storeId)->getWebsiteId();
         }
         $websiteIds = array_unique($websiteIds);
+
+        // Pre-load all categories for each store once to avoid per-product queries.
+        foreach ($storeIds as $storeId) {
+            $this->loadCategoriesForStore($storeId);
+        }
 
         if (isset($data['product_id']) && !is_array($data['product_id'])) {
             if (empty($data['product_id'])) {
@@ -212,27 +223,39 @@ class ProductsFeed extends AbstractRetriever
             unset($row['price']);
         }
 
-        // Categories
-        $categoryCollection = $product->getCategoryCollection()
-            ->addAttributeToSelect('name')
-            ->addAttributeToSelect('path');
+        // Categories — use store-level cache to avoid per-product SQL queries.
+        $storeId = current($storeIds);
+        $categoryMap = $this->loadCategoriesForStore($storeId);
+        $categoryIds = $product->getCategoryIds();
 
-        $categories = [];
-
-        foreach ($categoryCollection as $category) {
-            $pathIds = explode('/', $category->getPath());
-            // Remove root categories (usually first 2 in Magento)
-            if (count($pathIds) > 2) {
-                $categories[] = $category->getName();
+        $categoryPaths = [];
+        foreach ($categoryIds as $categoryId) {
+            if (!isset($categoryMap[$categoryId])) {
+                continue;
+            }
+            $pathIds = explode('/', $categoryMap[$categoryId]['path']);
+            // Skip root categories (Magento root = depth 0/1, store root = depth 1/2).
+            if (count($pathIds) <= 2) {
+                continue;
+            }
+            // Build breadcrumb names, skipping the two root levels.
+            $pathNames = [];
+            foreach (array_slice($pathIds, 2) as $pathId) {
+                if (isset($categoryMap[$pathId]) && $categoryMap[$pathId]['name'] !== '') {
+                    $pathNames[] = $categoryMap[$pathId]['name'];
+                }
+            }
+            if (!empty($pathNames)) {
+                $categoryPaths[] = $pathNames;
             }
         }
 
-        if (!empty($categories)) {
-            $row['category'] = $categories[0];
-            $row['subcategories'] = implode(' ' . self::CATEGORIES_SEPARATOR . ' ', $categories);
+        if (!empty($categoryPaths)) {
+            $row['category'] = end($categoryPaths[0]);
+            $row['subcategories'] = $categoryPaths;
         } else {
             $row['category'] = '';
-            $row['subcategories'] = '';
+            $row['subcategories'] = [];
         }
 
         // Stock status
@@ -276,6 +299,37 @@ class ProductsFeed extends AbstractRetriever
         }
 
         return (float) $maxQty;
+    }
+
+    /**
+     * Load all active categories for a store into a flat map, cached per store ID.
+     *
+     * Returns [categoryId => ['name' => string, 'path' => string]]
+     *
+     * @param int|string $storeId
+     * @return array
+     */
+    public function loadCategoriesForStore($storeId)
+    {
+        if (isset($this->categoriesCache[$storeId])) {
+            return $this->categoriesCache[$storeId];
+        }
+
+        $collection = $this->categoryCollectionFactory->create();
+        $collection->setStoreId($storeId)
+            ->addAttributeToSelect(['name', 'path'])
+            ->addIsActiveFilter();
+
+        $map = [];
+        foreach ($collection as $category) {
+            $map[$category->getId()] = [
+                'name' => (string) $category->getName(),
+                'path' => (string) $category->getPath(),
+            ];
+        }
+
+        $this->categoriesCache[$storeId] = $map;
+        return $map;
     }
 
     /**
