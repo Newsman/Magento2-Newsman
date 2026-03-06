@@ -7,8 +7,10 @@
  */
 namespace Dazoot\Newsman\Block\Adminhtml\System\Config;
 
+use Dazoot\Newsman\Model\Config as NewsmanConfig;
 use Magento\Backend\Block\AbstractBlock;
 use Magento\Backend\Block\Context;
+use Magento\Framework\Composer\ComposerInformation;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\Data\Form\Element\Renderer\RendererInterface;
 
@@ -23,15 +25,37 @@ class Info extends AbstractBlock implements
     protected $_request;
 
     /**
+     * @var ComposerInformation
+     */
+    protected $composerInformation;
+
+    /**
      * @param Context $context
+     * @param ComposerInformation $composerInformation
      * @param array $data
      */
     public function __construct(
         Context $context,
+        ComposerInformation $composerInformation,
         array $data = []
     ) {
         parent::__construct($context, $data);
         $this->_request = $context->getRequest();
+        $this->composerInformation = $composerInformation;
+    }
+
+    /**
+     * Get extension version from composer
+     *
+     * @return string
+     */
+    protected function getExtensionVersion()
+    {
+        $packages = $this->composerInformation->getInstalledMagentoPackages();
+        if (isset($packages[NewsmanConfig::COMPOSER_PACKAGE_NAME])) {
+            return $packages[NewsmanConfig::COMPOSER_PACKAGE_NAME]['version'];
+        }
+        return 'unknown';
     }
 
     /**
@@ -42,7 +66,9 @@ class Info extends AbstractBlock implements
      */
     public function render(AbstractElement $element)
     {
-        $logoUrl = 'http://s1-cdn.nl.nzmt.eu/images/templates/lcor/Images/NewsmanLogo/logo_white.png';
+        $logoUrl = $this->getViewFileUrl('Dazoot_Newsman::images/logo.png');
+        $extensionVersion = $this->getExtensionVersion();
+        $versionLabel = __('Newsman Extension Version');
         $contactText = __('If you need support or have any questions, please contact us at');
         $buttonLabel = __('Configure with Newsman Login');
 
@@ -63,13 +89,11 @@ class Info extends AbstractBlock implements
 <div style="border:1px solid #e3e3e3; min-height:100px; display: block; padding:15px;
     background-color: #f8f8f8; border-radius: 5px; margin-bottom: 20px;">
     <div style="display: flex; align-items: center; margin-bottom: 15px;">
-        <div style="background: #a04747; border-radius: 5px; padding: 10px; margin-right: 15px;">
-            <img src="$logoUrl" style="display: block; height: 30px;" />
+        <div style="margin-right: 15px;">
+            <a href="https://www.newsman.com/" target="_blank"><img src="$logoUrl" style="display: block; height: 30px;" /></a>
         </div>
         <div>
-            <h2 style="margin: 0; color: #333;">Newsman</h2>
-            <p style="margin: 0;">by <strong><a href="https://www.newsman.ro"
-                target="_blank" style="color: #a04747; text-decoration: none;">Newsman</a></strong></p>
+            <p style="margin: 0; color: #888; font-size: 12px;">{$versionLabel}: {$extensionVersion}</p>
         </div>
     </div>
     <div style="margin-bottom: 15px;">
