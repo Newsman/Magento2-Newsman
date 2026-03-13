@@ -30,58 +30,8 @@ php bin/magento deploy:mode:set production
 
 # Configuration
 
-1. Go to **Admin > Stores > Configuration > NEWSMAN > General > General**
-   ![Newsman Configuration General](./assets/newsman-configuration-general.png)
-   
-   - Activate the module
-   - Set "Send User IP Address" to yes. If not, please set the Magento server IP address. The IP address is used in Newsman API operations.
-   - Set "Server IP Address". Set your Magento server IP address if you know it or use your preferred website to find it like https://who.is/.
-   - Export Order After Date is set by default with minus 2 years. You can choose a date that you prefer.
-2. Go to **Admin >Stores > Configuration > NEWSMAN > General > API**
-   ![Newsman Configuration General](./assets/newsman-api-settings.png)
-
-    - Fill in your [Newsman](https://newsman.app/) User ID and API KEY and click the **Save Config** button.
-    - Click on "Synchronize Lists and Segments" button to fetch the lists and segments from Newsman.
-    - Select the List ID from the dropdown.
-    - Click the **Save Config** button again.
-    - [optional] Click on button "Export Newsletter Subscribers" to send all subscribed newsletter emails in Magento to Newsman.
-      
-      If you have a multistore configuration with multiple Newsman List IDs than **do not click** the button yet. Finish all admin stores configurations regarding this extension.
-      The extension will sends subscribers to corresponding Newsman lists by store.
-      
-      Clicking on the button creates a message queue that is processed in background by Magento server.
-      See Admin > System > Actions Log > Bulk Actions to see when it finished.
-3. Go to **Admin >Stores > Configuration > NEWSMAN > General > Export**
-
-   The authorization used to export data from Magento into Newsman APP: 
-    - Set Authorization Header Name. The configuration has to be the same as in Newsman App > E-Commerce > Coupons > Authorisation Header name, Newsman App > E-Commerce > Feed > a feed > Header Authorization, etc.
-    - Set Authorization Header Key. The configuration has to be the same as in Newsman App > E-Commerce > Coupons > Authorisation Header value, Newsman App > E-Commerce > Feed > a feed > Header Authorization, etc.
-   
-    Settings in Newsman App:
-    - In Newsman App > E-Commerce > Feeds > edit a feed, please select the type of file "NewsMAN API".
-    - The Feed URL is https://example.com/newsman/?newsman=products.json
-    - In Newsman App > E-Commerce > Coupons > URL Webhook is https://example.com/newsman/?newsman=coupons.json
-
-    Other URLs available:
-    - https://example.com/newsman/?newsman=orders.json 
-    - https://example.com/newsman/?newsman=customers.json 
-    - https://example.com/newsman/?newsman=subscribers.json 
-    - https://example.com/newsman/?newsman=count.json (count subscribers)
-    
-      Data lists work with pagination and Newsman App uses it.
-    The endpoints require authentication (see above). 
-   
-    - Set "Customer Attributes Map" to send customer attributes to Newsman.
-4. Go to **Admin >Stores > Configuration > NEWSMAN > Remarketing > General**
-   ![Newsman Configuration General](./assets/newsman-remarketing.png)
-   - Please paste your Newsman Remarketing ID from [Newsman](https://newsman.app/) and set it in this section.
-
-## Webhooks
-
-Configure WebHook URL in [Newsman](https://newsman.app/) in Settings > List > WebHook URL.
-The webhook URL is `newsman/` relatively to Magento store's base secure URL. Example: `https://example.com/newsman/` or `https://example.com/[store_code]/newsman/` (if the option to add store codes in URL is set in Magento admin).
-
-Further more set in Newsman APP > Settings > List > "Event-uri Webhook", check "Abonari" (Subscribe), "Importuri" (Import), "Dezabonari" (Unsubscribe).
+- [Configuration Guide (English)](https://github.com/Newsman/Magento2-Newsman/blob/master/configuration-en.md)
+- [Ghid de Configurare (Romana)](https://github.com/Newsman/Magento2-Newsman/blob/master/configuration-ro.md)
 
 ## Useful links:
 - Newsman Knowledge Base https://kb.newsman.com/
