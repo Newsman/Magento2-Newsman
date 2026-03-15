@@ -20,7 +20,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
 
 /**
- * Class Oauth callback after Newsman Login
+ * OAuth Step 2: Exchange authorization code for access token and save credentials.
  */
 class OauthCallback extends Action
 {

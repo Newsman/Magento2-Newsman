@@ -18,6 +18,8 @@ use Magento\Store\Model\StoreManagerInterface;
 use Dazoot\Newsman\Model\Config\Source\Lists as ListsSource;
 
 /**
+ * Utility action: queue bulk subscriber export to Newsman.
+ *
  * @deprecated Use the CLI console command instead.
  * @see \Dazoot\Newsman\Console\Command\ExportSubscriberCommand
  */

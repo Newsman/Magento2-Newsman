@@ -16,6 +16,9 @@ use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Serialize\Serializer\Json;
 
+/**
+ * @deprecated No longer used. Remarketing script is fetched from Newsman API.
+ */
 class Cache
 {
     /**

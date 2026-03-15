@@ -7,6 +7,9 @@
  */
 namespace Dazoot\Newsmanmarketing\Model\Http\Client;
 
+/**
+ * @deprecated No longer used. Remarketing script is fetched from Newsman API.
+ */
 class Curl extends \Magento\Framework\HTTP\Client\Curl
 {
     /**

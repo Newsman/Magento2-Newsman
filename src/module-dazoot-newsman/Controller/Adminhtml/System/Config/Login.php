@@ -11,6 +11,9 @@ use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\Redirect;
 
+/**
+ * OAuth Step 1: Redirect admin to Newsman authorize endpoint.
+ */
 class Login extends Action
 {
     public const ADMIN_RESOURCE = 'Dazoot_Newsman::config_newsman';

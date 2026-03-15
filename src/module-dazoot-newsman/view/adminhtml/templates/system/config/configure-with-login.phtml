@@ -1,13 +1,59 @@
 <?php
 /** @var $block \Dazoot\Newsman\Block\Adminhtml\System\Config\ConfigureWithLogin */
+/** @var \Magento\Framework\Escaper $escaper */
 $buttonLabel = $block->getData('button_label');
 $loginUrl = $block->getData('login_url');
 $htmlId = $block->getData('html_id');
+$showScopeWarning = (bool) $block->getData('show_scope_warning');
 ?>
 <div class="actions actions-validate newsman-configure-with-login">
     <a id="<?= /* @noEscape */ $htmlId ?>_button"
        class="action-default scalable primary"
-       href="<?= /* @noEscape */ $loginUrl ?>">
+       <?php if ($showScopeWarning): ?>
+       href="#"
+       data-login-url="<?= /* @noEscape */ $loginUrl ?>"
+       <?php else: ?>
+       href="<?= /* @noEscape */ $loginUrl ?>"
+       <?php endif; ?>
+       >
         <span><?= $escaper->escapeHtml($buttonLabel) ?></span>
     </a>
 </div>
+<?php if ($showScopeWarning): ?>
+<script type="text/javascript">
+    require(['jquery', 'Magento_Ui/js/modal/confirm'], function ($, confirm) {
+        $('#<?= /* @noEscape */ $htmlId ?>_button').on('click', function (e) {
+            e.preventDefault();
+            var loginUrl = $(this).data('login-url');
+            confirm({
+                title: '<?= $escaper->escapeJs(__('Multistore Installation')) ?>',
+                content: '<?= $escaper->escapeJs(
+                    __(
+                        'In Magento 2 multistore installations we recommend to associate'
+                        . ' an email list with a store view. Please switch to a specific'
+                        . ' store view scope before configuring.'
+                    )
+                ) ?>',
+                actions: {
+                    confirm: function () {
+                        window.location.href = loginUrl;
+                    }
+                },
+                buttons: [{
+                    text: '<?= $escaper->escapeJs(__('Cancel')) ?>',
+                    class: 'action-secondary action-dismiss',
+                    click: function (event) {
+                        this.closeModal(event);
+                    }
+                }, {
+                    text: '<?= $escaper->escapeJs(__('Continue')) ?>',
+                    class: 'action-primary action-accept',
+                    click: function (event) {
+                        this.closeModal(event, true);
+                    }
+                }]
+            });
+        });
+    });
+</script>
+<?php endif; ?>
