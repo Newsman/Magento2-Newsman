@@ -18,6 +18,7 @@ use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Store\Model\ScopeInterface;
 
 /**
  * Fetch remarketing settings and save the remarketing ID after a list is configured.
@@ -71,17 +72,17 @@ class SaveConfigureListAfterObserver implements ObserverInterface
     }
 
     /**
-     * Retrieve remarketing settings and persist the remarketing ID for the configured list.
+     * Fetch remarketing settings once per list and save to all stores sharing that list ID.
      *
      * @param Observer $observer
      * @return void
      */
     public function execute(Observer $observer)
     {
+        // Call remarketing.getSettings once for the configured list, then save
+        // the remarketing ID and JS snippet to every store sharing that list ID.
         $listId = $observer->getEvent()->getData('list_id');
         $storeModel = $observer->getEvent()->getData('store');
-        $scope = $observer->getEvent()->getData('scope');
-        $scopeId = $observer->getEvent()->getData('scope_id');
 
         $userId = $this->newsmanConfig->getUserId($storeModel);
         $apiKey = $this->newsmanConfig->getApiKey($storeModel);
@@ -102,7 +103,26 @@ class SaveConfigureListAfterObserver implements ObserverInterface
                 $remarketingId = $settings['site_id'] . '-' . $settings['list_id'] . '-' .
                     $settings['form_id'] . '-' . $settings['control_list_hash'];
 
-                $this->configWriter->save(Config::XML_PATH_UA_ID, $remarketingId, $scope, $scopeId);
+                $storeIds = $this->newsmanConfig->getStoreIdsByListId($listId);
+
+                foreach ($storeIds as $storeId) {
+                    $this->configWriter->save(
+                        Config::XML_PATH_UA_ID,
+                        $remarketingId,
+                        ScopeInterface::SCOPE_STORES,
+                        $storeId
+                    );
+
+                    if (!empty($settings['javascript'])) {
+                        $this->configWriter->save(
+                            Config::XML_PATH_SCRIPT_JS,
+                            $settings['javascript'],
+                            ScopeInterface::SCOPE_STORES,
+                            $storeId
+                        );
+                    }
+                }
+
                 $this->cacheTypeList->cleanType(\Magento\Framework\App\Cache\Type\Config::TYPE_IDENTIFIER);
 
                 $this->logger->info(__(

@@ -27,7 +27,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\ScopeInterface;
 
 /**
- * Class save list ID configuration action
+ * OAuth Step 4: Save selected list ID, sync authenticate token to all stores, and call integration setup API.
  */
 class SaveConfigureList extends Action
 {
@@ -183,21 +183,30 @@ class SaveConfigureList extends Action
             );
         }
 
-        // Ensure authenticate token exists.
+        // Gather all stores sharing this list ID and ensure the current scope's store is included
+        // (in-memory scopeConfig may not yet reflect the just-saved list ID).
         $storeModel = $this->resolveStore($website, $store);
+        $storeIds = $this->newsmanConfig->getStoreIdsByListId($listId);
+        if ($storeModel !== null && !in_array($storeModel->getId(), $storeIds)) {
+            $storeIds[] = $storeModel->getId();
+        }
+
+        // Generate or reuse the authenticate token once and save it to every store in the group.
         $authenticateToken = $this->newsmanConfig->getExportAuthenticateToken($storeModel);
         if (empty($authenticateToken)) {
             $authenticateToken = $this->generateRandomToken(32);
+        }
+        foreach ($storeIds as $storeId) {
             $this->configWriter->save(
                 NewsmanConfig::XML_PATH_EXPORT_AUTHENTICATE_TOKEN,
                 $authenticateToken,
-                $scope,
-                $scopeId
+                ScopeInterface::SCOPE_STORES,
+                (int) $storeId
             );
-            $this->cacheTypeList->cleanType(\Magento\Framework\App\Cache\Type\Config::TYPE_IDENTIFIER);
         }
+        $this->cacheTypeList->cleanType(\Magento\Framework\App\Cache\Type\Config::TYPE_IDENTIFIER);
 
-        // Call saveListIntegrationSetup API.
+        // Call saveListIntegrationSetup API once for the group.
         $integrationResult = $this->callSaveListIntegrationSetup(
             $listId,
             $storeModel,
@@ -221,8 +230,6 @@ class SaveConfigureList extends Action
             [
                 'list_id'  => $listId,
                 'store'    => $storeModel,
-                'scope'    => $scope,
-                'scope_id' => $scopeId,
             ]
         );
 

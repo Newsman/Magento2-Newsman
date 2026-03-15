@@ -152,10 +152,11 @@ class Config
      *
      * @param null|string|bool|int|Store $store
      * @return bool
+     * @deprecated No longer used. Remarketing script is fetched from Newsman API.
      */
     public function useTunnel($store = null)
     {
-        return $this->config->isActive($store) && $this->scopeConfig->isSetFlag(
+        return false && $this->config->isActive($store) && $this->scopeConfig->isSetFlag(
             self::XML_PATH_USE_TUNNEL,
             ScopeInterface::SCOPE_STORE,
             $store
@@ -212,6 +213,7 @@ class Config
      *
      * @param null|string|bool|int|Store $store
      * @return string
+     * @deprecated No longer used. Remarketing script is fetched from Newsman API.
      */
     public function getScriptUrl($store = null)
     {
@@ -227,6 +229,7 @@ class Config
      *
      * @param null|string|bool|int|Store $store
      * @return string
+     * @deprecated No longer used. Remarketing script is fetched from Newsman API.
      */
     public function getResourcesUrl($store = null)
     {
@@ -243,6 +246,7 @@ class Config
      *
      * @param null|string|bool|int|Store $store
      * @return string
+     * @deprecated No longer used. Remarketing script is fetched from Newsman API.
      */
     public function getTrackingUrl($store = null)
     {
@@ -259,6 +263,7 @@ class Config
      *
      * @param null|string|bool|int|Store $store
      * @return array
+     * @deprecated No longer used. Remarketing script is fetched from Newsman API.
      */
     public function getRequiredFilePatterns($store = null)
     {
@@ -290,6 +295,7 @@ class Config
      *
      * @param null|string|bool|int|Store $store
      * @return string
+     * @deprecated No longer used. Remarketing script is fetched from Newsman API.
      */
     public function getScriptRequestUri($store = null)
     {
@@ -315,6 +321,7 @@ class Config
      *
      * @param null|string|bool|int|Store $store
      * @return bool
+     * @deprecated No longer used. Remarketing script is fetched from Newsman API.
      */
     public function isLogTunnel($store = null)
     {

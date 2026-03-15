@@ -24,7 +24,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\ScopeInterface;
 
 /**
- * Class configure list view page
+ * OAuth Step 3: Display the email list selection page (syncs lists/segments on load).
  */
 class ConfigureList extends Action
 {

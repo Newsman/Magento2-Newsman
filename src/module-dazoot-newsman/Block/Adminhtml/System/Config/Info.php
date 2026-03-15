@@ -13,6 +13,7 @@ use Magento\Backend\Block\Context;
 use Magento\Framework\Composer\ComposerInformation;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\Data\Form\Element\Renderer\RendererInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 class Info extends AbstractBlock implements
     RendererInterface
@@ -30,18 +31,26 @@ class Info extends AbstractBlock implements
     protected $composerInformation;
 
     /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
      * @param Context $context
      * @param ComposerInformation $composerInformation
+     * @param StoreManagerInterface $storeManager
      * @param array $data
      */
     public function __construct(
         Context $context,
         ComposerInformation $composerInformation,
+        StoreManagerInterface $storeManager,
         array $data = []
     ) {
         parent::__construct($context, $data);
         $this->_request = $context->getRequest();
         $this->composerInformation = $composerInformation;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -81,6 +90,18 @@ class Info extends AbstractBlock implements
         }
         $loginUrl = $this->getUrl('newsman/system_config/login', $params);
 
+        $storeCount = count(array_filter(
+            $this->storeManager->getStores(),
+            function ($store) {
+                return $store->isActive();
+            }
+        ));
+        $showScopeWarning = $storeCount > 1 && empty($params['store']);
+
+        $buttonAttr = $showScopeWarning
+            ? 'href="#" id="nzm-info-login-btn" data-login-url="' . $loginUrl . '"'
+            : 'href="' . $loginUrl . '"';
+
         $html = <<<HTML
 <div style="width: 100%; padding: 15px; display: none;" id="infoPanel">
 <span style="display: inline-block; color: #49e249; padding: 5px;" id="msgType"></span>
@@ -109,12 +130,56 @@ class Info extends AbstractBlock implements
         </p>
     </div>
     <div style="margin-top: 20px;">
-        <a href="{$loginUrl}" class="action-default scalable primary">
+        <a {$buttonAttr} class="action-default scalable primary">
             <span>{$buttonLabel}</span>
         </a>
     </div>
 </div>
 HTML;
+
+        if ($showScopeWarning) {
+            $dialogTitle = __('Multistore Installation');
+            $dialogContent = __(
+                'In Magento 2 multistore installations we recommend to associate'
+                . ' an email list with a store view. Please switch to a specific'
+                . ' store view scope before configuring.'
+            );
+            $cancelLabel = __('Cancel');
+            $continueLabel = __('Continue');
+            $html .= <<<HTML
+<script type="text/javascript">
+    require(['jquery', 'Magento_Ui/js/modal/confirm'], function ($, confirm) {
+        $('#nzm-info-login-btn').on('click', function (e) {
+            e.preventDefault();
+            var loginUrl = $(this).data('login-url');
+            confirm({
+                title: '{$dialogTitle}',
+                content: '{$dialogContent}',
+                actions: {
+                    confirm: function () {
+                        window.location.href = loginUrl;
+                    }
+                },
+                buttons: [{
+                    text: '{$cancelLabel}',
+                    class: 'action-secondary action-dismiss',
+                    click: function (event) {
+                        this.closeModal(event);
+                    }
+                }, {
+                    text: '{$continueLabel}',
+                    class: 'action-primary action-accept',
+                    click: function (event) {
+                        this.closeModal(event, true);
+                    }
+                }]
+            });
+        });
+    });
+</script>
+HTML;
+        }
+
         return $html;
     }
 }
