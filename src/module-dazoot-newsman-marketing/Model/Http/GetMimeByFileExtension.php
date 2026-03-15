@@ -19,6 +19,7 @@ use Magento\Framework\Serialize\SerializerInterface;
  *
  * @see https://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types
  * @see https://www.php.net/manual/en/function.mime-content-type.php#107798
+ * @deprecated No longer used. Remarketing script is fetched from Newsman API.
  */
 class GetMimeByFileExtension
 {

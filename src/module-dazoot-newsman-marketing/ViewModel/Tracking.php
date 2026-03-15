@@ -88,6 +88,7 @@ class Tracking implements ArgumentInterface
      * Check if tunnel should be used for requests.
      *
      * @return bool
+     * @deprecated No longer used. Remarketing script is fetched from Newsman API.
      */
     public function useTunnel()
     {
@@ -110,6 +111,7 @@ class Tracking implements ArgumentInterface
      * @return string
      * @throws FileSystemException
      * @throws NoSuchEntityException
+     * @deprecated No longer used. Remarketing script is fetched from Newsman API.
      */
     public function getResourcesUrl()
     {
@@ -126,6 +128,7 @@ class Tracking implements ArgumentInterface
      *
      * @return bool
      * @throws FileSystemException
+     * @deprecated No longer used. Remarketing script is fetched from Newsman API.
      */
     public function isTrackingJsCached()
     {
@@ -142,6 +145,7 @@ class Tracking implements ArgumentInterface
      * Get the base URL for Newsman tracking.
      *
      * @return string
+     * @deprecated No longer used. Remarketing script is fetched from Newsman API.
      */
     public function getTrackingUrl()
     {
@@ -152,6 +156,7 @@ class Tracking implements ArgumentInterface
      * Get the Newsman script URL.
      *
      * @return string
+     * @deprecated No longer used. Remarketing script is fetched from Newsman API.
      */
     public function getScriptUrl()
     {
@@ -162,6 +167,7 @@ class Tracking implements ArgumentInterface
      * Get the final script URL, considering tunnel and cache.
      *
      * @return string
+     * @deprecated No longer used. Remarketing script is fetched from Newsman API.
      */
     public function getScriptFinalUrl()
     {
@@ -176,6 +182,7 @@ class Tracking implements ArgumentInterface
      * Get the Newsman script request URI.
      *
      * @return string
+     * @deprecated No longer used. Remarketing script is fetched from Newsman API.
      */
     public function getScriptRequestUri()
     {

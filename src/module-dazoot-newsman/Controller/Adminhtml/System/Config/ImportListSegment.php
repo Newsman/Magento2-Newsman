@@ -20,7 +20,7 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Filter\StripTags;
 
 /**
- * Import lists and segments from Newsman in config
+ * AJAX endpoint: fetch and cache Newsman lists/segments (called from ConfigureList page JS).
  */
 class ImportListSegment extends Action
 {

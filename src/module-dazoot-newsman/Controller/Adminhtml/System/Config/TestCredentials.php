@@ -19,7 +19,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\ScopeInterface;
 
 /**
- * Controller to test Newsman credentials by attempting to fetch lists
+ * Utility action: validate saved Newsman credentials by attempting to fetch lists.
  */
 class TestCredentials extends Action
 {

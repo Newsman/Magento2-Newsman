@@ -16,27 +16,23 @@ if (!$viewModel->isActive()) {
     return '';
 }
 
-$conditionTunnelScript = 'false';
-$resourcesBaseUrl = $trackingBaseUrl = '';
-if ($viewModel->useTunnel()) {
-    $conditionTunnelScript = 'true';
-    $resourcesBaseUrl = $escaper->escapeJsQuote($escaper->escapeHtml($viewModel->getResourcesUrl()));
-    $trackingBaseUrl = $escaper->escapeJsQuote($escaper->escapeHtml($viewModel->getTrackingUrl()));
+$scriptJs = $viewModel->getScriptJs();
+if (empty($scriptJs) || stripos($scriptJs, '<script') === false) {
+    return '';
 }
 
-$nzmConfigJs = $viewModel->getNewsmanConfigJs();
-
-$scriptString = strtr($viewModel->getScriptJs(), [
-    '{{nzmConfigJs}}' => $nzmConfigJs,
-    '{{conditionTunnelScript}}' => $conditionTunnelScript,
-    '{{resourcesBaseUrl}}' => $resourcesBaseUrl,
-    '{{trackingBaseUrl}}' => $trackingBaseUrl,
-    '{{remarketingId}}' => $escaper->escapeJsQuote($escaper->escapeHtml($viewModel->getUaId())),
-    '{{trackingScriptUrl}}' => $escaper->escapeJsQuote($escaper->escapeUrl($viewModel->getScriptFinalUrl()))
-
-]);
+$nzmConfigJs = "_nzm_config['disable_datalayer'] = 1;";
+$nzmConfigJs .= $viewModel->getNewsmanConfigJs();
 ?>
-<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false); ?>
+<?php if (!empty($nzmConfigJs)): ?>
+    <?= /* @noEscape */ $secureRenderer->renderTag(
+        'script',
+        [],
+        "var _nzm_config = _nzm_config || [];" . $nzmConfigJs,
+        false
+    ); ?>
+<?php endif; ?>
+<?= /* @noEscape */ $scriptJs; ?>
 <?php
 $anonymizeIpScript = '';
 if ($viewModel->getAnynymizeIp()) {

@@ -23,6 +23,8 @@ use Magento\Framework\Serialize\Serializer\Json;
 
 /**
  * Remarketing tunnel request
+ *
+ * @deprecated No longer used. Remarketing script is fetched from Newsman API.
  */
 class Tunnel
 {
