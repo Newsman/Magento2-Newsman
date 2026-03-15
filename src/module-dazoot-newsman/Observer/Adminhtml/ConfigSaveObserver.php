@@ -17,13 +17,13 @@ use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Composer\ComposerInformation;
+use Magento\Framework\Event\ManagerInterface as EventManagerInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\ScopeInterface;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 
 /**
  * Observer for Newsman admin system config save.
@@ -73,6 +73,11 @@ class ConfigSaveObserver implements ObserverInterface
     protected $logger;
 
     /**
+     * @var EventManagerInterface
+     */
+    protected $eventManager;
+
+    /**
      * @var ManagerInterface
      */
     protected $messageManager;
@@ -86,6 +91,7 @@ class ConfigSaveObserver implements ObserverInterface
      * @param ProductMetadataInterface $productMetadata
      * @param ComposerInformation $composerInformation
      * @param Logger $logger
+     * @param EventManagerInterface $eventManager
      * @param ManagerInterface $messageManager
      */
     public function __construct(
@@ -97,6 +103,7 @@ class ConfigSaveObserver implements ObserverInterface
         ProductMetadataInterface $productMetadata,
         ComposerInformation $composerInformation,
         Logger $logger,
+        EventManagerInterface $eventManager,
         ManagerInterface $messageManager
     ) {
         $this->newsmanConfig = $newsmanConfig;
@@ -107,6 +114,7 @@ class ConfigSaveObserver implements ObserverInterface
         $this->productMetadata = $productMetadata;
         $this->composerInformation = $composerInformation;
         $this->logger = $logger;
+        $this->eventManager = $eventManager;
         $this->messageManager = $messageManager;
     }
 
@@ -129,10 +137,13 @@ class ConfigSaveObserver implements ObserverInterface
             return;
         }
 
+        $this->cacheTypeList->cleanType(\Magento\Framework\App\Cache\Type\Config::TYPE_IDENTIFIER);
+
         $website = (string) $observer->getEvent()->getData('website');
         $store = (string) $observer->getEvent()->getData('store');
 
         try {
+            // Resolve the store from the admin scope context and read the list ID.
             $storeModel = $this->resolveStore($website, $store);
             $listId = $this->newsmanConfig->getListId($storeModel);
 
@@ -148,20 +159,38 @@ class ConfigSaveObserver implements ObserverInterface
                 return;
             }
 
+            // Gather all stores sharing this list ID and ensure the current scope's store is included
+            // (in-memory scopeConfig may not yet reflect the just-saved credentials).
+            $storeIds = $this->newsmanConfig->getStoreIdsByListId($listId);
+            if ($storeModel !== null && !in_array($storeModel->getId(), $storeIds)) {
+                $storeIds[] = $storeModel->getId();
+            }
+
+            // Generate or reuse the authenticate token once and save it to every store in the group.
             $authenticateToken = $this->newsmanConfig->getExportAuthenticateToken($storeModel);
             if (empty($authenticateToken)) {
                 $authenticateToken = $this->generateRandomToken(32);
-                [$scope, $scopeId] = $this->resolveScope($website, $store);
+            }
+            foreach ($storeIds as $storeId) {
                 $this->configWriter->save(
                     NewsmanConfig::XML_PATH_EXPORT_AUTHENTICATE_TOKEN,
                     $authenticateToken,
-                    $scope,
-                    $scopeId
+                    ScopeInterface::SCOPE_STORES,
+                    (int) $storeId
                 );
-                $this->cacheTypeList->cleanType(\Magento\Framework\App\Cache\Type\Config::TYPE_IDENTIFIER);
             }
+            $this->cacheTypeList->cleanType(\Magento\Framework\App\Cache\Type\Config::TYPE_IDENTIFIER);
 
+            // Call saveListIntegrationSetup API once for the group.
             $this->callSaveListIntegrationSetup($listId, $userId, $apiKey, $storeModel, $authenticateToken);
+
+            $this->eventManager->dispatch(
+                'dazoot_newsman_save_configure_list_after',
+                [
+                    'list_id'  => $listId,
+                    'store'    => $storeModel,
+                ]
+            );
         } catch (\Exception $e) {
             $this->logger->error('ConfigSaveObserver: saveListIntegrationSetup failed: ' . $e->getMessage());
             $this->messageManager->addErrorMessage(
@@ -237,30 +266,6 @@ class ConfigSaveObserver implements ObserverInterface
         }
 
         return null;
-    }
-
-    /**
-     * Resolve saved configuration scope.
-     *
-     * @param string $website
-     * @param string $store
-     * @return array
-     */
-    protected function resolveScope($website, $store)
-    {
-        try {
-            if (!empty($store)) {
-                $storeModel = $this->storeManager->getStore($store);
-                return [ScopeInterface::SCOPE_STORES, (int)$storeModel->getId()];
-            }
-            if (!empty($website)) {
-                $websiteModel = $this->storeManager->getWebsite($website);
-                return [ScopeInterface::SCOPE_WEBSITES, (int)$websiteModel->getId()];
-            }
-        } catch (\Exception $e) {
-            $this->logger->error($e->getMessage());
-        }
-        return [ScopeConfigInterface::SCOPE_TYPE_DEFAULT, 0];
     }
 
     /**

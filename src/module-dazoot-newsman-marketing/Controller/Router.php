@@ -18,6 +18,8 @@ use Magento\Framework\App\RouterInterface;
 
 /**
  * Match nz-mark/res or nz-mark/req and capture everything after it
+ *
+ * @deprecated No longer used. Remarketing script is fetched from Newsman API.
  */
 class Router implements RouterInterface
 {
@@ -81,9 +83,13 @@ class Router implements RouterInterface
      *
      * @param RequestInterface $request
      * @return ActionInterface|null
+     * @deprecated No longer used. Remarketing script is fetched from Newsman API.
      */
     public function match(RequestInterface $request)
     {
+        return null;
+
+        // @phpcs:disable Squiz.PHP.NonExecutableCode
         $path = ltrim($request->getPathInfo(), '/');
 
         $isResources = false;
@@ -129,5 +135,6 @@ class Router implements RouterInterface
             $action->setNzmType(self::TRACKING_IDENTIFIER);
         }
         return $action;
+        // @phpcs:enable Squiz.PHP.NonExecutableCode
     }
 }

@@ -44,6 +44,16 @@
             </argument>
         </arguments>
     </type>
+    <type name="Dazoot\Newsman\Model\Export\Retriever\Pool">
+        <arguments>
+            <argument name="retrieverList" xsi:type="array">
+                <item name="refresh-remarketing" xsi:type="array">
+                    <item name="class" xsi:type="string">\Dazoot\Newsmanmarketing\Model\Export\Retriever\RefreshRemarketing</item>
+                    <item name="code" xsi:type="string">refresh-remarketing</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
     <type name="Dazoot\Newsman\Model\Export\Retriever\Config">
         <arguments>
             <argument name="configWhitelist" xsi:type="array">

@@ -109,6 +109,8 @@ class SaveIntegrationSetupForConfiguredStores implements DataPatchInterface
      */
     public function apply()
     {
+        // For each unique list ID, generate/reuse an authenticate token, save it
+        // to all stores sharing that list, and call SaveListIntegrationSetup once.
         $this->moduleDataSetup->getConnection()->startSetup();
 
         $pluginVersion = 'unknown';
@@ -118,36 +120,41 @@ class SaveIntegrationSetupForConfiguredStores implements DataPatchInterface
         }
 
         $tokenSaved = false;
+        $serverAddr = (new \Dazoot\Newsman\Model\Util\ServerIpResolver())->resolve();
 
-        foreach ($this->storeManager->getStores() as $store) {
-            if (!$store->getIsActive()) {
+        foreach ($this->newsmanConfig->getAllListIds() as $listId) {
+            $storeIds = $this->newsmanConfig->getStoreIdsByListId($listId);
+            if (empty($storeIds)) {
                 continue;
             }
 
-            $userId = $this->newsmanConfig->getUserId($store);
-            $apiKey = $this->newsmanConfig->getApiKey($store);
-            $listId = $this->newsmanConfig->getListId($store);
+            $firstStoreId = reset($storeIds);
+            $userId = $this->newsmanConfig->getUserId($firstStoreId);
+            $apiKey = $this->newsmanConfig->getApiKey($firstStoreId);
 
-            if (empty($userId) || empty($apiKey) || empty($listId)) {
+            if (empty($userId) || empty($apiKey)) {
                 continue;
             }
 
-            $authenticateToken = $this->newsmanConfig->getExportAuthenticateToken($store);
+            $authenticateToken = $this->newsmanConfig->getExportAuthenticateToken($firstStoreId);
             if (empty($authenticateToken)) {
                 $authenticateToken = $this->generateRandomToken(32);
+            }
+
+            foreach ($storeIds as $storeId) {
                 $this->configWriter->save(
                     NewsmanConfig::XML_PATH_EXPORT_AUTHENTICATE_TOKEN,
                     $authenticateToken,
                     ScopeInterface::SCOPE_STORES,
-                    (int) $store->getId()
+                    (int) $storeId
                 );
-                $tokenSaved = true;
             }
+            $tokenSaved = true;
 
+            $store = $this->storeManager->getStore($firstStoreId);
             $baseUrl = $store->getBaseUrl(UrlInterface::URL_TYPE_WEB, true);
             $apiUrl = rtrim($baseUrl, '/') . '/newsman/index/index';
 
-            $serverAddr = (new \Dazoot\Newsman\Model\Util\ServerIpResolver())->resolve();
             $payload = [
                 'api_url'                   => $apiUrl,
                 'api_key'                   => $authenticateToken,
@@ -170,7 +177,7 @@ class SaveIntegrationSetupForConfiguredStores implements DataPatchInterface
                 $this->saveIntegrationService->execute($context);
             } catch (\Exception $e) {
                 $this->logger->error(
-                    'SaveIntegrationSetupForConfiguredStores patch: store ' . $store->getId() . ': ' . $e->getMessage()
+                    'SaveIntegrationSetupForConfiguredStores patch: list ' . $listId . ': ' . $e->getMessage()
                 );
             }
         }

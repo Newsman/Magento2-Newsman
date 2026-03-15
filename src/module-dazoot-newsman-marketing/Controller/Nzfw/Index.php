@@ -34,6 +34,7 @@ use Magento\Framework\App\CsrfAwareActionInterface;
 /**
  * Class Newsman Marketing resource index action
  * @note HttpHeadActionInterface is deprecated. HEAD and GET requests use HttpGetActionInterface
+ * @deprecated No longer used. Remarketing script is fetched from Newsman API.
  */
 class Index extends Action implements HttpGetActionInterface, HttpPostActionInterface, CsrfAwareActionInterface
 {
@@ -119,9 +120,14 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
      * @return ResultInterface|void
      * @throws LocalizedException
      * @throws FileSystemException
+     * @deprecated No longer used. Remarketing script is fetched from Newsman API.
      */
     public function execute()
     {
+        $this->sendNotFound();
+        return;
+
+        // @phpcs:disable Squiz.PHP.NonExecutableCode
         if (!$this->config->isActive()) {
             $this->sendNotFound();
             return;
@@ -206,6 +212,7 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
         } else {
             $this->sendNotFound();
         }
+        // @phpcs:enable Squiz.PHP.NonExecutableCode
     }
 
     /**
