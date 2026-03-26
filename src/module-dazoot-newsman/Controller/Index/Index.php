@@ -197,6 +197,10 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
 
             $store = $this->storeManager->getStore();
 
+            if (!$this->config->isEnabled($store)) {
+                throw new ApiV1Exception(1011, 'API not available', 403);
+            }
+
             // Resolve API key: Authorization header takes precedence, then nzmhash in params.
             // If neither is present, Processor::process() will throw AuthenticatorException,
             // which is caught below and returned as error code 1001.
