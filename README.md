@@ -9,7 +9,7 @@ Simplify the connection between your shop and NewsMAN platform using this straig
 | Magento Version        | Extension version             | Add New Features | Fix extension bugs |
 |------------------------|-------------------------------|------------------|--------------------|
 | 2.4.0 to 2.4.3         | 2.3.0 to 2.3.27               | No               | Yes                |
-| 2.4.4 to 2.4.4-p15     | 2.4.0 to 2.4.27               | No               | Yes                |
+| 2.4.4 to 2.4.4-p15     | 2.4.0 to 2.4.50 (excluding)   | No               | Yes                |
 | 2.4.4-p16 to 2.4.4-p17 | 2.4.50 to 2.4.100 (excluding) | Yes              | Yes                |
 | 2.4.5 to 2.4.5-p14     | 2.4.100 to 2.4.150 (excluding)            | No               | Yes                |
 | 2.4.5-p15 to 2.4.5-p16 | 2.4.150 to 2.5.0 (excluding)  | Yes              | Yes                |
