@@ -211,3 +211,6 @@
 "Invalid API key for store","Clé API invalide pour le magasin"
 "Only SELECT queries are allowed. Got:","Seules les requêtes SELECT sont autorisées. Reçu :"
 "Processing import notifier:","Traitement de la notification d'importation :"
+"Authenticate Token","Jeton d'authentification"
+"Used for Newsman API authentication. It is exchanged automatically when the API key, User ID, enabled flag or list is changed, and when reconfigure or login with Newsman is done.","Utilisé pour l'authentification API Newsman. Il est échangé automatiquement lorsque la clé API, l'ID utilisateur, l'indicateur d'activation ou la liste est modifié, et lors de la reconfiguration ou de la connexion avec Newsman."
+"Not set","Non défini"

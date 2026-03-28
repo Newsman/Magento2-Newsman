@@ -108,6 +108,11 @@
             <group id="export" translate="label" type="text" sortOrder="40" showInDefault="1"
                    showInWebsite="1" showInStore="1">
                 <label>Export</label>
+                <field id="authenticate_token" translate="label" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="0">
+                    <label>Authenticate Token</label>
+                    <frontend_model>Dazoot\Newsman\Block\Adminhtml\System\Config\AuthenticateToken</frontend_model>
+                    <comment><![CDATA[Used for Newsman API authentication. It is exchanged automatically when the API key, User ID, enabled flag or list is changed, and when reconfigure or login with Newsman is done.]]></comment>
+                </field>
                 <field id="authorize_header_name" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="0">
                     <label>Authorization Header Name</label>
                     <comment><![CDATA[Authorization in HTTP header as name. Format alpanumeric separated by hyphen-minus. Please also set it in Newsman App > E-Commerce > Coupons > Authorisation Header name, Newsman App > E-Commerce > Feed > a feed > Header Authorization, etc,]]></comment>

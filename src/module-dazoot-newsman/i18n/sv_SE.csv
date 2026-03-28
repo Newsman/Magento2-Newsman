@@ -211,3 +211,6 @@
 "Invalid API key for store","Ogiltig API-nyckel för butik"
 "Only SELECT queries are allowed. Got:","Endast SELECT-frågor är tillåtna. Mottaget:"
 "Processing import notifier:","Bearbetar importmeddelande:"
+"Authenticate Token","Autentiseringstoken"
+"Used for Newsman API authentication. It is exchanged automatically when the API key, User ID, enabled flag or list is changed, and when reconfigure or login with Newsman is done.","Används för Newsman API-autentisering. Den utbyts automatiskt när API-nyckeln, användar-ID, aktiveringsflaggan eller listan ändras, och vid omkonfigurering eller inloggning med Newsman."
+"Not set","Inte inställd"
