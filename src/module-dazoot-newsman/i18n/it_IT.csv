@@ -211,3 +211,6 @@
 "Invalid API key for store","Chiave API non valida per il negozio"
 "Only SELECT queries are allowed. Got:","Solo le query SELECT sono consentite. Ricevuto:"
 "Processing import notifier:","Elaborazione notifica di importazione:"
+"Authenticate Token","Token di autenticazione"
+"Used for Newsman API authentication. It is exchanged automatically when the API key, User ID, enabled flag or list is changed, and when reconfigure or login with Newsman is done.","Utilizzato per l'autenticazione API Newsman. Viene scambiato automaticamente quando la chiave API, l'ID utente, il flag di attivazione o la lista viene modificato, e quando si riconfigura o si accede con Newsman."
+"Not set","Non impostato"
