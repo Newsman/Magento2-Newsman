@@ -21,7 +21,7 @@ class PayloadParser
      *
      * @var array
      */
-    public static $methodMap = [
+    protected $methodMap = [
         'customer.list'          => 'customers',
         'subscriber.list'        => 'subscribers',
         'subscriber.subscribe'   => 'subscriber-subscribe',
@@ -42,6 +42,16 @@ class PayloadParser
         'sql.version'               => 'sql-version',
         'refresh.remarketing'       => 'refresh-remarketing',
     ];
+
+    /**
+     * Get the method-to-retriever-code mapping.
+     *
+     * @return array
+     */
+    public function getMethodMap()
+    {
+        return $this->methodMap;
+    }
 
     /**
      * Determine whether the raw request body should be handled as an API v1 payload.
@@ -90,7 +100,7 @@ class PayloadParser
         }
 
         $method = $payload['method'];
-        if (!isset(self::$methodMap[$method])) {
+        if (!isset($this->methodMap[$method])) {
             throw new ApiV1Exception(1004, 'Unknown method: ' . $method, 404);
         }
 
@@ -116,7 +126,7 @@ class PayloadParser
         $data['_v1_filter_fields'] = $filterFields;
 
         return [
-            'code' => self::$methodMap[$method],
+            'code' => $this->methodMap[$method],
             'data' => $data,
         ];
     }
