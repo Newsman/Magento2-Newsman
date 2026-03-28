@@ -20,7 +20,7 @@
 "Please enter a valid Newsman API key.","Please enter a valid Newsman API key."
 "List ID","List ID"
 "Segment ID","Segment ID"
-"All Newsman lists.","All Newsman lists."
+
 "All Newsman segments. Selecting a segment is not mandatory. The segment ID must match corresponding list ID.","All Newsman segments. Selecting a segment is not mandatory. The segment ID must match corresponding list ID."
 "Please choose a list","Please choose a list"
 "List ID is required.","List ID is required."
@@ -165,7 +165,7 @@
 "Credentials are invalid or there is temporarily API error!","Credentials are invalid or there is temporarily API error!"
 "Newsman integration setup failed: %1","Newsman integration setup failed: %1"
 "Multistore Installation","Multistore Installation"
-"In Magento 2 multistore installations we recommend to associate an email list with a store view. Please switch to a specific store view scope before configuring.","In Magento 2 multistore installations we recommend to associate an email list with a store view. Please switch to a specific store view scope before configuring."
+
 
 "Newsman Extension Version","Newsman Extension Version"
 "If you need support or have any questions, please contact us at","If you need support or have any questions, please contact us at"
@@ -203,3 +203,12 @@
 "Subscribed telephone %1","Subscribed telephone %1"
 "Try to unsubscribe telephone %1","Try to unsubscribe telephone %1"
 "Unsubscribed telephone %1","Unsubscribed telephone %1"
+"Do you want to proceed to reconfigure?","Do you want to proceed to reconfigure?"
+"We recommend assigning a different list to each store view.","We recommend assigning a different list to each store view."
+"Installed products feed %1","Installed products feed %1"
+"Try to install products feed %1","Try to install products feed %1"
+"Try to update feed %1","Try to update feed %1"
+"Updated feed %1","Updated feed %1"
+"Invalid API key for store","Invalid API key for store"
+"Only SELECT queries are allowed. Got:","Only SELECT queries are allowed. Got:"
+"Processing import notifier:","Processing import notifier:"
