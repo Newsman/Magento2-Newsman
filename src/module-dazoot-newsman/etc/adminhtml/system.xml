@@ -91,7 +91,7 @@
                        showInStore="1">
                     <label>List ID</label>
                     <source_model>Dazoot\Newsman\Model\Config\Source\Lists</source_model>
-                    <comment><![CDATA[All Newsman lists.]]></comment>
+                    <comment><![CDATA[We recommend assigning a different list to each store view.]]></comment>
                 </field>
                 <field id="segmentId" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1"
                        showInStore="1">

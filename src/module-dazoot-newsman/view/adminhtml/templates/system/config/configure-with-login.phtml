@@ -27,13 +27,7 @@ $showScopeWarning = (bool) $block->getData('show_scope_warning');
             var loginUrl = $(this).data('login-url');
             confirm({
                 title: '<?= $escaper->escapeJs(__('Multistore Installation')) ?>',
-                content: '<?= $escaper->escapeJs(
-                    __(
-                        'In Magento 2 multistore installations we recommend to associate'
-                        . ' an email list with a store view. Please switch to a specific'
-                        . ' store view scope before configuring.'
-                    )
-                ) ?>',
+                content: '<?= $escaper->escapeJs(__('Do you want to proceed to reconfigure?')) ?>',
                 actions: {
                     confirm: function () {
                         window.location.href = loginUrl;
