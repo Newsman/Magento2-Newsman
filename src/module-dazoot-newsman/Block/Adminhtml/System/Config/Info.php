@@ -139,11 +139,7 @@ HTML;
 
         if ($showScopeWarning) {
             $dialogTitle = __('Multistore Installation');
-            $dialogContent = __(
-                'In Magento 2 multistore installations we recommend to associate'
-                . ' an email list with a store view. Please switch to a specific'
-                . ' store view scope before configuring.'
-            );
+            $dialogContent = __('Do you want to proceed to reconfigure?');
             $cancelLabel = __('Cancel');
             $continueLabel = __('Continue');
             $html .= <<<HTML
