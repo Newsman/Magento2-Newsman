@@ -148,13 +148,25 @@ class Index extends Action implements HttpGetActionInterface, HttpPostActionInte
             $store = $this->storeManager->getStore();
             $parameters = $this->getRequest()->getParams();
 
+            $code = $this->retrieverProcessor->getCodeByData($parameters);
+
+            // Block legacy access for endpoints available in API v1.
+            if ($code !== false && in_array($code, $this->v1PayloadParser->getMethodMap(), true)) {
+                $jsonResult = $this->resultJsonFactory->create();
+                $jsonResult->setHttpResponseCode(Http::STATUS_CODE_403);
+                $jsonResult->setJsonData($this->serializer->serialize([
+                    'error' => 'This endpoint is only available via API v1 (JSON POST).'
+                ]));
+                return $jsonResult;
+            }
+
             $apiKey = $this->getApiKeyFromHeader();
             if (!empty($apiKey) && empty($parameters[Authenticator::API_KEY_PARAM])) {
                 $parameters[Authenticator::API_KEY_PARAM] = $apiKey;
             }
 
             $result = $this->retrieverProcessor->process(
-                $this->retrieverProcessor->getCodeByData($parameters),
+                $code,
                 $store,
                 $parameters
             );
