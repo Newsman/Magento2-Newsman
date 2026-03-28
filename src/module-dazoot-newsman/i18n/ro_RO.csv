@@ -20,7 +20,7 @@
 "Please enter a valid Newsman API key.","Vă rugăm să introduceți o cheie validă de API Newsman."
 "List ID","ID-ul listei"
 "Segment ID","ID-ul segmentului"
-"All Newsman lists.","Toate listele Newsman."
+
 "All Newsman segments. Selecting a segment is not mandatory. The segment ID must match corresponding list ID.","Toate segmentele Newsman. Selectarea unui segment nu este obligatorie. ID-ul segmentului trebuie să se potrivească cu ID-ul listei corespunzătoare."
 "Please choose a list","Vă rugăm să alegeți o listă"
 "List ID is required.","ID-ul listei este obligatoriu."
@@ -165,7 +165,7 @@
 "Credentials are invalid or there is temporarily API error!","Credențialele sunt invalide sau există o eroare temporară a API-ului!"
 "Newsman integration setup failed: %1","Configurarea integrării Newsman a eșuat: %1"
 "Multistore Installation","Instalare multimagazin"
-"In Magento 2 multistore installations we recommend to associate an email list with a store view. Please switch to a specific store view scope before configuring.","În instalările multimagazin Magento 2, recomandăm asocierea unei liste de e-mail cu un store view. Vă rugăm să schimbați la un store view specific înainte de a configura."
+
 
 "Newsman Extension Version","Versiunea extensiei Newsman"
 "If you need support or have any questions, please contact us at","Dacă aveți nevoie de asistență sau aveți întrebări, vă rugăm să ne contactați la"
@@ -203,3 +203,12 @@
 "Subscribed telephone %1","Telefon abonat %1"
 "Try to unsubscribe telephone %1","Încercare de dezabonare a telefonului %1"
 "Unsubscribed telephone %1","Telefon dezabonat %1"
+"Do you want to proceed to reconfigure?","Doriți să continuați reconfigurarea?"
+"We recommend assigning a different list to each store view.","Recomandăm alocarea unei liste diferite fiecărui store view."
+"Installed products feed %1","Feed produse instalat %1"
+"Try to install products feed %1","Încercare de instalare feed produse %1"
+"Try to update feed %1","Încercare de actualizare feed %1"
+"Updated feed %1","Feed actualizat %1"
+"Invalid API key for store","Cheie API invalidă pentru magazin"
+"Only SELECT queries are allowed. Got:","Doar interogările SELECT sunt permise. S-a primit:"
+"Processing import notifier:","Procesare notificare import:"
