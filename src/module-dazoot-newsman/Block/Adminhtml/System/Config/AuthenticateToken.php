@@ -73,6 +73,6 @@ class AuthenticateToken extends Field
         if ($len <= 2) {
             return str_repeat('*', $len);
         }
-        return str_repeat('*', $len - 2) . substr($token, -2);
+        return '*****' . substr($token, -2);
     }
 }
