@@ -62,7 +62,7 @@ class AuthenticateToken extends Field
     }
 
     /**
-     * Mask a token showing first 3 and last 4 characters.
+     * Mask a token showing only the last 2 characters.
      *
      * @param string $token
      * @return string
@@ -70,9 +70,9 @@ class AuthenticateToken extends Field
     protected function maskToken($token)
     {
         $len = strlen($token);
-        if ($len <= 7) {
+        if ($len <= 2) {
             return str_repeat('*', $len);
         }
-        return substr($token, 0, 3) . '****' . substr($token, -4);
+        return str_repeat('*', $len - 2) . substr($token, -2);
     }
 }
