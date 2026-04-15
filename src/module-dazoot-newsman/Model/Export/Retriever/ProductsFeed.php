@@ -258,8 +258,9 @@ class ProductsFeed extends AbstractRetriever
             $row['subcategories'] = [];
         }
 
-        // Stock status
-        $row['in_stock'] = ($row['stock_quantity'] > 0) ? 1 : 0;
+        // Stock status — authoritative flag maintained by Magento itself:
+        // for configurable/grouped/bundle this is already aggregated from children.
+        $row['in_stock'] = $this->getProductInStock($product, $websiteIds);
         $row['variants'] = '';
 
         foreach ($this->getAdditionalAttributes($storeIds) as $attributeCode => $fieldName) {
@@ -279,18 +280,112 @@ class ProductsFeed extends AbstractRetriever
     /**
      * Retrieve current quantity for a product.
      *
+     * For composite types (configurable, grouped, bundle) returns the sum of
+     * in-stock child quantities, since the parent itself has no real qty.
+     *
      * @param Product|ProductInterface $product
      * @param array $websiteIds
      * @return float
      */
     public function getProductQuantity($product, $websiteIds)
     {
-        $maxQty = 0.0;
+        $typeId = $product->getTypeId();
+
+        if ($typeId === 'configurable') {
+            return $this->sumChildrenQuantity(
+                $product->getTypeInstance()->getUsedProducts($product),
+                $websiteIds
+            );
+        }
+
+        if ($typeId === 'grouped') {
+            return $this->sumChildrenQuantity(
+                $product->getTypeInstance()->getAssociatedProducts($product),
+                $websiteIds
+            );
+        }
+
+        if ($typeId === 'bundle') {
+            $typeInstance = $product->getTypeInstance();
+            $optionIds = $typeInstance->getOptionsIds($product);
+            $selections = $typeInstance->getSelectionsCollection($optionIds, $product);
+            return $this->sumChildrenQuantity($selections, $websiteIds);
+        }
+
+        return $this->getSkuQuantity($product->getSku(), $websiteIds);
+    }
+
+    /**
+     * Retrieve in_stock flag for a product across websites.
+     *
+     * Returns 1 if any website reports stock_status = 1 for this SKU.
+     * For configurable/grouped/bundle, Magento already aggregates children's
+     * availability into the parent's stock_status row.
+     *
+     * @param Product|ProductInterface $product
+     * @param array $websiteIds
+     * @return int
+     */
+    public function getProductInStock($product, $websiteIds)
+    {
         foreach ($websiteIds as $websiteId) {
             $stockStatus = $this->stockRegistry->getStockStatusBySku(
                 $product->getSku(),
                 $websiteId
             );
+            if ((is_object($stockStatus) || is_array($stockStatus))
+                && isset($stockStatus['stock_status'])
+                && (int) $stockStatus['stock_status'] === 1
+            ) {
+                return 1;
+            }
+        }
+
+        return 0;
+    }
+
+    /**
+     * Sum in-stock quantity across a set of child products.
+     *
+     * @param iterable $children
+     * @param array $websiteIds
+     * @return float
+     */
+    public function sumChildrenQuantity($children, $websiteIds)
+    {
+        $sum = 0.0;
+        foreach ($children as $child) {
+            $childQty = 0.0;
+            foreach ($websiteIds as $websiteId) {
+                $stockStatus = $this->stockRegistry->getStockStatusBySku(
+                    $child->getSku(),
+                    $websiteId
+                );
+                if ((is_object($stockStatus) || is_array($stockStatus))
+                    && isset($stockStatus['stock_status']) && (int) $stockStatus['stock_status'] === 1
+                    && isset($stockStatus['qty']) && (float) $stockStatus['qty'] > $childQty
+                ) {
+                    $childQty = (float) $stockStatus['qty'];
+                }
+            }
+            $sum += $childQty;
+        }
+
+        return $sum;
+    }
+
+    /**
+     * Retrieve max qty for a given SKU across websites.
+     *
+     * @param string $sku
+     * @param array $websiteIds
+     * @return float
+     */
+    public function getSkuQuantity($sku, $websiteIds)
+    {
+        $maxQty = 0.0;
+        foreach ($websiteIds as $websiteId) {
+            $stockStatus = $this->stockRegistry->getStockStatusBySku($sku, $websiteId);
 
             if ((is_object($stockStatus) || is_array($stockStatus))
                 && isset($stockStatus['qty']) && $stockStatus['qty'] > $maxQty) {

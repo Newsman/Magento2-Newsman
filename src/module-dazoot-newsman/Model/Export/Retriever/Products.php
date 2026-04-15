@@ -226,18 +226,83 @@ class Products extends AbstractRetriever implements RetrieverInterface
     /**
      * Retrieve current quantity for a product.
      *
+     * For composite types (configurable, grouped, bundle) returns the sum of
+     * in-stock child quantities, since the parent itself has no real qty.
+     *
      * @param Product|ProductInterface $product
      * @param array $websiteIds
      * @return float
      */
     public function getProductQuantity($product, $websiteIds)
     {
+        $typeId = $product->getTypeId();
+
+        if ($typeId === 'configurable') {
+            return $this->sumChildrenQuantity(
+                $product->getTypeInstance()->getUsedProducts($product),
+                $websiteIds
+            );
+        }
+
+        if ($typeId === 'grouped') {
+            return $this->sumChildrenQuantity(
+                $product->getTypeInstance()->getAssociatedProducts($product),
+                $websiteIds
+            );
+        }
+
+        if ($typeId === 'bundle') {
+            $typeInstance = $product->getTypeInstance();
+            $optionIds = $typeInstance->getOptionsIds($product);
+            $selections = $typeInstance->getSelectionsCollection($optionIds, $product);
+            return $this->sumChildrenQuantity($selections, $websiteIds);
+        }
+
+        return $this->getSkuQuantity($product->getSku(), $websiteIds);
+    }
+
+    /**
+     * Sum in-stock quantity across a set of child products.
+     *
+     * @param iterable $children
+     * @param array $websiteIds
+     * @return float
+     */
+    public function sumChildrenQuantity($children, $websiteIds)
+    {
+        $sum = 0.0;
+        foreach ($children as $child) {
+            $childQty = 0.0;
+            foreach ($websiteIds as $websiteId) {
+                $stockStatus = $this->stockRegistry->getStockStatusBySku(
+                    $child->getSku(),
+                    $websiteId
+                );
+                if ((is_object($stockStatus) || is_array($stockStatus))
+                    && isset($stockStatus['stock_status']) && (int) $stockStatus['stock_status'] === 1
+                    && isset($stockStatus['qty']) && (float) $stockStatus['qty'] > $childQty
+                ) {
+                    $childQty = (float) $stockStatus['qty'];
+                }
+            }
+            $sum += $childQty;
+        }
+
+        return $sum;
+    }
+
+    /**
+     * Retrieve max qty for a given SKU across websites.
+     *
+     * @param string $sku
+     * @param array $websiteIds
+     * @return float
+     */
+    public function getSkuQuantity($sku, $websiteIds)
+    {
         $maxQty = 0.0;
         foreach ($websiteIds as $websiteId) {
-            $stockStatus = $this->stockRegistry->getStockStatusBySku(
-                $product->getSku(),
-                $websiteId
-            );
+            $stockStatus = $this->stockRegistry->getStockStatusBySku($sku, $websiteId);
 
             if ((is_object($stockStatus) || is_array($stockStatus))
                 && isset($stockStatus['qty']) && $stockStatus['qty'] > $maxQty) {
