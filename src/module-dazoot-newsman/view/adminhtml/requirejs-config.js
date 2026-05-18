@@ -8,7 +8,8 @@
 var config = {
     map: {
         '*': {
-            newsmanImportListSegment: 'Dazoot_Newsman/js/import-list-segment'
+            newsmanImportListSegment: 'Dazoot_Newsman/js/import-list-segment',
+            newsmanSegmentListFilter: 'Dazoot_Newsman/js/segment-list-filter'
         }
     }
 };
