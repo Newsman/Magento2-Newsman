@@ -9,7 +9,7 @@ define([
     'jquery',
     'underscore',
     'Magento_Ui/js/modal/alert',
-    'jquery/ui'
+    'jquery-ui-modules/widget'
 ], function ($, _, alert) {
     'use strict';
 
@@ -104,6 +104,8 @@ define([
                             }
                         });
                     }
+
+                    $('#' + self.options.listElementId).trigger('newsmanListsSynced');
                 } else {
                     msg = response.errorMessage;
 
