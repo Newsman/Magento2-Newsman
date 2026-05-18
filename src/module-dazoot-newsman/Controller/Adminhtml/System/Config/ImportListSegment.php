@@ -10,6 +10,7 @@ namespace Dazoot\Newsman\Controller\Adminhtml\System\Config;
 use Dazoot\Newsman\Model\Config;
 use Dazoot\Newsman\Model\Service\Configuration\GetListAll;
 use Dazoot\Newsman\Model\Service\Configuration\GetSegments;
+use Dazoot\Newsman\Model\Service\Context\Configuration\ListContext;
 use Dazoot\Newsman\Model\Service\Context\Configuration\ListContextFactory;
 use Dazoot\Newsman\Model\Service\Context\Configuration\UserContextFactory;
 use Magento\Backend\App\Action;
@@ -167,13 +168,24 @@ class ImportListSegment extends Action
             );
             $segmentsData = [$userId => []];
             if (!empty($listsData)) {
+                $segments = $this->getSegments->execute(
+                    $this->listContextFactory->create()
+                        ->setUserId($userId)
+                        ->setApiKey($apiKey)
+                        ->setListId(ListContext::LIST_ID_ALL)
+                );
+                $segmentsByList = [];
+                if (is_array($segments)) {
+                    foreach ($segments as $segment) {
+                        if (!isset($segment['list_id'])) {
+                            continue;
+                        }
+                        $segmentsByList[(int) $segment['list_id']][] = $segment;
+                    }
+                }
                 foreach ($listsData as $listItem) {
-                    $segmentsData[$userId][$listItem['list_id']] = $this->getSegments->execute(
-                        $this->listContextFactory->create()
-                            ->setUserId($userId)
-                            ->setApiKey($apiKey)
-                            ->setListId($listItem['list_id'])
-                    );
+                    $segmentsData[$userId][$listItem['list_id']] =
+                        $segmentsByList[(int) $listItem['list_id']] ?? [];
                 }
             }
         } catch (LocalizedException $e) {
