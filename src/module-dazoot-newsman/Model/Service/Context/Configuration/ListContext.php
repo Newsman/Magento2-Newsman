@@ -15,16 +15,21 @@ use Dazoot\Newsman\Model\Service\ContextInterface;
 class ListContext extends UserContext
 {
     /**
-     * Newsman list ID.
+     * List ID value that requests segments for every list in the account.
+     */
+    public const LIST_ID_ALL = 'all';
+
+    /**
+     * Newsman list ID: a single list ID, the string 'all', or an array of list IDs.
      *
-     * @var int
+     * @var int|string|int[]
      */
     protected $listId;
 
     /**
      * Set the Newsman list ID.
      *
-     * @param int $listId
+     * @param int|string|int[] $listId Single list ID, 'all', or an array of list IDs
      * @return ContextInterface
      */
     public function setListId($listId)
@@ -36,7 +41,7 @@ class ListContext extends UserContext
     /**
      * Retrieve the Newsman list ID.
      *
-     * @return int
+     * @return int|string|int[]
      */
     public function getListId()
     {
