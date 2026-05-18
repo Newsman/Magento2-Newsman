@@ -25,7 +25,10 @@ use Magento\Framework\Escaper;
     "listEmptyLabel": "<?= $escaper->escapeHtml(__('Please choose a list')) ?>",
     "segmentElementId": "newsman_credentials_segmentId",
     "segmentEmptyLabel": "<?= $escaper->escapeHtml(__('Please choose a segment')) ?>",
-    "fieldMapping": "<?= /* @noEscape */ $block->getFieldMapping() ?>"}, "validation": {}}'>
+    "fieldMapping": "<?= /* @noEscape */ $block->getFieldMapping() ?>"},
+    "newsmanSegmentListFilter": {
+    "listElementId": "newsman_credentials_listId",
+    "segmentElementId": "newsman_credentials_segmentId"}, "validation": {}}'>
     <span id="<?= /* @noEscape */ $block->getHtmlId() ?>_result"
         ><?= $escaper->escapeHtml($block->getButtonLabel()) ?></span>
     <span id="<?= /* @noEscape */ $block->getHtmlId() ?>_error"></span>
