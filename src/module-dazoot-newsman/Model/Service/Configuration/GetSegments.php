@@ -12,7 +12,7 @@ use Dazoot\Newsman\Model\Service\Context\Configuration\ListContext;
 use Magento\Framework\Exception\LocalizedException;
 
 /**
- * Get all newsletter segments by list ID
+ * Get newsletter segments in a single segment.all API call
  */
 class GetSegments extends AbstractService
 {
@@ -22,7 +22,12 @@ class GetSegments extends AbstractService
     public const ENDPOINT = 'segment.all';
 
     /**
-     * Execute API call to retrieve all segments for the specified list.
+     * Fetch newsletter segments in a single segment.all API call.
+     *
+     * The context list ID may be a single list ID, the string 'all', or an
+     * array of list IDs (sent as a comma-separated list). The raw API result
+     * is returned as-is: a flat list of segment rows, each carrying its own
+     * list_id. Callers group it as needed.
      *
      * @param ListContext $context
      * @return array
@@ -36,13 +41,18 @@ class GetSegments extends AbstractService
             throw $e;
         }
 
+        $listId = $context->getListId();
+        if (is_array($listId)) {
+            $listId = implode(',', array_map('intval', $listId));
+        }
+
         $apiContext = $this->createApiContext()
             ->setUserId($context->getUserId())
             ->setApiKey($context->getApiKey())
             ->setEndpoint(self::ENDPOINT);
 
         $client = $this->createApiClient();
-        $result = $client->get($apiContext, ['list_id' => $context->getListId()]);
+        $result = $client->get($apiContext, ['list_id' => $listId]);
 
         if ($client->hasError()) {
             throw new LocalizedException(__($client->getErrorMessage()), null, $client->getErrorCode());
