@@ -74,7 +74,7 @@ class ServerIpResolver
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         $result   = curl_exec($ch);
         $httpCode = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+        unset($ch);
         // phpcs:enable Magento2.Functions.DiscouragedFunction.Discouraged
 
         if ($result === false || $httpCode !== 200) {
