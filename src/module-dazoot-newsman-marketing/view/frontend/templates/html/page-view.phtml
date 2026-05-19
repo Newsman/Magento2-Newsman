@@ -7,14 +7,17 @@
  */
 
 /** @var \Magento\Framework\View\Element\Template $block */
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
 /** @var \Dazoot\Newsmanmarketing\ViewModel\Marketing $viewModel */
 $viewModel = $block->getViewModel();
 if (!$viewModel->isActive()) {
     return '';
 }
-?>
-<script>
+
+$pageViewScript = <<<EOT
 if (typeof _nzm !== 'undefined') {
     _nzm.run('send', 'pageview');
 }
-</script>
+EOT;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $pageViewScript, false) ?>
