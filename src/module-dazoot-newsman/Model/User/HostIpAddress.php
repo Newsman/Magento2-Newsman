@@ -145,7 +145,7 @@ class HostIpAddress implements IpAddressInterface
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_exec($ch);
         $ip = curl_getinfo($ch, CURLINFO_PRIMARY_IP);
-        curl_close($ch);
+        unset($ch);
         // @codingStandardsIgnoreEnd
 
         if (empty($ip) || $ip === '127.0.0.1') {
