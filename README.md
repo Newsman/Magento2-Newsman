@@ -15,10 +15,11 @@ Simplify the connection between your shop and NewsMAN platform using this straig
 | 2.4.5-p15 to 2.4.5-p16 | 2.4.150 to 2.5.0 (excluding)  | Yes              | Yes                |
 | 2.4.6 to 2.4.6-p12     | 2.4.100 to 2.4.150 (excluding)| No               | Yes                |
 | 2.4.6-p13 to 2.4.6-p14 | 2.4.150 to 2.5.0 (excluding)  | Yes              | Yes                |
-| 2.4.7 to 2.4.7-p7      | 2.5.0 to 2.7.0 (excluding)    | No               | Yes                |
-| 2.4.7-p8 to 2.4.7-p9   | 2.7.0 to latest               | Yes              | Yes                |
-| 2.4.8 to 2.4.8-p2      | 2.5.0 to 2.7.0 (excluding)    | No               | Yes                |
-| 2.4.8-p3 to 2.4.8-p4   | 2.7.0 to latest               | Yes              | Yes                |
+| 2.4.7 to 2.4.7-p7      | 2.5.0 to 2.6.100 (excluding)  | No               | Yes                |
+| 2.4.7-p8 to 2.4.7-p10  | 2.7.0 to latest               | Yes              | Yes                |
+| 2.4.8 to 2.4.8-p2      | 2.6.100 to 2.7.0 (excluding)  | No               | Yes                |
+| 2.4.8-p3 to 2.4.8-p5   | 2.7.0 to latest               | Yes              | Yes                |
+| 2.4.9 to latest        | 2.7.0 to latest               | Yes              | Yes                |
 
 
 # Installation with Composer
