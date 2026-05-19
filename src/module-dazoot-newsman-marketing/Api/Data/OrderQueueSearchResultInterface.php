@@ -27,5 +27,5 @@ interface OrderQueueSearchResultInterface extends SearchResultsInterface
      * @param OrderQueueInterface[] $items
      * @return $this
      */
-    public function setItems(array $items = null);
+    public function setItems(array $items);
 }
