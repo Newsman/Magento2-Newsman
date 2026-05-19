@@ -13,36 +13,43 @@
         <policy id="style-src">
             <values>
                 <value id="dazoot_newsmanapp_com" type="host">*.newsmanapp.com</value>
+                <value id="dazoot_newsman_eu" type="host">*.newsman.eu</value>
             </values>
         </policy>
         <policy id="script-src">
             <values>
                 <value id="dazoot_newsmanapp_com" type="host">*.newsmanapp.com</value>
+                <value id="dazoot_newsman_eu" type="host">*.newsman.eu</value>
             </values>
         </policy>
         <policy id="img-src">
             <values>
                 <value id="dazoot_newsmanapp_com" type="host">*.newsmanapp.com</value>
+                <value id="dazoot_newsman_eu" type="host">*.newsman.eu</value>
             </values>
         </policy>
         <policy id="frame-src">
             <values>
                 <value id="dazoot_newsmanapp_com" type="host">*.newsmanapp.com</value>
+                <value id="dazoot_newsman_eu" type="host">*.newsman.eu</value>
             </values>
         </policy>
         <policy id="connect-src">
             <values>
                 <value id="dazoot_newsmanapp_com" type="host">*.newsmanapp.com</value>
+                <value id="dazoot_newsman_eu" type="host">*.newsman.eu</value>
             </values>
         </policy>
         <policy id="form-action">
             <values>
                 <value id="dazoot_newsmanapp_com" type="host">*.newsmanapp.com</value>
+                <value id="dazoot_newsman_eu" type="host">*.newsman.eu</value>
             </values>
         </policy>
         <policy id="font-src">
             <values>
                 <value id="dazoot_newsmanapp_com" type="host">*.newsmanapp.com</value>
+                <value id="dazoot_newsman_eu" type="host">*.newsman.eu</value>
             </values>
         </policy>
     </policies>
