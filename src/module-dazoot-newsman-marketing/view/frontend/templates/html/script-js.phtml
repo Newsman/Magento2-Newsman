@@ -32,7 +32,21 @@ $nzmConfigJs .= $viewModel->getNewsmanConfigJs();
         false
     ); ?>
 <?php endif; ?>
-<?= /* @noEscape */ $scriptJs; ?>
+<?php
+if (substr_count(strtolower($scriptJs), '<script') === 1
+    && preg_match('#^\s*<script\b[^>]*>(.*)</script>\s*$#is', $scriptJs, $scriptMatch)
+) {
+    $scriptJsOutput = $secureRenderer->renderTag(
+        'script',
+        ['type' => 'text/javascript'],
+        $scriptMatch[1],
+        false
+    );
+} else {
+    $scriptJsOutput = $scriptJs;
+}
+?>
+<?= /* @noEscape */ $scriptJsOutput ?>
 <?php
 $anonymizeIpScript = '';
 if ($viewModel->getAnynymizeIp()) {
