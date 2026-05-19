@@ -110,7 +110,7 @@ class Curl extends \Magento\Framework\HTTP\Client\Curl
         if ($err) {
             $this->doError(curl_error($this->_ch));
         }
-        curl_close($this->_ch);
+        unset($this->_ch);
         // @codingStandardsIgnoreEnd
     }
 }
