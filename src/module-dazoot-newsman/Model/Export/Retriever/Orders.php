@@ -213,12 +213,27 @@ class Orders extends AbstractRetriever
         $orderList = $this->orderRepository->getList($searchCriteria);
         $count = $orderList->getTotalCount();
 
-        $pageOffset = $params['currentPage'] * $params['limit'];
-        $prevPageOffset = ($params['currentPage'] - 1) * $params['limit'];
-        if (($count >= $pageOffset)
-            || (($count < $pageOffset) && ($count > $prevPageOffset))
-        ) {
-            $orders = $orderList->getItems();
+        if ($count > $params['start']) {
+            if (($params['start'] % $params['limit']) === 0) {
+                $orders = $orderList->getItems();
+            } else {
+                // The repository API is page-based, so a start offset that is
+                // not a multiple of the page size is fetched as the two pages
+                // covering the requested window and sliced to the exact rows.
+                $page = (int)floor($params['start'] / $params['limit']) + 1;
+                $searchCriteria->setPageSize($params['limit'])->setCurrentPage($page);
+                $orders = array_values($this->orderRepository->getList($searchCriteria)->getItems());
+                $searchCriteria->setCurrentPage($page + 1);
+                $orders = array_merge(
+                    $orders,
+                    array_values($this->orderRepository->getList($searchCriteria)->getItems())
+                );
+                $orders = array_slice(
+                    $orders,
+                    $params['start'] - ($page - 1) * $params['limit'],
+                    $params['limit']
+                );
+            }
             /** @var OrderInterface $order */
             foreach ($orders as $order) {
                 try {
@@ -281,6 +296,14 @@ class Orders extends AbstractRetriever
             'modified_at' => 'updated_at',
             'order_id' => 'entity_id',
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDefaultSortField()
+    {
+        return 'entity_id';
     }
 
     /**
