@@ -161,11 +161,7 @@ class ProductsFeed extends AbstractRetriever
 
         $count = $collection->getSize();
         $result = [];
-        $pageOffset = $params['currentPage'] * $params['limit'];
-        $prevPageOffset = ($params['currentPage'] - 1) * $params['limit'];
-        if (($count >= $pageOffset)
-            || (($count < $pageOffset) && ($count > $prevPageOffset))
-        ) {
+        if ($count > $params['start']) {
             /** @var Product $product */
             foreach ($collection as $product) {
                 try {
@@ -522,5 +518,13 @@ class ProductsFeed extends AbstractRetriever
             'name' => 'name',
             'price' => 'price'
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDefaultSortField()
+    {
+        return 'entity_id';
     }
 }

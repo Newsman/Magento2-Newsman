@@ -129,11 +129,7 @@ class Customers extends AbstractRetriever
         $count = $collection->getSize();
         $result = [];
 
-        $pageOffset = $params['currentPage'] * $params['limit'];
-        $prevPageOffset = ($params['currentPage'] - 1) * $params['limit'];
-        if (($count >= $pageOffset)
-            || (($count < $pageOffset) && ($count > $prevPageOffset))
-        ) {
+        if ($count > $params['start']) {
             /** @var CustomerInterface $customer */
             foreach ($collection as $customer) {
                 try {
@@ -242,6 +238,14 @@ class Customers extends AbstractRetriever
             'firstname' => 'firstname',
             'lastname' => 'lastname',
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDefaultSortField()
+    {
+        return 'entity_id';
     }
 
     /**

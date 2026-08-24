@@ -142,12 +142,17 @@ class Products extends AbstractRetriever implements RetrieverInterface
         );
 
         $collection = $this->createCollection($websiteIds, $storeIds, $currentPage, $pageSize);
+        if (($start % $pageSize) !== 0) {
+            // A start offset that is not a multiple of the page size cannot be
+            // expressed as a page number and would be silently rounded down to
+            // a page boundary; apply it directly on the select instead.
+            $collection->setPageSize(false);
+            $collection->getSelect()->limit($pageSize, $start);
+        }
 
         $count = $collection->getSize();
         $result = [];
-        if (($count >= $currentPage * $pageSize)
-            || (($count < $currentPage * $pageSize) && ($count > ($currentPage - 1) * $pageSize))
-        ) {
+        if ($count > $start) {
             /** @var Product $product */
             foreach ($collection as $product) {
                 try {
@@ -332,7 +337,9 @@ class Products extends AbstractRetriever implements RetrieverInterface
         // Get out of stock products too
         $collection->setFlag('has_stock_status_filter', true);
         $collection->addAttributeToSelect(['*'])
-            ->addWebsiteFilter($websiteIds)
+            ->addWebsiteFilter($websiteIds);
+        // Deterministic order keeps LIMIT pages stable between requests
+        $collection->setOrder('entity_id', 'ASC')
             ->setCurPage($currentPage)
             ->setPageSize($pageSize);
 
