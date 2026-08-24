@@ -35,6 +35,19 @@ abstract class AbstractRetriever implements RetrieverInterface
     }
 
     /**
+     * Get the field used to keep paginated exports deterministic
+     *
+     * Returns an empty string when the retriever applies its own ordering or
+     * when it is not paginated.
+     *
+     * @return string
+     */
+    public function getDefaultSortField()
+    {
+        return '';
+    }
+
+    /**
      * Process list parameters
      *
      * @param array $data
@@ -48,6 +61,7 @@ abstract class AbstractRetriever implements RetrieverInterface
             'sort' => null,
             'order' => 'ASC',
             'limit' => $defaultPageSize,
+            'start' => 0,
             'currentPage' => 1
         ];
 
@@ -64,6 +78,19 @@ abstract class AbstractRetriever implements RetrieverInterface
             $params['order'] = 'DESC';
         }
 
+        if ($params['sort'] === null) {
+            // Without an explicit ORDER BY, MySQL does not guarantee a stable
+            // row order between two pages of the same query. Paginated exports
+            // then repeat some rows and skip others, so part of the catalog
+            // never reaches Newsman. Fall back to the deterministic sort field
+            // of the retriever when it defines one.
+            $defaultSort = $this->getDefaultSortField();
+            if (!empty($defaultSort)) {
+                $params['sort'] = $defaultSort;
+                $params['order'] = 'ASC';
+            }
+        }
+
         $limit = isset($data['limit']) ? (int)$data['limit'] : $defaultPageSize;
         if ($limit < 1) {
             $limit = $defaultPageSize;
@@ -74,6 +101,7 @@ abstract class AbstractRetriever implements RetrieverInterface
         if ($start < 0) {
             $start = 0;
         }
+        $params['start'] = $start;
         $params['currentPage'] = (int)floor($start / $limit) + 1;
 
         return $params;
@@ -187,8 +215,15 @@ abstract class AbstractRetriever implements RetrieverInterface
             $collection->setOrder($params['sort'], $params['order']);
         }
 
-        $collection->setPageSize($params['limit']);
-        $collection->setCurPage($params['currentPage']);
+        if (!empty($params['start']) && ($params['start'] % $params['limit']) !== 0) {
+            // A start offset that is not a multiple of the page size cannot be
+            // expressed as a page number and would be silently rounded down to
+            // a page boundary; apply it directly on the select instead.
+            $collection->getSelect()->limit($params['limit'], $params['start']);
+        } else {
+            $collection->setPageSize($params['limit']);
+            $collection->setCurPage($params['currentPage']);
+        }
     }
 
     /**
