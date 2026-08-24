@@ -107,11 +107,7 @@ class Subscribers extends AbstractRetriever
         $result = [];
 
         $count = $collection->getSize();
-        $pageOffset = $params['currentPage'] * $params['limit'];
-        $prevPageOffset = ($params['currentPage'] - 1) * $params['limit'];
-        if (($count >= $pageOffset)
-            || (($count < $pageOffset) && ($count > $prevPageOffset))
-        ) {
+        if ($count > $params['start']) {
             $emails = $collection->getColumnValues('subscriber_email');
             $customerCollection = $this->createCustomerCollection($storeIds, $emails);
             $customersData = $this->getCustomerData($customerCollection, $storeIds);
@@ -228,6 +224,14 @@ class Subscribers extends AbstractRetriever
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getDefaultSortField()
+    {
+        return 'subscriber_id';
+    }
+
+    /**
      * Extract relevant customer data from the collection.
      *
      * @param CustomerCollection $collection
@@ -295,7 +299,7 @@ class Subscribers extends AbstractRetriever
         /** @var CustomerCollection $collection */
         $collection = $this->customerCollectionFactory->create();
         $collection->addAttributeToSelect(['entity_id', 'email', 'firstname', 'lastname'])
-            ->addAttributeToSelect('email', ['in' => $emails])
+            ->addAttributeToFilter('email', ['in' => $emails])
             ->addAttributeToFilter('store_id', ['in' => $storeIds]);
 
         if (!empty($additionalAttributes)) {

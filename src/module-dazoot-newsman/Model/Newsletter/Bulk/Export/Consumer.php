@@ -382,7 +382,10 @@ class Consumer
         /** @var Collection $collection */
         $collection = $this->collectionFactory->create()
             ->addFieldToFilter('subscriber_status', Subscriber::STATUS_SUBSCRIBED)
-            ->addFieldToFilter('store_id', ['in' => $storeIds])
+            ->addFieldToFilter('store_id', ['in' => $storeIds]);
+        // Deterministic order keeps the chunk boundaries stable between the
+        // separately executed chunk queries
+        $collection->setOrder('subscriber_id', 'ASC')
             ->setPageSize($chunkSize)
             ->setCurPage($step);
 
@@ -418,7 +421,7 @@ class Consumer
         /** @var CustomerCollection $collection */
         $collection = $this->customerCollectionFactory->create();
         $collection->addAttributeToSelect(['entity_id', 'email', 'firstname', 'lastname'])
-            ->addAttributeToSelect('email', ['in' => $emails])
+            ->addAttributeToFilter('email', ['in' => $emails])
             ->addAttributeToFilter('store_id', ['in' => $storeIds]);
 
         if (!empty($additionalAttributes)) {
