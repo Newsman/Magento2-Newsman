@@ -22,20 +22,48 @@ $ordersData = $viewModel->getMarketingData($orderIds);
 if (empty($ordersData)) {
     return '';
 }
+
+// To track an order, a user has to be identified.
+$buyer = null;
+foreach ($ordersData as $order) {
+    if (isset($order['products']) && !empty($order['products']) && !empty($order['buyer']['email'])) {
+        $buyer = $order['buyer'];
+        break;
+    }
+}
 ?>
 <script>
 if (typeof _nzm !== 'undefined') {
-    <?php foreach ($ordersData as $order): ?>
-        <?php if (!(isset($order['products']) && !empty($order['products']))) {
-            continue;
-        } ?>
-        <?php /* To track an order, a user has to be identified. */ ?>
-        _nzm.identify(<?= /* @noEscape */ $serializer->serialize($order['buyer']) ?>);
-        <?php foreach ($order['products'] as $product): ?>
-            _nzm.run('ec:addProduct', <?= /* @noEscape */ $serializer->serialize($product) ?>);
-        <?php endforeach ?>
-        _nzm.run('ec:setAction', 'purchase', <?= /* @noEscape */ $serializer->serialize($order['order']) ?>);
-    <?php endforeach ?>
-    _nzm.run('send', 'pageview');
+    (function () {
+        var nzmIdentity = <?= /* @noEscape */ $buyer === null ? 'null' : $serializer->serialize($buyer) ?>;
+        var nzmPurchaseSent = false;
+        function nzmSendPurchase() {
+            if (nzmPurchaseSent) {
+                return;
+            }
+            nzmPurchaseSent = true;
+            <?php foreach ($ordersData as $order): ?>
+                <?php if (!(isset($order['products']) && !empty($order['products']))) {
+                    continue;
+                } ?>
+                <?php foreach ($order['products'] as $product): ?>
+                    _nzm.run('ec:addProduct', <?= /* @noEscape */ $serializer->serialize($product) ?>);
+                <?php endforeach ?>
+                _nzm.run('ec:setAction', 'purchase', <?= /* @noEscape */ $serializer->serialize($order['order']) ?>);
+            <?php endforeach ?>
+            _nzm.run('send', 'pageview');
+        }
+        <?php /* The tracker drops a purchase from a visitor without a tracking id, so a
+        visitor not identified yet sends it once identify has stored the id. */ ?>
+        if (!nzmIdentity) {
+            nzmSendPurchase();
+        } else if (/(?:^|;\s*)_nzm_id_[^=]*=[^;]/.test(document.cookie)) {
+            _nzm.identify(nzmIdentity);
+            nzmSendPurchase();
+        } else {
+            _nzm.identify(nzmIdentity, undefined, nzmSendPurchase);
+            setTimeout(nzmSendPurchase, 5000);
+        }
+    })();
 }
 </script>
