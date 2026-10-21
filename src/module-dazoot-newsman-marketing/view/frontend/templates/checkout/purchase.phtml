@@ -24,19 +24,43 @@ if (empty($ordersData)) {
     return '';
 }
 
-$purchaseScript = "if (typeof _nzm !== 'undefined') {\n";
+$buyer = null;
+$purchaseActions = '';
 foreach ($ordersData as $order) {
     if (!(isset($order['products']) && !empty($order['products']))) {
         continue;
     }
     // To track an order, a user has to be identified.
-    $purchaseScript .= '_nzm.identify(' . $serializer->serialize($order['buyer']) . ");\n";
-    foreach ($order['products'] as $product) {
-        $purchaseScript .= "_nzm.run('ec:addProduct', " . $serializer->serialize($product) . ");\n";
+    if ($buyer === null && !empty($order['buyer']['email'])) {
+        $buyer = $order['buyer'];
     }
-    $purchaseScript .= "_nzm.run('ec:setAction', 'purchase', "
+    foreach ($order['products'] as $product) {
+        $purchaseActions .= "_nzm.run('ec:addProduct', " . $serializer->serialize($product) . ");\n";
+    }
+    $purchaseActions .= "_nzm.run('ec:setAction', 'purchase', "
         . $serializer->serialize($order['order']) . ");\n";
 }
-$purchaseScript .= "_nzm.run('send', 'pageview');\n}";
+
+$purchaseScript = "if (typeof _nzm !== 'undefined') {\n(function () {\n"
+    . 'var nzmIdentity = ' . ($buyer === null ? 'null' : $serializer->serialize($buyer)) . ";\n"
+    . "var nzmPurchaseSent = false;\n"
+    . "function nzmSendPurchase() {\n"
+    . "if (nzmPurchaseSent) {\nreturn;\n}\n"
+    . "nzmPurchaseSent = true;\n"
+    . $purchaseActions
+    . "_nzm.run('send', 'pageview');\n"
+    . "}\n"
+    // The tracker drops a purchase from a visitor without a tracking id, so a
+    // visitor not identified yet sends it once identify has stored the id.
+    . "if (!nzmIdentity) {\n"
+    . "nzmSendPurchase();\n"
+    . "} else if (/(?:^|;\\s*)_nzm_id_[^=]*=[^;]/.test(document.cookie)) {\n"
+    . "_nzm.identify(nzmIdentity);\n"
+    . "nzmSendPurchase();\n"
+    . "} else {\n"
+    . "_nzm.identify(nzmIdentity, undefined, nzmSendPurchase);\n"
+    . "setTimeout(nzmSendPurchase, 5000);\n"
+    . "}\n"
+    . "})();\n}";
 ?>
 <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $purchaseScript, false) ?>
