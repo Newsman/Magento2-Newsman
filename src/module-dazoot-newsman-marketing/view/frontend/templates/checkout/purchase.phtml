@@ -37,8 +37,13 @@ foreach ($ordersData as $order) {
     foreach ($order['products'] as $product) {
         $purchaseActions .= "_nzm.run('ec:addProduct', " . $serializer->serialize($product) . ");\n";
     }
+    // The tracker sends one purchase per pageview: each order gets its own.
     $purchaseActions .= "_nzm.run('ec:setAction', 'purchase', "
-        . $serializer->serialize($order['order']) . ");\n";
+        . $serializer->serialize($order['order']) . ");\n"
+        . "_nzm.run('send', 'pageview');\n";
+}
+if ($purchaseActions === '') {
+    $purchaseActions = "_nzm.run('send', 'pageview');\n";
 }
 
 $purchaseScript = "if (typeof _nzm !== 'undefined') {\n(function () {\n"
@@ -48,7 +53,6 @@ $purchaseScript = "if (typeof _nzm !== 'undefined') {\n(function () {\n"
     . "if (nzmPurchaseSent) {\nreturn;\n}\n"
     . "nzmPurchaseSent = true;\n"
     . $purchaseActions
-    . "_nzm.run('send', 'pageview');\n"
     . "}\n"
     // The tracker drops a purchase from a visitor without a tracking id, so a
     // visitor not identified yet sends it once identify has stored the id.
