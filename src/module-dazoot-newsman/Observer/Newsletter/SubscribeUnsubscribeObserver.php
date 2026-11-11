@@ -13,6 +13,7 @@ use Dazoot\Newsman\Helper\Customer\AttributesMap;
 use Dazoot\Newsman\Logger\Logger;
 use Dazoot\Newsman\Model\Api\ErrorCode\InitSubscribe as InitSubscribeError;
 use Dazoot\Newsman\Model\Config;
+use Dazoot\Newsman\Model\Newsletter\Bulk\Sync\Collector as SyncCollector;
 use Dazoot\Newsman\Model\Service\SubscribeEmail;
 use Dazoot\Newsman\Model\Service\Context\SubscribeEmailContext;
 use Dazoot\Newsman\Model\Service\Context\SubscribeEmailContextFactory;
@@ -28,6 +29,7 @@ use Dazoot\Newsman\Model\Service\Context\InitUnsubscribeEmailContextFactory;
 use Magento\Customer\Api\Data\CustomerInterface as CustomerData;
 use Magento\Customer\Model\Customer;
 use Magento\Customer\Model\Session as CustomerSession;
+use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\LocalizedException;
@@ -113,6 +115,11 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
     protected $attributesMap;
 
     /**
+     * @var SyncCollector
+     */
+    protected $syncCollector;
+
+    /**
      * @param StoreManagerInterface $storeManager
      * @param SubscribeEmail $subscribeEmail
      * @param SubscribeEmailContextFactory $subscribeEmailContextFactory
@@ -127,6 +134,7 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
      * @param Config $config
      * @param Logger $logger
      * @param AttributesMap $attributesMap
+     * @param SyncCollector|null $syncCollector
      */
     public function __construct(
         StoreManagerInterface $storeManager,
@@ -142,7 +150,8 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
         CustomerSession $customerSession,
         Config $config,
         Logger $logger,
-        AttributesMap $attributesMap
+        AttributesMap $attributesMap,
+        ?SyncCollector $syncCollector = null
     ) {
         $this->storeManager = $storeManager;
         $this->subscribeEmail = $subscribeEmail;
@@ -158,6 +167,7 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
         $this->config = $config;
         $this->logger = $logger;
         $this->attributesMap = $attributesMap;
+        $this->syncCollector = $syncCollector ?: ObjectManager::getInstance()->get(SyncCollector::class);
     }
 
     /**
@@ -184,6 +194,32 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
 
         /* @see \Dazoot\Newsman\Model\Webhooks::processUnsubscribe() */
         if ($subscriber->getNewsmanSkipUnsubscribeFlag()) {
+            return;
+        }
+
+        /* Admin customer grid mass action: sent from the queue after the request. */
+        /* @see \Dazoot\Newsman\Plugin\Controller\Customer\Adminhtml\Index\MassSubscription */
+        if ($this->syncCollector->isCollecting()) {
+            $this->syncCollector->add($subscriber);
+            return;
+        }
+
+        $this->sendSubscriber($subscriber);
+    }
+
+    /**
+     * Send the subscriber status to Newsman: subscribe, init subscribe or unsubscribe
+     *
+     * @see \Dazoot\Newsman\Model\Newsletter\Bulk\Sync\Consumer
+     * @param Subscriber $subscriber
+     * @return void
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
+     */
+    public function sendSubscriber($subscriber)
+    {
+        $storeId = $subscriber->getStoreId();
+        if (!$this->config->isEnabled($storeId)) {
             return;
         }
 

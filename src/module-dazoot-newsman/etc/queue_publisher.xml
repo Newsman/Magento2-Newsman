@@ -14,6 +14,9 @@
     <publisher topic="dazoot_newsman.newsletter.bulk.delete" queue="dazoot_newsman.newsletter.bulk.delete">
         <connection name="db" exchange="magento-db" />
     </publisher>
+    <publisher topic="dazoot_newsman.newsletter.bulk.sync" queue="dazoot_newsman.newsletter.bulk.sync">
+        <connection name="db" exchange="magento-db" />
+    </publisher>
     <!-- deprecated <publisher topic="dazoot_newsman.newsletter.bulk.export.list">
         <connection name="db" exchange="magento-db" />
     </publisher>-->

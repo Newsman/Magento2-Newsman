@@ -75,7 +75,7 @@ class MassDelete extends MassActionAbstract
 
         if ($countExecuted > 0) {
             $this->messageManager->addSuccessMessage(
-                __('Total of %1 record(s) were deleted.', count($countExecuted))
+                __('Total of %1 record(s) were deleted.', $countExecuted)
             );
         }
 

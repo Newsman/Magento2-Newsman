@@ -28,6 +28,9 @@ class Consumer extends \Dazoot\Newsman\Model\Newsletter\Bulk\Unsubscribe\Consume
     public function executeSubscriberAction($subscriber)
     {
         if ($subscriber->getSubscriberId() > 0) {
+            /* The email was unsubscribed from Newsman above, no second unsubscribe on delete. */
+            /* @see \Dazoot\Newsman\Observer\Newsletter\DeleteUnsubscribeObserver */
+            $subscriber->setNewsmanSkipUnsubscribeFlag(true);
             $subscriber->delete();
             $this->logger->info(
                 __('Executed Magento delete subscriber with email %1', $subscriber->getSubscriberEmail())

@@ -20,6 +20,12 @@
               connection="db"
               maxMessages="500"
               consumerInstance="Magento\Framework\MessageQueue\Consumer" />
+    <consumer name="dazoot_newsman.newsletter.bulk.sync"
+              queue="dazoot_newsman.newsletter.bulk.sync"
+              handler="Dazoot\Newsman\Model\Newsletter\Bulk\Sync\Consumer::process"
+              connection="db"
+              maxMessages="500"
+              consumerInstance="Magento\Framework\MessageQueue\Consumer" />
     <!-- deprecated <consumer name="dazoot_newsman.newsletter.bulk.export.list"
               queue="dazoot_newsman.newsletter.bulk.export.list"
               handler="Dazoot\Newsman\Model\Newsletter\Bulk\Export\Consumer::process"
