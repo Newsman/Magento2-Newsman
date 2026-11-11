@@ -8,6 +8,10 @@
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="newsletter_subscriber_save_before">
+        <observer name="dazoot_newsman_newsletter_sub_unsub"
+                  instance="Dazoot\Newsman\Observer\Newsletter\SubscribeUnsubscribeObserver"/>
+    </event>
     <event name="admin_system_config_changed_section_newsman">
         <observer name="dazoot_newsman_config_save_integration_setup"
                   instance="Dazoot\Newsman\Observer\Adminhtml\ConfigSaveObserver"/>
