@@ -18,6 +18,14 @@
         <plugin name="dazoot_newsman_newsletter_mass_delete" disabled="false"
                 type="Dazoot\Newsman\Plugin\Controller\Newsletter\Adminhtml\Subscriber\MassDelete" />
     </type>
+    <type name="Magento\Customer\Controller\Adminhtml\Index\MassSubscribe">
+        <plugin name="dazoot_newsman_customer_mass_subscribe" disabled="false"
+                type="Dazoot\Newsman\Plugin\Controller\Customer\Adminhtml\Index\MassSubscription" />
+    </type>
+    <type name="Magento\Customer\Controller\Adminhtml\Index\MassUnsubscribe">
+        <plugin name="dazoot_newsman_customer_mass_unsubscribe" disabled="false"
+                type="Dazoot\Newsman\Plugin\Controller\Customer\Adminhtml\Index\MassSubscription" />
+    </type>
     <type name="Magento\Framework\View\Element\Message\MessageConfigurationsPool">
         <arguments>
             <argument name="configurationsMap" xsi:type="array">

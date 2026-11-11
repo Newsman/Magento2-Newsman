@@ -173,4 +173,8 @@ Da. Toate setarile suporta sistemul de scope al Magento. Folositi selectorul de 
 
 ### Ce se intampla cand un client se aboneaza la newsletter?
 
-Cand un client se aboneaza prin formularul de newsletter al Magento, extensia trimite automat abonarea catre Newsman folosind lista si segmentul configurate. Daca "Send Subscribe/Unsubscribe Emails From Newsman" este activat, Newsman va trimite emailul de confirmare in loc de Magento.
+Cand un client se aboneaza prin formularul de newsletter al Magento, extensia trimite automat abonarea catre Newsman folosind lista si segmentul configurate. Daca "Send Subscribe/Unsubscribe Emails From Newsman" este activat, Newsman va trimite emailul de confirmare in loc de Magento. La fel se intampla cand un administrator schimba abonarea din pagina clientului sau din grila de clienti, si cand abonarea se schimba prin REST sau GraphQL API. Actiunile in masa din grila de clienti si din **Marketing > Communications > Newsletter Subscribers** sunt trimise in fundal de consumatorii de mesaje (message queue) ai Magento, deci cron-ul Magento trebuie sa ruleze.
+
+### Ce se intampla cand este sters un client sau un abonat la newsletter?
+
+Cand un abonat la newsletter este sters in Magento, extensia dezaboneaza emailul din lista Newsman a store view-ului abonatului, fara email de confirmare. Acest lucru acopera stergerea unui client (pagina clientului, grila de clienti, REST API), de exemplu dupa o cerere GDPR de stergere a datelor clientului, si stergerea abonatilor din **Marketing > Communications > Newsletter Subscribers**. Sunt trimisi doar abonatii care erau abonati sau asteptau confirmarea; nu se trimite nimic pentru un store view unde extensia este dezactivata. Daca Newsman nu poate fi contactat, stergerea se finalizeaza oricum si eroarea este scrisa in logul extensiei.
