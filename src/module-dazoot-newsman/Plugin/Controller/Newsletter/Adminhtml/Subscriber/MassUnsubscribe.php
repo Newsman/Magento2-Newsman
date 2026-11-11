@@ -79,7 +79,7 @@ class MassUnsubscribe extends MassActionAbstract
 
         if ($countExecuted > 0) {
             $this->messageManager->addSuccessMessage(
-                __('A total of %1 record(s) were updated.', count($countExecuted))
+                __('A total of %1 record(s) were updated.', $countExecuted)
             );
         }
 

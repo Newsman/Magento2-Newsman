@@ -22,6 +22,13 @@
               maxIdleTime="60"
               sleep="1"
               onlySpawnWhenMessageAvailable="1" />
+    <consumer name="dazoot_newsman.newsletter.bulk.sync"
+              queue="dazoot_newsman.newsletter.bulk.sync"
+              handler="Dazoot\Newsman\Model\Newsletter\Bulk\Sync\Consumer::process"
+              maxMessages="500"
+              maxIdleTime="60"
+              sleep="1"
+              onlySpawnWhenMessageAvailable="1" />
     <!-- deprecated <consumer name="dazoot_newsman.newsletter.bulk.export.list"
               queue="dazoot_newsman.newsletter.bulk.export.list"
               handler="Dazoot\Newsman\Model\Newsletter\Bulk\Export\Consumer::process"

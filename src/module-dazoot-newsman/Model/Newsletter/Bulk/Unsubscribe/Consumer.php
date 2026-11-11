@@ -238,6 +238,9 @@ class Consumer
     public function executeSubscriberAction($subscriber)
     {
         if ($subscriber->getSubscriberId() > 0) {
+            /* The email was unsubscribed from Newsman above, no second unsubscribe on save. */
+            /* @see \Dazoot\Newsman\Observer\Newsletter\SubscribeUnsubscribeObserver */
+            $subscriber->setNewsmanSkipUnsubscribeFlag(true);
             $subscriber->unsubscribe();
             $this->logger->info(__('Executed Magento unsubscribe email %1', $subscriber->getSubscriberEmail()));
         }

@@ -19,6 +19,16 @@ use Dazoot\Newsman\Logger\Logger;
 class Client implements ClientInterface
 {
     /**
+     * Error code when Newsman cannot be reached (connection refused, timeout, DNS error) and there is no HTTP status
+     */
+    public const ERROR_CODE_CONNECTION = 599;
+
+    /**
+     * Error code at HTTP 200 when the answer is not valid JSON, or is a Newsman error ("err") without a code
+     */
+    public const ERROR_CODE_RESPONSE = 1;
+
+    /**
      * @var Config
      */
     protected $config;
@@ -144,14 +154,14 @@ class Client implements ClientInterface
                 try {
                     $result = $this->json->unserialize($httpClient->getBody());
                     if (($apiError = $this->parseApiError($result)) !== false) {
-                        $this->errorCode = (int) $apiError['code'];
-                        $this->errorMessage = $apiError['message'];
+                        // A true "err" without a code is still an error. A false "err" without a code is not.
+                        $this->setApiError($apiError, empty($apiError['err']) ? 0 : self::ERROR_CODE_RESPONSE);
                         $this->logger->warning($this->errorCode . ' | ' . $this->errorMessage);
                     } else {
                         $this->logger->notice($this->json->serialize($result));
                     }
                 } catch (\Exception $e) {
-                    $this->errorCode = 1;
+                    $this->errorCode = self::ERROR_CODE_RESPONSE;
                     $this->errorMessage = $e->getMessage();
                     $this->logger->critical($e);
                     return [];
@@ -162,8 +172,8 @@ class Client implements ClientInterface
                     if (stripos($httpClient->getBody(), '{') !== false) {
                         $body = $this->json->unserialize($httpClient->getBody());
                         if (($apiError = $this->parseApiError($body)) !== false) {
-                            $this->errorCode = (int) $apiError['code'];
-                            $this->errorMessage = $apiError['message'];
+                            // Without a Newsman code the HTTP status stays the error code.
+                            $this->setApiError($apiError, $this->errorCode);
                         } else {
                             $this->errorMessage = 'Error: ' . $this->errorCode;
                         }
@@ -176,12 +186,38 @@ class Client implements ClientInterface
         } catch (\Exception $e) {
             /** @see \Magento\Framework\HTTP\Client\Curl::doError() */
             $this->errorCode = (int) $httpClient->getStatus();
+            if ($this->errorCode <= 0) {
+                $this->errorCode = self::ERROR_CODE_CONNECTION;
+            }
             $this->errorMessage = $e->getMessage();
             $this->logger->critical($e);
         }
         unset($httpClient);
 
         return $result;
+    }
+
+    /**
+     * Set the error code and message from a parsed Newsman error answer.
+     *
+     * The code of the answer is kept as it is. Without a code the fallback code is used (0 = not an error).
+     *
+     * @param array $apiError Result of parseApiError()
+     * @param int $fallbackCode
+     * @return void
+     */
+    protected function setApiError(array $apiError, $fallbackCode)
+    {
+        $this->errorMessage = $apiError['message'];
+        if ($apiError['has_code']) {
+            $this->errorCode = (int) $apiError['code'];
+            return;
+        }
+
+        $this->errorCode = (int) $fallbackCode;
+        if ($this->errorCode > 0 && $this->errorMessage === '') {
+            $this->errorMessage = 'Error: ' . $this->errorCode;
+        }
     }
 
     /**
@@ -198,7 +234,9 @@ class Client implements ClientInterface
 
         return [
             'code' => isset($result['code']) ? $result['code'] : 0,
-            'message' => $result['message'] ?? ''
+            'message' => $result['message'] ?? '',
+            'has_code' => isset($result['code']),
+            'err' => $result['err'],
         ];
     }
 

@@ -110,7 +110,7 @@ class ExportSubscriberCommand extends Command
      *
      * @return int
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $data = [
             'list_id' => $input->getOption(self::INPUT_KEY_LIST_ID),
