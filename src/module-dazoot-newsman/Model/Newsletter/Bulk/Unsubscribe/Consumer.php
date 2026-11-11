@@ -7,6 +7,7 @@
  */
 namespace Dazoot\Newsman\Model\Newsletter\Bulk\Unsubscribe;
 
+use Dazoot\Newsman\Model\Api\ErrorCode\Unsubscribe as UnsubscribeError;
 use Dazoot\Newsman\Model\Service\Context\UnsubscribeEmailContext;
 use Dazoot\Newsman\Model\Service\Context\UnsubscribeEmailContextFactory;
 use Dazoot\Newsman\Model\Service\UnsubscribeEmail;
@@ -203,7 +204,13 @@ class Consumer
 
                 $this->logger->info(__('%1 | Unsubscribed email %2', $this->name, $subscriber->getSubscriberEmail()));
             } catch (\Exception $e) {
-                $this->logger->error($e->getMessage());
+                if ((int) $e->getCode() === UnsubscribeError::NO_SUCH_SUBSCRIBER) {
+                    $this->logger->info(
+                        __('%1 | Email %2 is not on the Newsman list', $this->name, $subscriber->getSubscriberEmail())
+                    );
+                } else {
+                    $this->logger->error($e->getMessage());
+                }
             }
 
             $this->executeSubscriberAction($subscriber);
