@@ -14,6 +14,9 @@
     <topic name="dazoot_newsman.newsletter.bulk.delete" request="Magento\AsynchronousOperations\Api\Data\OperationInterface">
         <handler name="dazoot_newsman.newsletter.bulk.delete" type="Dazoot\Newsman\Model\Newsletter\Bulk\Delete\Consumer" method="process" />
     </topic>
+    <topic name="dazoot_newsman.newsletter.bulk.sync" request="Magento\AsynchronousOperations\Api\Data\OperationInterface">
+        <handler name="dazoot_newsman.newsletter.bulk.sync" type="Dazoot\Newsman\Model\Newsletter\Bulk\Sync\Consumer" method="process" />
+    </topic>
     <!-- deprecated <topic name="dazoot_newsman.newsletter.bulk.export.list" request="Magento\AsynchronousOperations\Api\Data\OperationInterface">
         <handler name="dazoot_newsman.newsletter.bulk.export.list" type="Dazoot\Newsman\Model\Newsletter\Bulk\Export\Consumer" method="process" />
     </topic>-->

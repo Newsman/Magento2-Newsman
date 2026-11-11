@@ -173,4 +173,8 @@ Yes. All settings support Magento's scope system. Use the **Store View** selecto
 
 ### What happens when a customer subscribes to the newsletter?
 
-When a customer subscribes through Magento's newsletter form, the extension automatically sends the subscription to Newsman using the configured list and segment. If "Send Subscribe/Unsubscribe Emails From Newsman" is enabled, Newsman will send the confirmation email instead of Magento.
+When a customer subscribes through Magento's newsletter form, the extension automatically sends the subscription to Newsman using the configured list and segment. If "Send Subscribe/Unsubscribe Emails From Newsman" is enabled, Newsman will send the confirmation email instead of Magento. The same happens when an administrator changes the subscription on the customer page or from the customer grid, and when it changes through the REST or GraphQL API. Mass actions from the customer grid and from **Marketing > Communications > Newsletter Subscribers** are sent in the background by the Magento message queue consumers, so Magento cron must be running.
+
+### What happens when a customer or a newsletter subscriber is deleted?
+
+When a newsletter subscriber is deleted in Magento, the extension unsubscribes the email from the Newsman list of the subscriber's store view, without a confirmation email. This covers deleting a customer (customer page, customer grid, REST API), for example after a GDPR request to erase the customer data, and deleting subscribers from **Marketing > Communications > Newsletter Subscribers**. Only subscribers that were subscribed or waiting for confirmation are sent; nothing is sent for a store view where the extension is disabled. If Newsman cannot be reached, the delete still completes and the error is written to the extension log.
