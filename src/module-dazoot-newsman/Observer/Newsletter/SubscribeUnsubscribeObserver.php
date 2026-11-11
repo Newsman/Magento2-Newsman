@@ -12,6 +12,7 @@ namespace Dazoot\Newsman\Observer\Newsletter;
 use Dazoot\Newsman\Helper\Customer\AttributesMap;
 use Dazoot\Newsman\Logger\Logger;
 use Dazoot\Newsman\Model\Api\ErrorCode\InitSubscribe as InitSubscribeError;
+use Dazoot\Newsman\Model\Api\ErrorCode\Unsubscribe as UnsubscribeError;
 use Dazoot\Newsman\Model\Config;
 use Dazoot\Newsman\Model\Newsletter\Bulk\Sync\Collector as SyncCollector;
 use Dazoot\Newsman\Model\Service\SubscribeEmail;
@@ -255,6 +256,15 @@ class SubscribeUnsubscribeObserver implements ObserverInterface
                 }
             }
         } catch (LocalizedException $e) {
+            if (!$isInitSubscribe
+                && (int) $subscriber->getStatus() === Subscriber::STATUS_UNSUBSCRIBED
+                && (int) $e->getCode() === UnsubscribeError::NO_SUCH_SUBSCRIBER
+            ) {
+                $this->logger->info(
+                    __('Email %1 is not on the Newsman list, nothing to unsubscribe', $subscriber->getEmail())
+                );
+                return;
+            }
             $this->logger->error($e);
             if ($isInitSubscribe && $e->getCode() === InitSubscribeError::TOO_MANY_REQUESTS) {
                 throw $e;

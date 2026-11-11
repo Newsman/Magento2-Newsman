@@ -10,6 +10,7 @@ declare(strict_types = 1);
 namespace Dazoot\Newsman\Observer\Newsletter;
 
 use Dazoot\Newsman\Logger\Logger;
+use Dazoot\Newsman\Model\Api\ErrorCode\Unsubscribe as UnsubscribeError;
 use Dazoot\Newsman\Model\Config;
 use Dazoot\Newsman\Model\Service\Context\UnsubscribeEmailContextFactory;
 use Dazoot\Newsman\Model\Service\UnsubscribeEmail;
@@ -142,7 +143,26 @@ class DeleteUnsubscribeObserver implements ObserverInterface
                     ->setIp($this->ipAddress->getIp())
             );
         } catch (\Throwable $e) {
+            if ((int) $e->getCode() === UnsubscribeError::NO_SUCH_SUBSCRIBER) {
+                $this->logInfo(__('Email %1 is not on the Newsman list, nothing to unsubscribe', $email));
+                return;
+            }
             $this->logError($email, $e);
+        }
+    }
+
+    /**
+     * Log an info message without letting a logger error reach the subscriber delete
+     *
+     * @param \Magento\Framework\Phrase|string $message
+     * @return void
+     */
+    protected function logInfo($message)
+    {
+        try {
+            $this->logger->info($message);
+        } catch (\Throwable $e) {
+            return;
         }
     }
 
