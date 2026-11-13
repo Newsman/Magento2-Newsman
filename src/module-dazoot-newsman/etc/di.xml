@@ -36,6 +36,10 @@
         <plugin name="dazoot_newsman_suppress_send_email" disabled="false"
                 type="Dazoot\Newsman\Plugin\Model\Newsletter\Subscriber\SuppressSendEmail" />
     </type>
+    <type name="Magento\Customer\Api\AccountManagementInterface">
+        <plugin name="dazoot_newsman_skip_anonymise_on_create_rollback" disabled="false"
+                type="Dazoot\Newsman\Plugin\Model\Customer\AccountManagement\SkipAnonymiseOnCreateRollback" />
+    </type>
     <type name="Dazoot\Newsman\Model\Export\Retriever\Pool">
         <arguments>
             <argument name="retrieverList" xsi:type="array">
