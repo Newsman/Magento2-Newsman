@@ -9,7 +9,11 @@
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
     <event name="newsletter_subscriber_delete_commit_after">
-        <observer name="dazoot_newsman_newsletter_delete_unsubscribe"
-                  instance="Dazoot\Newsman\Observer\Newsletter\DeleteUnsubscribeObserver"/>
+        <observer name="dazoot_newsman_newsletter_delete_anonymise"
+                  instance="Dazoot\Newsman\Observer\Newsletter\DeleteAnonymiseObserver"/>
+    </event>
+    <event name="customer_delete_commit_after">
+        <observer name="dazoot_newsman_customer_delete_anonymise"
+                  instance="Dazoot\Newsman\Observer\Customer\DeleteAnonymiseObserver"/>
     </event>
 </config>
