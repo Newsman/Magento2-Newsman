@@ -23,7 +23,9 @@ use Magento\Newsletter\Model\Subscriber;
  * subscribe / unsubscribe observer does not run.
  *
  * The email is anonymised whatever the subscriber status: an unsubscribed or not confirmed email can still be in
- * Newsman with personal data. Runs after the delete is committed, so only when the row is really gone.
+ * Newsman with personal data. When "Anonymise in Newsman when customers are deleted" is No, the email is unsubscribed
+ * instead (decided per Newsman list by the Anonymiser). Runs after the delete is committed, so only when the row is
+ * really gone.
  * A Newsman error is logged and never stops the delete.
  *
  * @see \Dazoot\Newsman\Observer\Customer\DeleteAnonymiseObserver
@@ -67,7 +69,8 @@ class DeleteAnonymiseObserver implements ObserverInterface
             $this->anonymiser->anonymise(
                 $email,
                 [(int) $subscriber->getStoreId()],
-                __('Subscriber deleted in Magento, anonymise email %1', $email)
+                __('Subscriber deleted in Magento, anonymise email %1', $email),
+                __('Subscriber deleted in Magento, unsubscribe email %1', $email)
             );
         } catch (\Throwable $e) {
             return;
