@@ -13,14 +13,14 @@ use Magento\Newsletter\Model\ResourceModel\Subscriber\Collection;
 use Magento\Newsletter\Model\Subscriber;
 
 /**
- * Class send to API delete from Newsman newsletter using bulk async operations.
+ * Anonymise the emails in Newsman and delete the newsletter subscribers using bulk async operations.
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class MassDelete extends MassActionAbstract
 {
     /**
-     * Create queue message to unsubscribe emails from Newsman and delete subscribers
+     * Create queue message to anonymise emails in Newsman and delete subscribers
      *
      * @param \Magento\Newsletter\Controller\Adminhtml\Subscriber\MassDelete $subject
      * @param Closure $proceed
@@ -88,9 +88,9 @@ class MassDelete extends MassActionAbstract
             $this->publish(
                 $subscriberIdsNewsman,
                 'dazoot_newsman.newsletter.bulk.delete',
-                'Unsubscribe emails from Newsman newsletter and delete subscriber chunk %1',
+                'Anonymise emails in Newsman and delete subscriber chunk %1',
                 __(
-                    'Newsletter unsubscribe from Newsman for %1 emails and delete subscribers in Magento',
+                    'Anonymise %1 emails in Newsman and delete the subscribers in Magento',
                     count($subscriberIdsNewsman)
                 )
             );
