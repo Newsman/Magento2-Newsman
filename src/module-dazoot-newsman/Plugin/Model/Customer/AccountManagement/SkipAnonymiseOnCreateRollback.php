@@ -12,7 +12,7 @@ use Magento\Customer\Api\AccountManagementInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
 
 /**
- * Do not anonymise in Newsman when Magento deletes the customer it was creating.
+ * Do not anonymise (or unsubscribe) in Newsman when Magento deletes the customer it was creating.
  *
  * When an address of a new account cannot be saved, Magento deletes the customer it has just saved (and its
  * newsletter subscriber) and shows the error. The person did not ask for a delete and usually registers again
@@ -36,7 +36,7 @@ class SkipAnonymiseOnCreateRollback
     }
 
     /**
-     * Suspend the anonymise on delete while the account is created
+     * Suspend the anonymise (or unsubscribe) on delete while the account is created
      *
      * @param AccountManagementInterface $subject
      * @param callable $proceed

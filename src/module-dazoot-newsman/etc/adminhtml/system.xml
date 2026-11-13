@@ -158,6 +158,12 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment><![CDATA[Newsman sends the emails subscribe to newsletter confirmation and unsubscribe from newsletter.]]></comment>
                 </field>
+                <field id="anonymise_on_delete" translate="label comment" type="select" sortOrder="20" showInDefault="1"
+                       showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Anonymise in Newsman when customers are deleted</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Yes: the email of deleted customers and deleted newsletter subscribers is anonymised in Newsman. No: it is unsubscribed instead. When store views use the same Newsman list and one of them is set to No, the email is unsubscribed from that list.]]></comment>
+                </field>
             </group>
             <group id="developer" translate="label" type="text" sortOrder="100" showInDefault="1"
                    showInWebsite="1" showInStore="1">
