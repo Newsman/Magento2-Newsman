@@ -23,7 +23,8 @@ use Magento\Store\Model\StoreManagerInterface;
  * Newsletter Bulk Delete Consumer
  *
  * Anonymises the emails in the Newsman list of the subscriber's store view, whatever the subscriber status, then
- * deletes the subscribers in Magento.
+ * deletes the subscribers in Magento. When "Anonymise in Newsman when customers are deleted" is No, the emails are
+ * unsubscribed instead (decided per Newsman list by the Anonymiser).
  */
 class Consumer extends \Dazoot\Newsman\Model\Newsletter\Bulk\Unsubscribe\Consumer
 {
@@ -77,7 +78,7 @@ class Consumer extends \Dazoot\Newsman\Model\Newsletter\Bulk\Unsubscribe\Consume
     }
 
     /**
-     * Anonymise the emails in Newsman and delete the subscribers
+     * Anonymise (or unsubscribe) the emails in Newsman and delete the subscribers
      *
      * @param array $data
      * @return int
@@ -103,7 +104,8 @@ class Consumer extends \Dazoot\Newsman\Model\Newsletter\Bulk\Unsubscribe\Consume
             $this->anonymiser->anonymise(
                 $email,
                 [(int) $subscriber->getStoreId()],
-                __('%1 | Try to anonymise email %2', $this->name, $email)
+                __('%1 | Try to anonymise email %2', $this->name, $email),
+                __('%1 | Try to unsubscribe email %2', $this->name, $email)
             );
 
             $this->executeSubscriberAction($subscriber);
@@ -122,7 +124,7 @@ class Consumer extends \Dazoot\Newsman\Model\Newsletter\Bulk\Unsubscribe\Consume
     public function executeSubscriberAction($subscriber)
     {
         if ($subscriber->getSubscriberId() > 0) {
-            /* The email was anonymised in Newsman above, no second call on delete. */
+            /* The email was anonymised (or unsubscribed) in Newsman above, no second call on delete. */
             /* @see \Dazoot\Newsman\Observer\Newsletter\DeleteAnonymiseObserver */
             $subscriber->setNewsmanSkipUnsubscribeFlag(true);
             $subscriber->delete();
