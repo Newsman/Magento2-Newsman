@@ -147,6 +147,11 @@ class Config
     public const XML_PATH_NEWSLETTER_NEWSMAN_SENDS_SUB = 'newsman/newsletter/send_subscribe_newsman';
 
     /**
+     * Newsletter anonymise in Newsman when customers and newsletter subscribers are deleted (else unsubscribe)
+     */
+    public const XML_PATH_NEWSLETTER_ANONYMISE_ON_DELETE = 'newsman/newsletter/anonymise_on_delete';
+
+    /**
      * Placeholder for lists config path by user ID
      */
     public const XML_PATH_STORED_LISTS_PLACEHOLDER = 'newsman/stored/lists_%s';
@@ -561,6 +566,28 @@ class Config
             ScopeInterface::SCOPE_STORE,
             $store
         );
+    }
+
+    /**
+     * Is the email of deleted customers and newsletter subscribers anonymised in Newsman (else unsubscribed)
+     *
+     * A missing value is Yes.
+     *
+     * @param null|string|bool|int|Store $store
+     * @return bool
+     */
+    public function isNewsletterAnonymiseOnDelete($store = null)
+    {
+        $value = $this->scopeConfig->getValue(
+            self::XML_PATH_NEWSLETTER_ANONYMISE_ON_DELETE,
+            ScopeInterface::SCOPE_STORE,
+            $store
+        );
+        if ($value === null || $value === '') {
+            return true;
+        }
+
+        return (bool) (int) $value;
     }
 
     /**

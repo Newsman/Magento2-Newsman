@@ -39,6 +39,7 @@
             </export>
             <newsletter>
                 <send_subscribe_newsman>1</send_subscribe_newsman>
+                <anonymise_on_delete>1</anonymise_on_delete>
             </newsletter>
             <developer>
                 <active_user_ip>0</active_user_ip>

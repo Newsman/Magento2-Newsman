@@ -17,6 +17,9 @@ use Magento\Framework\Event\ObserverInterface;
 /**
  * Anonymise the email in the Newsman lists after a customer is deleted in Magento.
  *
+ * When "Anonymise in Newsman when customers are deleted" is No, the email is unsubscribed instead (decided per
+ * Newsman list by the Anonymiser).
+ *
  * Covers every customer delete: admin customer page, admin customer grid mass delete, REST and GraphQL API, customer
  * repository in a CLI or cron process. The customer can be in Newsman without a newsletter subscriber row (customer or
  * order exports, an older subscription), so the email is anonymised in the distinct lists of the store views of the
@@ -61,7 +64,8 @@ class DeleteAnonymiseObserver implements ObserverInterface
             $this->anonymiser->anonymise(
                 $email,
                 $this->anonymiser->getCustomerStoreIds($customer->getWebsiteId()),
-                __('Customer deleted in Magento, anonymise email %1', $email)
+                __('Customer deleted in Magento, anonymise email %1', $email),
+                __('Customer deleted in Magento, unsubscribe email %1', $email)
             );
         } catch (\Throwable $e) {
             return;
